@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Map of Human Knowledge</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #080810; font-family: system-ui, sans-serif; overflow: hidden; }
+#canvas { width: 100vw; height: 100vh; }
+#tooltip {
+  position: fixed; pointer-events: none;
+  background: rgba(10,10,20,0.95); color: #e0e0f0;
+  padding: 8px 12px; border-radius: 6px; font-size: 13px;
+  border: 0.5px solid rgba(255,255,255,0.2);
+  display: none; max-width: 200px; line-height: 1.4;
+}
+#legend {
+  position: fixed; bottom: 20px; left: 20px;
+  display: flex; flex-wrap: wrap; gap: 8px; max-width: 440px;
+}
+.leg-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: #aaa;
+}
+.leg-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+#info {
+  position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+  color: rgba(255,255,255,0.3); font-size: 12px; pointer-events: none;
+}
+#search-box {
+  position: fixed; top: 14px; right: 20px;
+  background: rgba(20,20,35,0.9); border: 0.5px solid rgba(255,255,255,0.2);
+  border-radius: 6px; padding: 6px 10px; color: #e0e0f0; font-size: 12px;
+  width: 180px; outline: none;
+}
+#search-box::placeholder { color: rgba(255,255,255,0.3); }
+</style>
+</head>
+<body>
+<svg id="canvas"></svg>
+<div id="tooltip"></div>
+<div id="legend"></div>
+<div id="info">Scroll to zoom · Drag to pan · Click node to highlight · Search top right</div>
+<input id="search-box" type="text" placeholder="Search knowledge..." />
+
+<script>
+const CONTINENTS = {
+  "Mathematics": "#378ADD",
+  "Philosophy": "#9F8FE8",
+  "Social Sciences": "#EF9F27",
+  "Medicine": "#E2614A",
+  "Humanities": "#2BBFA0",
+  "Arts": "#D4537E",
+  "Applied Sciences": "#7ABF3C",
+  "Natural Sciences": "#5BC8D8",
+  "Skills & Crafts": "#9A9890"
+};
+
+fetch('knowledge_map.json')
+  .then(r => r.json())
+  .then(data => init(data))
+  .catch(() => {
+    document.body.innerHTML = '<div style="color:white;padding:20px">Could not load knowledge_map.json — place it in the same folder as this HTML file.</div>';
+  });
+
+function init(data) {
+  const nodes = data.nodes.map(n => ({...n}));
+  const edges = data.edges.map(e => ({...e}));
+
+  const nodeMap = {};
+  nodes.forEach(n => nodeMap[n.id] = n);
+  const edgeMap = {};
+  edges.forEach(e => {
+    if (!edgeMap[e.target]) edgeMap[e.target] = e.source;
+  });
+
+  function getContinent(id) {
+    let cur = id;
+    let visited = new Set();
+    while (edgeMap[cur] !== undefined && !visited.has(cur)) {
+      visited.add(cur);
+      cur = edgeMap[cur];
+    }
+    return nodeMap[cur] ? nodeMap[cur].label : "Unknown";
+  }
+
+  nodes.forEach(n => {
+    n.continent = getContinent(n.id);
+    n.color = CONTINENTS[n.continent] || "#888";
+  });
+
+  const w = window.innerWidth, h = window.innerHeight;
+  const svg = d3.select("#canvas").attr("width", w).attr("height", h);
+  const g = svg.append("g");
+
+  svg.call(d3.zoom().scaleExtent([0.1, 6]).on("zoom", e => g.attr("transform", e.transform)));
+
+  const nodeRadius = d => d.level === 1 ? 16 : d.level === 2 ? 9 : d.level === 3 ? 5.5 : d.level === 4 ? 4 : 3;
+
+  const sim = d3.forceSimulation(nodes)
+    .force("link", d3.forceLink(edges).id(d => d.id).distance(d => {
+      const tl = typeof d.target === "object" ? d.target.level : (nodeMap[d.target]?.level || 2);
+      return tl <= 2 ? 90 : tl === 3 ? 55 : tl === 4 ? 35 : 22;
+    }).strength(0.7))
+    .force("charge", d3.forceManyBody().strength(d => d.level === 1 ? -500 : d.level === 2 ? -150 : d.level === 3 ? -50 : d.level === 4 ? -20 : -10))
+    .force("center", d3.forceCenter(w / 2, h / 2))
+    .force("collide", d3.forceCollide().radius(d => nodeRadius(d) + 2))
+    .force("x", d3.forceX(w / 2).strength(0.02))
+    .force("y", d3.forceY(h / 2).strength(0.02));
+
+  const link = g.append("g").selectAll("line")
+    .data(edges).join("line")
+    .attr("stroke", d => {
+      const src = typeof d.source === "object" ? d.source : nodeMap[d.source];
+      return src ? (CONTINENTS[src.continent] || "#444") : "#444";
+    })
+    .attr("stroke-opacity", d => {
+      const src = typeof d.source === "object" ? d.source : nodeMap[d.source];
+      return src?.level === 1 ? 0.5 : src?.level === 2 ? 0.35 : src?.level === 3 ? 0.2 : 0.12;
+    })
+    .attr("stroke-width", d => {
+      const src = typeof d.source === "object" ? d.source : nodeMap[d.source];
+      return src?.level === 1 ? 1.5 : src?.level === 2 ? 1 : 0.5;
+    });
+
+  const node = g.append("g").selectAll("circle")
+    .data(nodes).join("circle")
+    .attr("r", nodeRadius)
+    .attr("fill", d => d.color)
+    .attr("fill-opacity", d => d.level === 1 ? 1 : d.level === 2 ? 0.85 : 0.7)
+    .attr("stroke", d => d.level <= 2 ? "rgba(255,255,255,0.25)" : "none")
+    .attr("stroke-width", 0.5)
+    .style("cursor", "pointer")
+    .call(d3.drag()
+      .on("start", (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on("end", (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+
+  const label = g.append("g").selectAll("text")
+    .data(nodes.filter(n => n.level <= 2)).join("text")
+    .text(d => d.label)
+    .attr("font-size", d => d.level === 1 ? 13 : 10)
+    .attr("font-weight", d => d.level === 1 ? 600 : 400)
+    .attr("fill", d => d.level === 1 ? "#fff" : "rgba(255,255,255,0.75)")
+    .attr("text-anchor", "middle")
+    .attr("dy", d => -(nodeRadius(d) + 4))
+    .style("pointer-events", "none")
+    .style("user-select", "none");
+
+  const tt = document.getElementById("tooltip");
+  node.on("mouseover", (e, d) => {
+    tt.style.display = "block";
+    tt.innerHTML = `<strong style="color:${d.color}">${d.label}</strong><br><span style="color:#888;font-size:11px">${d.continent}</span>`;
+  }).on("mousemove", e => {
+    tt.style.left = (e.clientX + 14) + "px";
+    tt.style.top = (e.clientY - 10) + "px";
+  }).on("mouseout", () => { tt.style.display = "none"; });
+
+  let selected = null;
+  function resetHighlight() {
+    selected = null;
+    node.attr("fill-opacity", n => n.level === 1 ? 1 : n.level === 2 ? 0.85 : 0.7);
+    link.attr("stroke-opacity", l => {
+      const src = typeof l.source === "object" ? l.source : nodeMap[l.source];
+      return src?.level === 1 ? 0.5 : src?.level === 2 ? 0.35 : src?.level === 3 ? 0.2 : 0.12;
+    });
+  }
+
+  node.on("click", (e, d) => {
+    e.stopPropagation();
+    if (selected === d.id) { resetHighlight(); return; }
+    selected = d.id;
+    const connected = new Set([d.id]);
+    edges.forEach(l => {
+      const s = typeof l.source === "object" ? l.source.id : l.source;
+      const t = typeof l.target === "object" ? l.target.id : l.target;
+      if (s === d.id) connected.add(t);
+      if (t === d.id) connected.add(s);
+    });
+    node.attr("fill-opacity", n => connected.has(n.id) ? 1 : 0.08);
+    link.attr("stroke-opacity", l => {
+      const s = typeof l.source === "object" ? l.source.id : l.source;
+      const t = typeof l.target === "object" ? l.target.id : l.target;
+      return (s === d.id || t === d.id) ? 0.9 : 0.03;
+    });
+  });
+  svg.on("click", resetHighlight);
+
+  // Search
+  document.getElementById("search-box").addEventListener("input", function() {
+    const q = this.value.trim().toLowerCase();
+    if (!q) { resetHighlight(); return; }
+    const matches = new Set();
+    nodes.forEach(n => { if (n.label.toLowerCase().includes(q)) matches.add(n.id); });
+    node.attr("fill-opacity", n => matches.has(n.id) ? 1 : 0.06);
+    link.attr("stroke-opacity", 0.03);
+  });
+
+  sim.on("tick", () => {
+    link
+      .attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+      .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+    node.attr("cx", d => d.x).attr("cy", d => d.y);
+    label.attr("x", d => d.x).attr("y", d => d.y);
+  });
+
+  const legend = document.getElementById("legend");
+  Object.entries(CONTINENTS).forEach(([name, color]) => {
+    legend.innerHTML += `<div class="leg-item"><div class="leg-dot" style="background:${color}"></div>${name}</div>`;
+  });
+
+  window.addEventListener("resize", () => {
+    const nw = window.innerWidth, nh = window.innerHeight;
+    svg.attr("width", nw).attr("height", nh);
+    sim.force("center", d3.forceCenter(nw/2, nh/2)).alpha(0.1).restart();
+  });
+}
+</script>
+</body>
+</html>
