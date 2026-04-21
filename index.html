@@ -62,10 +62,10 @@ const CONTINENTS = {
 // Level 5: visible from 4.0 upward
 const LABEL_RANGES = {
   1: { min: 0.0, max: 0.9 },
-  2: { min: 0.4, max: 2.2 },
-  3: { min: 1.0, max: 99  },
-  4: { min: 2.0, max: 99  },
-  5: { min: 3.0, max: 99  },
+  2: { min: 0.3, max: 2.2 },
+  3: { min: 0.6, max: 99  },
+  4: { min: 1.2, max: 99  },
+  5: { min: 2.0, max: 99  },
 };
 
 function labelOpacity(level, zoom) {
@@ -130,16 +130,38 @@ function init(data) {
 
   const nodeRadius = d => d.level === 1 ? 16 : d.level === 2 ? 9 : d.level === 3 ? 5.5 : d.level === 4 ? 4 : 3;
 
+  // Pre-seed continent nodes in a circle so they start spread out
+  const continentNames = Object.keys(CONTINENTS);
+  const seedRadius = Math.min(w, h) * 0.32;
+  const continentSeeds = {};
+  continentNames.forEach((name, i) => {
+    const angle = (i / continentNames.length) * 2 * Math.PI;
+    continentSeeds[name] = {
+      x: w / 2 + seedRadius * Math.cos(angle),
+      y: h / 2 + seedRadius * Math.sin(angle)
+    };
+  });
+
+  nodes.forEach(n => {
+    const seed = continentSeeds[n.continent];
+    if (seed) {
+      const scatter = n.level === 1 ? 0 : n.level === 2 ? 60 : n.level === 3 ? 120 : n.level === 4 ? 160 : 190;
+      n.x = seed.x + (Math.random() - 0.5) * scatter;
+      n.y = seed.y + (Math.random() - 0.5) * scatter;
+    }
+  });
+
   const sim = d3.forceSimulation(nodes)
     .force("link", d3.forceLink(edges).id(d => d.id).distance(d => {
       const tl = typeof d.target === "object" ? d.target.level : (nodeMap[d.target]?.level || 2);
       return tl <= 2 ? 90 : tl === 3 ? 55 : tl === 4 ? 35 : 22;
-    }).strength(0.7))
-    .force("charge", d3.forceManyBody().strength(d => d.level === 1 ? -500 : d.level === 2 ? -150 : d.level === 3 ? -50 : d.level === 4 ? -20 : -10))
-    .force("center", d3.forceCenter(w / 2, h / 2))
-    .force("collide", d3.forceCollide().radius(d => nodeRadius(d) + 2))
-    .force("x", d3.forceX(w / 2).strength(0.02))
-    .force("y", d3.forceY(h / 2).strength(0.02));
+    }).strength(0.8))
+    .force("charge", d3.forceManyBody().strength(d => d.level === 1 ? -1200 : d.level === 2 ? -300 : d.level === 3 ? -80 : d.level === 4 ? -25 : -10))
+    .force("center", d3.forceCenter(w / 2, h / 2).strength(0.05))
+    .force("collide", d3.forceCollide().radius(d => nodeRadius(d) + 4).strength(0.8))
+    .force("x", d3.forceX(d => continentSeeds[d.continent] ? continentSeeds[d.continent].x : w/2).strength(d => d.level === 1 ? 0.15 : 0.04))
+    .force("y", d3.forceY(d => continentSeeds[d.continent] ? continentSeeds[d.continent].y : h/2).strength(d => d.level === 1 ? 0.15 : 0.04))
+    .alphaDecay(0.015);
 
   const link = g.append("g").selectAll("line")
     .data(edges).join("line")
