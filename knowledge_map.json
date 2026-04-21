@@ -7609,6 +7609,166 @@
       "id": 1541,
       "label": "Evaluation",
       "level": 3
+    },
+    {
+      "id": 1542,
+      "label": "Geography",
+      "level": 2
+    },
+    {
+      "id": 1543,
+      "label": "Biogeography",
+      "level": 3
+    },
+    {
+      "id": 1544,
+      "label": "Species distribution",
+      "level": 4
+    },
+    {
+      "id": 1545,
+      "label": "Dispersal",
+      "level": 4
+    },
+    {
+      "id": 1546,
+      "label": "Endemism",
+      "level": 4
+    },
+    {
+      "id": 1547,
+      "label": "Island biogeography",
+      "level": 4
+    },
+    {
+      "id": 1548,
+      "label": "Refugia",
+      "level": 4
+    },
+    {
+      "id": 1549,
+      "label": "Hydrology",
+      "level": 3
+    },
+    {
+      "id": 1550,
+      "label": "Surface water",
+      "level": 4
+    },
+    {
+      "id": 1551,
+      "label": "Groundwater",
+      "level": 4
+    },
+    {
+      "id": 1552,
+      "label": "Water cycle",
+      "level": 4
+    },
+    {
+      "id": 1553,
+      "label": "Fluvial hydrology",
+      "level": 4
+    },
+    {
+      "id": 1554,
+      "label": "Limnology",
+      "level": 4
+    },
+    {
+      "id": 1555,
+      "label": "Soil geography",
+      "level": 3
+    },
+    {
+      "id": 1556,
+      "label": "Soil formation",
+      "level": 4
+    },
+    {
+      "id": 1557,
+      "label": "Soil classification",
+      "level": 4
+    },
+    {
+      "id": 1558,
+      "label": "Soil distribution",
+      "level": 4
+    },
+    {
+      "id": 1559,
+      "label": "Soil erosion",
+      "level": 4
+    },
+    {
+      "id": 1560,
+      "label": "Cartography",
+      "level": 3
+    },
+    {
+      "id": 1561,
+      "label": "Geodesy",
+      "level": 4
+    },
+    {
+      "id": 1562,
+      "label": "Map projections",
+      "level": 4
+    },
+    {
+      "id": 1563,
+      "label": "Spatial representation",
+      "level": 4
+    },
+    {
+      "id": 1564,
+      "label": "Thematic mapping",
+      "level": 4
+    },
+    {
+      "id": 1565,
+      "label": "GIS",
+      "level": 4
+    },
+    {
+      "id": 1566,
+      "label": "Photogrammetry",
+      "level": 4
+    },
+    {
+      "id": 1567,
+      "label": "Human Geography",
+      "level": 3
+    },
+    {
+      "id": 1568,
+      "label": "Population geography",
+      "level": 4
+    },
+    {
+      "id": 1569,
+      "label": "Economic geography",
+      "level": 4
+    },
+    {
+      "id": 1570,
+      "label": "Political geography",
+      "level": 4
+    },
+    {
+      "id": 1571,
+      "label": "Cultural geography",
+      "level": 4
+    },
+    {
+      "id": 1572,
+      "label": "Urban geography",
+      "level": 4
+    },
+    {
+      "id": 1573,
+      "label": "Development geography",
+      "level": 4
     }
   ],
   "edges": [
@@ -13683,6 +13843,134 @@
     {
       "source": 514,
       "target": 1471
+    },
+    {
+      "source": 274,
+      "target": 1542
+    },
+    {
+      "source": 1542,
+      "target": 1543
+    },
+    {
+      "source": 1543,
+      "target": 1544
+    },
+    {
+      "source": 1543,
+      "target": 1545
+    },
+    {
+      "source": 1543,
+      "target": 1546
+    },
+    {
+      "source": 1543,
+      "target": 1547
+    },
+    {
+      "source": 1543,
+      "target": 1548
+    },
+    {
+      "source": 1542,
+      "target": 1549
+    },
+    {
+      "source": 1549,
+      "target": 1550
+    },
+    {
+      "source": 1549,
+      "target": 1551
+    },
+    {
+      "source": 1549,
+      "target": 1552
+    },
+    {
+      "source": 1549,
+      "target": 1553
+    },
+    {
+      "source": 1549,
+      "target": 1554
+    },
+    {
+      "source": 1542,
+      "target": 1555
+    },
+    {
+      "source": 1555,
+      "target": 1556
+    },
+    {
+      "source": 1555,
+      "target": 1557
+    },
+    {
+      "source": 1555,
+      "target": 1558
+    },
+    {
+      "source": 1555,
+      "target": 1559
+    },
+    {
+      "source": 1542,
+      "target": 1560
+    },
+    {
+      "source": 1560,
+      "target": 1561
+    },
+    {
+      "source": 1560,
+      "target": 1562
+    },
+    {
+      "source": 1560,
+      "target": 1563
+    },
+    {
+      "source": 1560,
+      "target": 1564
+    },
+    {
+      "source": 1560,
+      "target": 1565
+    },
+    {
+      "source": 1560,
+      "target": 1566
+    },
+    {
+      "source": 1542,
+      "target": 1567
+    },
+    {
+      "source": 1567,
+      "target": 1568
+    },
+    {
+      "source": 1567,
+      "target": 1569
+    },
+    {
+      "source": 1567,
+      "target": 1570
+    },
+    {
+      "source": 1567,
+      "target": 1571
+    },
+    {
+      "source": 1567,
+      "target": 1572
+    },
+    {
+      "source": 1567,
+      "target": 1573
     }
   ]
 }
