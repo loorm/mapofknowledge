@@ -6446,46 +6446,6 @@
       "level": 2
     },
     {
-      "id": 1303,
-      "label": "Sign",
-      "level": 3
-    },
-    {
-      "id": 1304,
-      "label": "Signifier",
-      "level": 3
-    },
-    {
-      "id": 1305,
-      "label": "Signified",
-      "level": 3
-    },
-    {
-      "id": 1306,
-      "label": "Iconicity",
-      "level": 3
-    },
-    {
-      "id": 1307,
-      "label": "Indexicality",
-      "level": 3
-    },
-    {
-      "id": 1308,
-      "label": "Arbitrariness",
-      "level": 3
-    },
-    {
-      "id": 1309,
-      "label": "Sign systems",
-      "level": 3
-    },
-    {
-      "id": 1310,
-      "label": "Semiosis",
-      "level": 3
-    },
-    {
       "id": 1311,
       "label": "Phonetics",
       "level": 3
@@ -7768,6 +7728,136 @@
     {
       "id": 1573,
       "label": "Development geography",
+      "level": 4
+    },
+    {
+      "id": 1574,
+      "label": "Sign theory",
+      "level": 3
+    },
+    {
+      "id": 1575,
+      "label": "Sign",
+      "level": 4
+    },
+    {
+      "id": 1576,
+      "label": "Signifier",
+      "level": 4
+    },
+    {
+      "id": 1577,
+      "label": "Signified",
+      "level": 4
+    },
+    {
+      "id": 1578,
+      "label": "Referent",
+      "level": 4
+    },
+    {
+      "id": 1579,
+      "label": "Arbitrariness",
+      "level": 4
+    },
+    {
+      "id": 1580,
+      "label": "Sign typology",
+      "level": 3
+    },
+    {
+      "id": 1581,
+      "label": "Icon",
+      "level": 4
+    },
+    {
+      "id": 1582,
+      "label": "Index",
+      "level": 4
+    },
+    {
+      "id": 1583,
+      "label": "Symbol",
+      "level": 4
+    },
+    {
+      "id": 1584,
+      "label": "Signal",
+      "level": 4
+    },
+    {
+      "id": 1585,
+      "label": "Symptom",
+      "level": 4
+    },
+    {
+      "id": 1586,
+      "label": "Sign relations",
+      "level": 3
+    },
+    {
+      "id": 1587,
+      "label": "Denotation",
+      "level": 4
+    },
+    {
+      "id": 1588,
+      "label": "Connotation",
+      "level": 4
+    },
+    {
+      "id": 1589,
+      "label": "Metonymy",
+      "level": 4
+    },
+    {
+      "id": 1590,
+      "label": "Intertextuality",
+      "level": 4
+    },
+    {
+      "id": 1591,
+      "label": "Semiosis",
+      "level": 3
+    },
+    {
+      "id": 1592,
+      "label": "Decoding",
+      "level": 4
+    },
+    {
+      "id": 1593,
+      "label": "Interpretant",
+      "level": 4
+    },
+    {
+      "id": 1594,
+      "label": "Sign systems",
+      "level": 3
+    },
+    {
+      "id": 1595,
+      "label": "Code",
+      "level": 4
+    },
+    {
+      "id": 1596,
+      "label": "Discourse",
+      "level": 4
+    },
+    {
+      "id": 1597,
+      "label": "Narrative",
+      "level": 4
+    },
+    {
+      "id": 1598,
+      "label": "Genre",
+      "level": 4
+    },
+    {
+      "id": 1599,
+      "label": "Medium",
       "level": 4
     }
   ],
@@ -12885,38 +12975,6 @@
       "target": 1302
     },
     {
-      "source": 1302,
-      "target": 1303
-    },
-    {
-      "source": 1302,
-      "target": 1304
-    },
-    {
-      "source": 1302,
-      "target": 1305
-    },
-    {
-      "source": 1302,
-      "target": 1306
-    },
-    {
-      "source": 1302,
-      "target": 1307
-    },
-    {
-      "source": 1302,
-      "target": 1308
-    },
-    {
-      "source": 1302,
-      "target": 1309
-    },
-    {
-      "source": 1302,
-      "target": 1310
-    },
-    {
       "source": 251,
       "target": 1311
     },
@@ -13971,6 +14029,110 @@
     {
       "source": 1567,
       "target": 1573
+    },
+    {
+      "source": 1302,
+      "target": 1574
+    },
+    {
+      "source": 1574,
+      "target": 1575
+    },
+    {
+      "source": 1574,
+      "target": 1576
+    },
+    {
+      "source": 1574,
+      "target": 1577
+    },
+    {
+      "source": 1574,
+      "target": 1578
+    },
+    {
+      "source": 1574,
+      "target": 1579
+    },
+    {
+      "source": 1302,
+      "target": 1580
+    },
+    {
+      "source": 1580,
+      "target": 1581
+    },
+    {
+      "source": 1580,
+      "target": 1582
+    },
+    {
+      "source": 1580,
+      "target": 1583
+    },
+    {
+      "source": 1580,
+      "target": 1584
+    },
+    {
+      "source": 1580,
+      "target": 1585
+    },
+    {
+      "source": 1302,
+      "target": 1586
+    },
+    {
+      "source": 1586,
+      "target": 1587
+    },
+    {
+      "source": 1586,
+      "target": 1588
+    },
+    {
+      "source": 1586,
+      "target": 1589
+    },
+    {
+      "source": 1586,
+      "target": 1590
+    },
+    {
+      "source": 1302,
+      "target": 1591
+    },
+    {
+      "source": 1591,
+      "target": 1592
+    },
+    {
+      "source": 1591,
+      "target": 1593
+    },
+    {
+      "source": 1302,
+      "target": 1594
+    },
+    {
+      "source": 1594,
+      "target": 1595
+    },
+    {
+      "source": 1594,
+      "target": 1596
+    },
+    {
+      "source": 1594,
+      "target": 1597
+    },
+    {
+      "source": 1594,
+      "target": 1598
+    },
+    {
+      "source": 1594,
+      "target": 1599
     }
   ]
 }
