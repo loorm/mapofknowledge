@@ -7464,6 +7464,151 @@
       "id": 1505,
       "label": "Contemporary history",
       "level": 4
+    },
+    {
+      "id": 1506,
+      "label": "Archaeological theory",
+      "level": 3
+    },
+    {
+      "id": 1507,
+      "label": "Culture history",
+      "level": 4
+    },
+    {
+      "id": 1508,
+      "label": "Processual archaeology",
+      "level": 4
+    },
+    {
+      "id": 1509,
+      "label": "Post-processual archaeology",
+      "level": 4
+    },
+    {
+      "id": 1510,
+      "label": "Evolutionary archaeology",
+      "level": 4
+    },
+    {
+      "id": 1511,
+      "label": "Phenomenological archaeology",
+      "level": 4
+    },
+    {
+      "id": 1512,
+      "label": "Taphonomy",
+      "level": 4
+    },
+    {
+      "id": 1513,
+      "label": "Archaeological method",
+      "level": 3
+    },
+    {
+      "id": 1514,
+      "label": "Survey",
+      "level": 4
+    },
+    {
+      "id": 1515,
+      "label": "Excavation",
+      "level": 4
+    },
+    {
+      "id": 1516,
+      "label": "Sampling",
+      "level": 4
+    },
+    {
+      "id": 1517,
+      "label": "Recording",
+      "level": 4
+    },
+    {
+      "id": 1518,
+      "label": "Dating methods",
+      "level": 3
+    },
+    {
+      "id": 1519,
+      "label": "Relative dating",
+      "level": 4
+    },
+    {
+      "id": 1520,
+      "label": "Radiocarbon dating",
+      "level": 4
+    },
+    {
+      "id": 1521,
+      "label": "Dendrochronology",
+      "level": 4
+    },
+    {
+      "id": 1522,
+      "label": "Thermoluminescence",
+      "level": 4
+    },
+    {
+      "id": 1523,
+      "label": "Potassium-argon dating",
+      "level": 4
+    },
+    {
+      "id": 1530,
+      "label": "Material culture",
+      "level": 3
+    },
+    {
+      "id": 1531,
+      "label": "Lithics",
+      "level": 4
+    },
+    {
+      "id": 1532,
+      "label": "Ceramics",
+      "level": 4
+    },
+    {
+      "id": 1533,
+      "label": "Archaeometallurgy",
+      "level": 4
+    },
+    {
+      "id": 1534,
+      "label": "Organic remains",
+      "level": 4
+    },
+    {
+      "id": 1535,
+      "label": "Landscape archaeology",
+      "level": 3
+    },
+    {
+      "id": 1536,
+      "label": "Settlement patterns",
+      "level": 4
+    },
+    {
+      "id": 1537,
+      "label": "Land use",
+      "level": 4
+    },
+    {
+      "id": 1538,
+      "label": "Remote sensing",
+      "level": 4
+    },
+    {
+      "id": 1539,
+      "label": "GIS in archaeology",
+      "level": 4
+    },
+    {
+      "id": 1540,
+      "label": "Seascape archaeology",
+      "level": 4
     }
   ],
   "edges": [
@@ -13422,6 +13567,122 @@
     {
       "source": 1499,
       "target": 1505
+    },
+    {
+      "source": 250,
+      "target": 1506
+    },
+    {
+      "source": 1506,
+      "target": 1507
+    },
+    {
+      "source": 1506,
+      "target": 1508
+    },
+    {
+      "source": 1506,
+      "target": 1509
+    },
+    {
+      "source": 1506,
+      "target": 1510
+    },
+    {
+      "source": 1506,
+      "target": 1511
+    },
+    {
+      "source": 1506,
+      "target": 1512
+    },
+    {
+      "source": 250,
+      "target": 1513
+    },
+    {
+      "source": 1513,
+      "target": 1514
+    },
+    {
+      "source": 1513,
+      "target": 1515
+    },
+    {
+      "source": 1513,
+      "target": 1516
+    },
+    {
+      "source": 1513,
+      "target": 1517
+    },
+    {
+      "source": 250,
+      "target": 1518
+    },
+    {
+      "source": 1518,
+      "target": 1519
+    },
+    {
+      "source": 1518,
+      "target": 1520
+    },
+    {
+      "source": 1518,
+      "target": 1521
+    },
+    {
+      "source": 1518,
+      "target": 1522
+    },
+    {
+      "source": 1518,
+      "target": 1523
+    },
+    {
+      "source": 250,
+      "target": 1530
+    },
+    {
+      "source": 1530,
+      "target": 1531
+    },
+    {
+      "source": 1530,
+      "target": 1532
+    },
+    {
+      "source": 1530,
+      "target": 1533
+    },
+    {
+      "source": 1530,
+      "target": 1534
+    },
+    {
+      "source": 250,
+      "target": 1535
+    },
+    {
+      "source": 1535,
+      "target": 1536
+    },
+    {
+      "source": 1535,
+      "target": 1537
+    },
+    {
+      "source": 1535,
+      "target": 1538
+    },
+    {
+      "source": 1535,
+      "target": 1539
+    },
+    {
+      "source": 1535,
+      "target": 1540
     }
   ]
 }
