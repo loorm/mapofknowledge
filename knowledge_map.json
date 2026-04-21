@@ -1201,56 +1201,6 @@
       "level": 1
     },
     {
-      "id": 254,
-      "label": "Music",
-      "level": 2
-    },
-    {
-      "id": 255,
-      "label": "Visual arts",
-      "level": 2
-    },
-    {
-      "id": 256,
-      "label": "Architecture",
-      "level": 2
-    },
-    {
-      "id": 257,
-      "label": "Literature",
-      "level": 2
-    },
-    {
-      "id": 258,
-      "label": "Theater",
-      "level": 2
-    },
-    {
-      "id": 259,
-      "label": "Dance",
-      "level": 2
-    },
-    {
-      "id": 260,
-      "label": "Motion Pictures",
-      "level": 2
-    },
-    {
-      "id": 261,
-      "label": "Design",
-      "level": 2
-    },
-    {
-      "id": 262,
-      "label": "Sculpture",
-      "level": 2
-    },
-    {
-      "id": 263,
-      "label": "Photography",
-      "level": 2
-    },
-    {
       "id": 264,
       "label": "Applied Sciences",
       "level": 1
@@ -9189,6 +9139,286 @@
       "id": 1871,
       "label": "Reprocessing",
       "level": 4
+    },
+    {
+      "id": 1872,
+      "label": "Music",
+      "level": 2
+    },
+    {
+      "id": 1873,
+      "label": "Music theory",
+      "level": 3
+    },
+    {
+      "id": 1874,
+      "label": "Music history",
+      "level": 3
+    },
+    {
+      "id": 1875,
+      "label": "Performance practice",
+      "level": 3
+    },
+    {
+      "id": 1876,
+      "label": "Conducting",
+      "level": 3
+    },
+    {
+      "id": 1877,
+      "label": "Musicology",
+      "level": 3
+    },
+    {
+      "id": 1878,
+      "label": "Ethnomusicology",
+      "level": 3
+    },
+    {
+      "id": 1879,
+      "label": "Visual arts",
+      "level": 2
+    },
+    {
+      "id": 1880,
+      "label": "Art theory",
+      "level": 3
+    },
+    {
+      "id": 1881,
+      "label": "Art history",
+      "level": 3
+    },
+    {
+      "id": 1882,
+      "label": "Iconography",
+      "level": 3
+    },
+    {
+      "id": 1883,
+      "label": "Colour theory",
+      "level": 3
+    },
+    {
+      "id": 1884,
+      "label": "Drawing",
+      "level": 3
+    },
+    {
+      "id": 1885,
+      "label": "Painting",
+      "level": 3
+    },
+    {
+      "id": 1886,
+      "label": "Printmaking",
+      "level": 3
+    },
+    {
+      "id": 1887,
+      "label": "Architecture",
+      "level": 2
+    },
+    {
+      "id": 1888,
+      "label": "Architectural theory",
+      "level": 3
+    },
+    {
+      "id": 1889,
+      "label": "Architectural history",
+      "level": 3
+    },
+    {
+      "id": 1890,
+      "label": "Spatial morphology",
+      "level": 3
+    },
+    {
+      "id": 1891,
+      "label": "Environmental design",
+      "level": 3
+    },
+    {
+      "id": 1892,
+      "label": "Urban design",
+      "level": 3
+    },
+    {
+      "id": 1893,
+      "label": "Literature",
+      "level": 2
+    },
+    {
+      "id": 1894,
+      "label": "Literary theory",
+      "level": 3
+    },
+    {
+      "id": 1895,
+      "label": "Poetics",
+      "level": 3
+    },
+    {
+      "id": 1896,
+      "label": "Rhetoric",
+      "level": 3
+    },
+    {
+      "id": 1897,
+      "label": "Comparative literature",
+      "level": 3
+    },
+    {
+      "id": 1898,
+      "label": "Narrative theory",
+      "level": 3
+    },
+    {
+      "id": 1899,
+      "label": "Theater",
+      "level": 2
+    },
+    {
+      "id": 1900,
+      "label": "Dramaturgy",
+      "level": 3
+    },
+    {
+      "id": 1901,
+      "label": "Theater history",
+      "level": 3
+    },
+    {
+      "id": 1902,
+      "label": "Stage design theory",
+      "level": 3
+    },
+    {
+      "id": 1903,
+      "label": "Performance studies",
+      "level": 3
+    },
+    {
+      "id": 1904,
+      "label": "Dance",
+      "level": 2
+    },
+    {
+      "id": 1905,
+      "label": "Choreology",
+      "level": 3
+    },
+    {
+      "id": 1906,
+      "label": "Dance notation",
+      "level": 3
+    },
+    {
+      "id": 1907,
+      "label": "Dance history",
+      "level": 3
+    },
+    {
+      "id": 1908,
+      "label": "Dance theory",
+      "level": 3
+    },
+    {
+      "id": 1909,
+      "label": "Motion Pictures",
+      "level": 2
+    },
+    {
+      "id": 1910,
+      "label": "Film theory",
+      "level": 3
+    },
+    {
+      "id": 1911,
+      "label": "Screenwriting theory",
+      "level": 3
+    },
+    {
+      "id": 1912,
+      "label": "Cinematography theory",
+      "level": 3
+    },
+    {
+      "id": 1913,
+      "label": "Editing theory",
+      "level": 3
+    },
+    {
+      "id": 1914,
+      "label": "Design",
+      "level": 2
+    },
+    {
+      "id": 1915,
+      "label": "Design theory",
+      "level": 3
+    },
+    {
+      "id": 1916,
+      "label": "Design history",
+      "level": 3
+    },
+    {
+      "id": 1917,
+      "label": "Design semantics",
+      "level": 3
+    },
+    {
+      "id": 1918,
+      "label": "Typography",
+      "level": 3
+    },
+    {
+      "id": 1919,
+      "label": "Sculpture",
+      "level": 2
+    },
+    {
+      "id": 1920,
+      "label": "Sculpture theory",
+      "level": 3
+    },
+    {
+      "id": 1921,
+      "label": "Materiality",
+      "level": 3
+    },
+    {
+      "id": 1922,
+      "label": "Sculpture history",
+      "level": 3
+    },
+    {
+      "id": 1923,
+      "label": "Spatial composition",
+      "level": 3
+    },
+    {
+      "id": 1924,
+      "label": "Photography",
+      "level": 2
+    },
+    {
+      "id": 1925,
+      "label": "Photo theory",
+      "level": 3
+    },
+    {
+      "id": 1926,
+      "label": "Photography history",
+      "level": 3
+    },
+    {
+      "id": 1927,
+      "label": "Visual composition",
+      "level": 3
     }
   ],
   "edges": [
@@ -10139,46 +10369,6 @@
     {
       "source": 247,
       "target": 251
-    },
-    {
-      "source": 253,
-      "target": 254
-    },
-    {
-      "source": 253,
-      "target": 255
-    },
-    {
-      "source": 253,
-      "target": 256
-    },
-    {
-      "source": 253,
-      "target": 257
-    },
-    {
-      "source": 253,
-      "target": 258
-    },
-    {
-      "source": 253,
-      "target": 259
-    },
-    {
-      "source": 253,
-      "target": 260
-    },
-    {
-      "source": 253,
-      "target": 261
-    },
-    {
-      "source": 253,
-      "target": 262
-    },
-    {
-      "source": 253,
-      "target": 263
     },
     {
       "source": 264,
@@ -16527,6 +16717,230 @@
     {
       "source": 1867,
       "target": 1871
+    },
+    {
+      "source": 253,
+      "target": 1872
+    },
+    {
+      "source": 1872,
+      "target": 1873
+    },
+    {
+      "source": 1872,
+      "target": 1874
+    },
+    {
+      "source": 1872,
+      "target": 1875
+    },
+    {
+      "source": 1872,
+      "target": 1876
+    },
+    {
+      "source": 1872,
+      "target": 1877
+    },
+    {
+      "source": 1872,
+      "target": 1878
+    },
+    {
+      "source": 253,
+      "target": 1879
+    },
+    {
+      "source": 1879,
+      "target": 1880
+    },
+    {
+      "source": 1879,
+      "target": 1881
+    },
+    {
+      "source": 1879,
+      "target": 1882
+    },
+    {
+      "source": 1879,
+      "target": 1883
+    },
+    {
+      "source": 1879,
+      "target": 1884
+    },
+    {
+      "source": 1879,
+      "target": 1885
+    },
+    {
+      "source": 1879,
+      "target": 1886
+    },
+    {
+      "source": 253,
+      "target": 1887
+    },
+    {
+      "source": 1887,
+      "target": 1888
+    },
+    {
+      "source": 1887,
+      "target": 1889
+    },
+    {
+      "source": 1887,
+      "target": 1890
+    },
+    {
+      "source": 1887,
+      "target": 1891
+    },
+    {
+      "source": 1887,
+      "target": 1892
+    },
+    {
+      "source": 253,
+      "target": 1893
+    },
+    {
+      "source": 1893,
+      "target": 1894
+    },
+    {
+      "source": 1893,
+      "target": 1895
+    },
+    {
+      "source": 1893,
+      "target": 1896
+    },
+    {
+      "source": 1893,
+      "target": 1897
+    },
+    {
+      "source": 1893,
+      "target": 1898
+    },
+    {
+      "source": 253,
+      "target": 1899
+    },
+    {
+      "source": 1899,
+      "target": 1900
+    },
+    {
+      "source": 1899,
+      "target": 1901
+    },
+    {
+      "source": 1899,
+      "target": 1902
+    },
+    {
+      "source": 1899,
+      "target": 1903
+    },
+    {
+      "source": 253,
+      "target": 1904
+    },
+    {
+      "source": 1904,
+      "target": 1905
+    },
+    {
+      "source": 1904,
+      "target": 1906
+    },
+    {
+      "source": 1904,
+      "target": 1907
+    },
+    {
+      "source": 1904,
+      "target": 1908
+    },
+    {
+      "source": 253,
+      "target": 1909
+    },
+    {
+      "source": 1909,
+      "target": 1910
+    },
+    {
+      "source": 1909,
+      "target": 1911
+    },
+    {
+      "source": 1909,
+      "target": 1912
+    },
+    {
+      "source": 1909,
+      "target": 1913
+    },
+    {
+      "source": 253,
+      "target": 1914
+    },
+    {
+      "source": 1914,
+      "target": 1915
+    },
+    {
+      "source": 1914,
+      "target": 1916
+    },
+    {
+      "source": 1914,
+      "target": 1917
+    },
+    {
+      "source": 1914,
+      "target": 1918
+    },
+    {
+      "source": 253,
+      "target": 1919
+    },
+    {
+      "source": 1919,
+      "target": 1920
+    },
+    {
+      "source": 1919,
+      "target": 1921
+    },
+    {
+      "source": 1919,
+      "target": 1922
+    },
+    {
+      "source": 1919,
+      "target": 1923
+    },
+    {
+      "source": 253,
+      "target": 1924
+    },
+    {
+      "source": 1924,
+      "target": 1925
+    },
+    {
+      "source": 1924,
+      "target": 1926
+    },
+    {
+      "source": 1924,
+      "target": 1927
     }
   ]
 }
