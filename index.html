@@ -64,8 +64,8 @@ const LABEL_RANGES = {
   1: { min: 0.0, max: 0.9 },
   2: { min: 0.4, max: 2.2 },
   3: { min: 1.0, max: 4.5 },
-  4: { min: 2.2, max: 9.0 },
-  5: { min: 4.0, max: 99  },
+  4: { min: 2.0, max: 99  },
+  5: { min: 3.0, max: 99  },
 };
 
 function labelOpacity(level, zoom) {
@@ -117,7 +117,7 @@ function init(data) {
   let currentZoom = 1;
 
   const zoomBehaviour = d3.zoom()
-    .scaleExtent([0.1, 8])
+    .scaleExtent([0.1, 15])
     .on("zoom", e => {
       g.attr("transform", e.transform);
       currentZoom = e.transform.k;
