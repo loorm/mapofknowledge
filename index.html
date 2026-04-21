@@ -209,7 +209,8 @@ function init(data) {
       .attr("opacity", d => labelOpacity(d.level, currentZoom))
       .attr("font-size", d => {
         const base = d.level === 1 ? 13 : d.level === 2 ? 11 : d.level === 3 ? 10 : d.level === 4 ? 9 : 8;
-        return base / currentZoom;
+        const minSize = d.level === 1 ? 11 : d.level === 2 ? 9 : 7;
+        return Math.max(minSize, base / currentZoom);
       })
       .attr("dy", d => -(nodeRadius(d) + 3) / currentZoom);
   }
