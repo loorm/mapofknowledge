@@ -113,6 +113,7 @@ function init(data) {
       g.attr("transform", e.transform);
       currentTransform = e.transform;
       updateLabels();
+      repositionLabels();
       document.getElementById("zoom-level").textContent = `zoom: ${e.transform.k.toFixed(2)}`;
     });
   svg.call(zoomBehaviour);
@@ -228,16 +229,18 @@ function init(data) {
     link.attr("stroke-opacity", 0.03);
   });
 
+  function repositionLabels() {
+    label
+      .attr("x", d => currentTransform.applyX(d.x))
+      .attr("y", d => currentTransform.applyY(d.y) - (NODE_OFFSET[d.level] || 10));
+  }
+
   sim.on("tick", () => {
     link
       .attr("x1", d => d.source.x).attr("y1", d => d.source.y)
       .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
     node.attr("cx", d => d.x).attr("cy", d => d.y);
-
-    // Convert world coords to screen coords for labels
-    label
-      .attr("x", d => currentTransform.applyX(d.x))
-      .attr("y", d => currentTransform.applyY(d.y) - (NODE_OFFSET[d.level] || 10));
+    repositionLabels();
   });
 
   // Set initial label opacity
