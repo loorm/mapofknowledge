@@ -1186,11 +1186,6 @@
       "level": 2
     },
     {
-      "id": 249,
-      "label": "History of Science",
-      "level": 3
-    },
-    {
       "id": 250,
       "label": "Archeology",
       "level": 2
@@ -2512,7 +2507,7 @@
     },
     {
       "id": 514,
-      "label": "Religion",
+      "label": "Theology",
       "level": 2
     },
     {
@@ -7009,6 +7004,466 @@
       "id": 1413,
       "label": "Language isolates",
       "level": 3
+    },
+    {
+      "id": 1414,
+      "label": "World Religions",
+      "level": 2
+    },
+    {
+      "id": 1415,
+      "label": "Abrahamic religions",
+      "level": 3
+    },
+    {
+      "id": 1416,
+      "label": "Christianity",
+      "level": 4
+    },
+    {
+      "id": 1417,
+      "label": "Islam",
+      "level": 4
+    },
+    {
+      "id": 1418,
+      "label": "Judaism",
+      "level": 4
+    },
+    {
+      "id": 1419,
+      "label": "Bah\u00e1'\u00ed",
+      "level": 4
+    },
+    {
+      "id": 1420,
+      "label": "Dharmic religions",
+      "level": 3
+    },
+    {
+      "id": 1421,
+      "label": "Hinduism",
+      "level": 4
+    },
+    {
+      "id": 1422,
+      "label": "Buddhism",
+      "level": 4
+    },
+    {
+      "id": 1423,
+      "label": "Jainism",
+      "level": 4
+    },
+    {
+      "id": 1424,
+      "label": "Sikhism",
+      "level": 4
+    },
+    {
+      "id": 1425,
+      "label": "East Asian religions",
+      "level": 3
+    },
+    {
+      "id": 1426,
+      "label": "Taoism",
+      "level": 4
+    },
+    {
+      "id": 1427,
+      "label": "Confucianism",
+      "level": 4
+    },
+    {
+      "id": 1428,
+      "label": "Shinto",
+      "level": 4
+    },
+    {
+      "id": 1429,
+      "label": "Chinese folk religion",
+      "level": 4
+    },
+    {
+      "id": 1430,
+      "label": "Iranian religions",
+      "level": 3
+    },
+    {
+      "id": 1431,
+      "label": "Zoroastrianism",
+      "level": 4
+    },
+    {
+      "id": 1432,
+      "label": "Manichaeism",
+      "level": 4
+    },
+    {
+      "id": 1433,
+      "label": "Yazidism",
+      "level": 4
+    },
+    {
+      "id": 1434,
+      "label": "African traditional religions",
+      "level": 3
+    },
+    {
+      "id": 1435,
+      "label": "Indigenous religions",
+      "level": 3
+    },
+    {
+      "id": 1436,
+      "label": "Native American religions",
+      "level": 4
+    },
+    {
+      "id": 1437,
+      "label": "Australian Aboriginal religions",
+      "level": 4
+    },
+    {
+      "id": 1438,
+      "label": "Mesoamerican religions",
+      "level": 4
+    },
+    {
+      "id": 1439,
+      "label": "Pagan & polytheistic traditions",
+      "level": 3
+    },
+    {
+      "id": 1440,
+      "label": "Ancient Greek religion",
+      "level": 4
+    },
+    {
+      "id": 1441,
+      "label": "Ancient Roman religion",
+      "level": 4
+    },
+    {
+      "id": 1442,
+      "label": "Norse religion",
+      "level": 4
+    },
+    {
+      "id": 1443,
+      "label": "Celtic religion",
+      "level": 4
+    },
+    {
+      "id": 1444,
+      "label": "New religious movements",
+      "level": 3
+    },
+    {
+      "id": 1445,
+      "label": "Spiritism",
+      "level": 4
+    },
+    {
+      "id": 1446,
+      "label": "Wicca",
+      "level": 4
+    },
+    {
+      "id": 1447,
+      "label": "Rastafarianism",
+      "level": 4
+    },
+    {
+      "id": 1448,
+      "label": "Systematic theology",
+      "level": 3
+    },
+    {
+      "id": 1449,
+      "label": "Doctrine of God",
+      "level": 4
+    },
+    {
+      "id": 1450,
+      "label": "Christology",
+      "level": 4
+    },
+    {
+      "id": 1451,
+      "label": "Pneumatology",
+      "level": 4
+    },
+    {
+      "id": 1452,
+      "label": "Anthropology",
+      "level": 4
+    },
+    {
+      "id": 1453,
+      "label": "Soteriology",
+      "level": 4
+    },
+    {
+      "id": 1454,
+      "label": "Ecclesiology",
+      "level": 4
+    },
+    {
+      "id": 1455,
+      "label": "Eschatology",
+      "level": 4
+    },
+    {
+      "id": 1456,
+      "label": "Historical theology",
+      "level": 3
+    },
+    {
+      "id": 1457,
+      "label": "Patristics",
+      "level": 4
+    },
+    {
+      "id": 1458,
+      "label": "Medieval theology",
+      "level": 4
+    },
+    {
+      "id": 1459,
+      "label": "Reformation theology",
+      "level": 4
+    },
+    {
+      "id": 1460,
+      "label": "Modern theology",
+      "level": 4
+    },
+    {
+      "id": 1461,
+      "label": "Comparative theology",
+      "level": 3
+    },
+    {
+      "id": 1462,
+      "label": "Interfaith dialogue",
+      "level": 4
+    },
+    {
+      "id": 1463,
+      "label": "Religious pluralism",
+      "level": 4
+    },
+    {
+      "id": 1464,
+      "label": "Typology of religions",
+      "level": 4
+    },
+    {
+      "id": 1465,
+      "label": "Cross-traditional reading",
+      "level": 4
+    },
+    {
+      "id": 1466,
+      "label": "Moral theology",
+      "level": 3
+    },
+    {
+      "id": 1467,
+      "label": "Natural law",
+      "level": 4
+    },
+    {
+      "id": 1468,
+      "label": "Virtue in theological context",
+      "level": 4
+    },
+    {
+      "id": 1469,
+      "label": "Conscience",
+      "level": 4
+    },
+    {
+      "id": 1470,
+      "label": "Casuistry",
+      "level": 4
+    },
+    {
+      "id": 1471,
+      "label": "Mystical theology",
+      "level": 3
+    },
+    {
+      "id": 1472,
+      "label": "Contemplative tradition",
+      "level": 4
+    },
+    {
+      "id": 1473,
+      "label": "Union with the divine",
+      "level": 4
+    },
+    {
+      "id": 1474,
+      "label": "Apophatic tradition",
+      "level": 4
+    },
+    {
+      "id": 1475,
+      "label": "Mystical experience",
+      "level": 4
+    },
+    {
+      "id": 1476,
+      "label": "Historiography",
+      "level": 3
+    },
+    {
+      "id": 1477,
+      "label": "Historical method",
+      "level": 4
+    },
+    {
+      "id": 1478,
+      "label": "Heuristics",
+      "level": 4
+    },
+    {
+      "id": 1479,
+      "label": "Hermeneutics",
+      "level": 4
+    },
+    {
+      "id": 1480,
+      "label": "Source criticism",
+      "level": 4
+    },
+    {
+      "id": 1481,
+      "label": "Periodisation theory",
+      "level": 4
+    },
+    {
+      "id": 1482,
+      "label": "Historical interpretation",
+      "level": 4
+    },
+    {
+      "id": 1483,
+      "label": "Historical dynamics",
+      "level": 3
+    },
+    {
+      "id": 1484,
+      "label": "Causality theory",
+      "level": 4
+    },
+    {
+      "id": 1485,
+      "label": "Continuity and rupture",
+      "level": 4
+    },
+    {
+      "id": 1486,
+      "label": "Diffusionism",
+      "level": 4
+    },
+    {
+      "id": 1487,
+      "label": "Cliometrics",
+      "level": 4
+    },
+    {
+      "id": 1488,
+      "label": "Philosophy of history",
+      "level": 3
+    },
+    {
+      "id": 1489,
+      "label": "Linear vs cyclical time",
+      "level": 4
+    },
+    {
+      "id": 1490,
+      "label": "Teleology",
+      "level": 4
+    },
+    {
+      "id": 1491,
+      "label": "Historical meta-narrative",
+      "level": 4
+    },
+    {
+      "id": 1492,
+      "label": "Historical determinism",
+      "level": 4
+    },
+    {
+      "id": 1493,
+      "label": "Archival science",
+      "level": 3
+    },
+    {
+      "id": 1494,
+      "label": "Paleography",
+      "level": 4
+    },
+    {
+      "id": 1495,
+      "label": "Epigraphy",
+      "level": 4
+    },
+    {
+      "id": 1496,
+      "label": "Diplomatics",
+      "level": 4
+    },
+    {
+      "id": 1497,
+      "label": "Oral tradition theory",
+      "level": 4
+    },
+    {
+      "id": 1498,
+      "label": "Chronometry",
+      "level": 4
+    },
+    {
+      "id": 1499,
+      "label": "World historical periods",
+      "level": 3
+    },
+    {
+      "id": 1500,
+      "label": "Prehistory",
+      "level": 4
+    },
+    {
+      "id": 1501,
+      "label": "Ancient history",
+      "level": 4
+    },
+    {
+      "id": 1502,
+      "label": "Medieval history",
+      "level": 4
+    },
+    {
+      "id": 1503,
+      "label": "Early modern history",
+      "level": 4
+    },
+    {
+      "id": 1504,
+      "label": "Modern history",
+      "level": 4
+    },
+    {
+      "id": 1505,
+      "label": "Contemporary history",
+      "level": 4
     }
   ],
   "edges": [
@@ -7951,10 +8406,6 @@
     {
       "source": 247,
       "target": 248
-    },
-    {
-      "source": 248,
-      "target": 249
     },
     {
       "source": 247,
@@ -12603,6 +13054,374 @@
     {
       "source": 1371,
       "target": 1413
+    },
+    {
+      "source": 247,
+      "target": 1414
+    },
+    {
+      "source": 1414,
+      "target": 1415
+    },
+    {
+      "source": 1415,
+      "target": 1416
+    },
+    {
+      "source": 1415,
+      "target": 1417
+    },
+    {
+      "source": 1415,
+      "target": 1418
+    },
+    {
+      "source": 1415,
+      "target": 1419
+    },
+    {
+      "source": 1414,
+      "target": 1420
+    },
+    {
+      "source": 1420,
+      "target": 1421
+    },
+    {
+      "source": 1420,
+      "target": 1422
+    },
+    {
+      "source": 1420,
+      "target": 1423
+    },
+    {
+      "source": 1420,
+      "target": 1424
+    },
+    {
+      "source": 1414,
+      "target": 1425
+    },
+    {
+      "source": 1425,
+      "target": 1426
+    },
+    {
+      "source": 1425,
+      "target": 1427
+    },
+    {
+      "source": 1425,
+      "target": 1428
+    },
+    {
+      "source": 1425,
+      "target": 1429
+    },
+    {
+      "source": 1414,
+      "target": 1430
+    },
+    {
+      "source": 1430,
+      "target": 1431
+    },
+    {
+      "source": 1430,
+      "target": 1432
+    },
+    {
+      "source": 1430,
+      "target": 1433
+    },
+    {
+      "source": 1414,
+      "target": 1434
+    },
+    {
+      "source": 1414,
+      "target": 1435
+    },
+    {
+      "source": 1435,
+      "target": 1436
+    },
+    {
+      "source": 1435,
+      "target": 1437
+    },
+    {
+      "source": 1435,
+      "target": 1438
+    },
+    {
+      "source": 1414,
+      "target": 1439
+    },
+    {
+      "source": 1439,
+      "target": 1440
+    },
+    {
+      "source": 1439,
+      "target": 1441
+    },
+    {
+      "source": 1439,
+      "target": 1442
+    },
+    {
+      "source": 1439,
+      "target": 1443
+    },
+    {
+      "source": 1414,
+      "target": 1444
+    },
+    {
+      "source": 1444,
+      "target": 1445
+    },
+    {
+      "source": 1444,
+      "target": 1446
+    },
+    {
+      "source": 1444,
+      "target": 1447
+    },
+    {
+      "source": 252,
+      "target": 1448
+    },
+    {
+      "source": 1448,
+      "target": 1449
+    },
+    {
+      "source": 1448,
+      "target": 1450
+    },
+    {
+      "source": 1448,
+      "target": 1451
+    },
+    {
+      "source": 1448,
+      "target": 1452
+    },
+    {
+      "source": 1448,
+      "target": 1453
+    },
+    {
+      "source": 1448,
+      "target": 1454
+    },
+    {
+      "source": 1448,
+      "target": 1455
+    },
+    {
+      "source": 252,
+      "target": 1456
+    },
+    {
+      "source": 1456,
+      "target": 1457
+    },
+    {
+      "source": 1456,
+      "target": 1458
+    },
+    {
+      "source": 1456,
+      "target": 1459
+    },
+    {
+      "source": 1456,
+      "target": 1460
+    },
+    {
+      "source": 252,
+      "target": 1461
+    },
+    {
+      "source": 1461,
+      "target": 1462
+    },
+    {
+      "source": 1461,
+      "target": 1463
+    },
+    {
+      "source": 1461,
+      "target": 1464
+    },
+    {
+      "source": 1461,
+      "target": 1465
+    },
+    {
+      "source": 252,
+      "target": 1466
+    },
+    {
+      "source": 1466,
+      "target": 1467
+    },
+    {
+      "source": 1466,
+      "target": 1468
+    },
+    {
+      "source": 1466,
+      "target": 1469
+    },
+    {
+      "source": 1466,
+      "target": 1470
+    },
+    {
+      "source": 252,
+      "target": 1471
+    },
+    {
+      "source": 1471,
+      "target": 1472
+    },
+    {
+      "source": 1471,
+      "target": 1473
+    },
+    {
+      "source": 1471,
+      "target": 1474
+    },
+    {
+      "source": 1471,
+      "target": 1475
+    },
+    {
+      "source": 248,
+      "target": 1476
+    },
+    {
+      "source": 1476,
+      "target": 1477
+    },
+    {
+      "source": 1476,
+      "target": 1478
+    },
+    {
+      "source": 1476,
+      "target": 1479
+    },
+    {
+      "source": 1476,
+      "target": 1480
+    },
+    {
+      "source": 1476,
+      "target": 1481
+    },
+    {
+      "source": 1476,
+      "target": 1482
+    },
+    {
+      "source": 248,
+      "target": 1483
+    },
+    {
+      "source": 1483,
+      "target": 1484
+    },
+    {
+      "source": 1483,
+      "target": 1485
+    },
+    {
+      "source": 1483,
+      "target": 1486
+    },
+    {
+      "source": 1483,
+      "target": 1487
+    },
+    {
+      "source": 248,
+      "target": 1488
+    },
+    {
+      "source": 1488,
+      "target": 1489
+    },
+    {
+      "source": 1488,
+      "target": 1490
+    },
+    {
+      "source": 1488,
+      "target": 1491
+    },
+    {
+      "source": 1488,
+      "target": 1492
+    },
+    {
+      "source": 248,
+      "target": 1493
+    },
+    {
+      "source": 1493,
+      "target": 1494
+    },
+    {
+      "source": 1493,
+      "target": 1495
+    },
+    {
+      "source": 1493,
+      "target": 1496
+    },
+    {
+      "source": 1493,
+      "target": 1497
+    },
+    {
+      "source": 1493,
+      "target": 1498
+    },
+    {
+      "source": 248,
+      "target": 1499
+    },
+    {
+      "source": 1499,
+      "target": 1500
+    },
+    {
+      "source": 1499,
+      "target": 1501
+    },
+    {
+      "source": 1499,
+      "target": 1502
+    },
+    {
+      "source": 1499,
+      "target": 1503
+    },
+    {
+      "source": 1499,
+      "target": 1504
+    },
+    {
+      "source": 1499,
+      "target": 1505
     }
   ]
 }
