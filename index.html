@@ -14,21 +14,15 @@ body { background: #080810; font-family: system-ui, sans-serif; overflow: hidden
   background: rgba(10,10,20,0.95); color: #e0e0f0;
   padding: 8px 12px; border-radius: 6px; font-size: 13px;
   border: 0.5px solid rgba(255,255,255,0.2);
-  display: none; max-width: 200px; line-height: 1.4;
+  display: none; max-width: 220px; line-height: 1.4;
 }
 #legend {
   position: fixed; bottom: 20px; left: 20px;
   display: flex; flex-wrap: wrap; gap: 8px; max-width: 440px;
 }
-.leg-item {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 11px; color: #aaa;
-}
+.leg-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #aaa; }
 .leg-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-#info {
-  position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
-  color: rgba(255,255,255,0.3); font-size: 12px; pointer-events: none;
-}
+#info { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.3); font-size: 12px; pointer-events: none; white-space: nowrap; }
 #search-box {
   position: fixed; top: 14px; right: 20px;
   background: rgba(20,20,35,0.9); border: 0.5px solid rgba(255,255,255,0.2);
@@ -36,6 +30,7 @@ body { background: #080810; font-family: system-ui, sans-serif; overflow: hidden
   width: 180px; outline: none;
 }
 #search-box::placeholder { color: rgba(255,255,255,0.3); }
+#zoom-level { position: fixed; bottom: 20px; right: 20px; color: rgba(255,255,255,0.2); font-size: 11px; }
 </style>
 </head>
 <body>
@@ -44,6 +39,7 @@ body { background: #080810; font-family: system-ui, sans-serif; overflow: hidden
 <div id="legend"></div>
 <div id="info">Scroll to zoom · Drag to pan · Click node to highlight · Search top right</div>
 <input id="search-box" type="text" placeholder="Search knowledge..." />
+<div id="zoom-level"></div>
 
 <script>
 const CONTINENTS = {
@@ -57,6 +53,31 @@ const CONTINENTS = {
   "Natural Sciences": "#5BC8D8",
   "Skills & Crafts": "#9A9890"
 };
+
+// Zoom thresholds: at what zoom scale each label level becomes visible
+// Level 1 (continents): visible from 0.1 to 0.8
+// Level 2: visible from 0.5 to 2.0
+// Level 3: visible from 1.2 to 4.0
+// Level 4: visible from 2.5 to 8.0
+// Level 5: visible from 4.0 upward
+const LABEL_RANGES = {
+  1: { min: 0.0, max: 0.9 },
+  2: { min: 0.4, max: 2.2 },
+  3: { min: 1.0, max: 4.5 },
+  4: { min: 2.2, max: 9.0 },
+  5: { min: 4.0, max: 99  },
+};
+
+function labelOpacity(level, zoom) {
+  const range = LABEL_RANGES[level];
+  if (!range) return 0;
+  const { min, max } = range;
+  const fadeWidth = (max - min) * 0.2;
+  if (zoom < min || zoom > max) return 0;
+  const fadeIn  = Math.min(1, (zoom - min) / Math.max(fadeWidth, 0.01));
+  const fadeOut = Math.min(1, (max - zoom) / Math.max(fadeWidth, 0.01));
+  return Math.min(fadeIn, fadeOut);
+}
 
 fetch('knowledge_map.json')
   .then(r => r.json())
@@ -72,9 +93,7 @@ function init(data) {
   const nodeMap = {};
   nodes.forEach(n => nodeMap[n.id] = n);
   const edgeMap = {};
-  edges.forEach(e => {
-    if (!edgeMap[e.target]) edgeMap[e.target] = e.source;
-  });
+  edges.forEach(e => { if (!edgeMap[e.target]) edgeMap[e.target] = e.source; });
 
   function getContinent(id) {
     let cur = id;
@@ -95,7 +114,18 @@ function init(data) {
   const svg = d3.select("#canvas").attr("width", w).attr("height", h);
   const g = svg.append("g");
 
-  svg.call(d3.zoom().scaleExtent([0.1, 6]).on("zoom", e => g.attr("transform", e.transform)));
+  let currentZoom = 1;
+
+  const zoomBehaviour = d3.zoom()
+    .scaleExtent([0.1, 8])
+    .on("zoom", e => {
+      g.attr("transform", e.transform);
+      currentZoom = e.transform.k;
+      updateLabels();
+      document.getElementById("zoom-level").textContent = `zoom: ${currentZoom.toFixed(2)}`;
+    });
+
+  svg.call(zoomBehaviour);
 
   const nodeRadius = d => d.level === 1 ? 16 : d.level === 2 ? 9 : d.level === 3 ? 5.5 : d.level === 4 ? 4 : 3;
 
@@ -138,16 +168,22 @@ function init(data) {
       .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
       .on("end", (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
 
+  // Labels for ALL levels — opacity controlled by zoom
   const label = g.append("g").selectAll("text")
-    .data(nodes.filter(n => n.level <= 2)).join("text")
+    .data(nodes).join("text")
     .text(d => d.label)
-    .attr("font-size", d => d.level === 1 ? 13 : 10)
-    .attr("font-weight", d => d.level === 1 ? 600 : 400)
-    .attr("fill", d => d.level === 1 ? "#fff" : "rgba(255,255,255,0.75)")
+    .attr("font-size", d => d.level === 1 ? 13 : d.level === 2 ? 10 : d.level === 3 ? 9 : d.level === 4 ? 8 : 7)
+    .attr("font-weight", d => d.level <= 2 ? 600 : 400)
+    .attr("fill", "#fff")
     .attr("text-anchor", "middle")
-    .attr("dy", d => -(nodeRadius(d) + 4))
+    .attr("dy", d => -(nodeRadius(d) + 3))
+    .attr("opacity", d => d.level <= 2 ? 1 : 0)
     .style("pointer-events", "none")
     .style("user-select", "none");
+
+  function updateLabels() {
+    label.attr("opacity", d => labelOpacity(d.level, currentZoom));
+  }
 
   const tt = document.getElementById("tooltip");
   node.on("mouseover", (e, d) => {
@@ -188,7 +224,6 @@ function init(data) {
   });
   svg.on("click", resetHighlight);
 
-  // Search
   document.getElementById("search-box").addEventListener("input", function() {
     const q = this.value.trim().toLowerCase();
     if (!q) { resetHighlight(); return; }
