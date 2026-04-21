@@ -3969,6 +3969,551 @@
       "id": 804,
       "label": "Panpsychism",
       "level": 4
+    },
+    {
+      "id": 805,
+      "label": "Cognitive psychology",
+      "level": 3
+    },
+    {
+      "id": 806,
+      "label": "Attention",
+      "level": 4
+    },
+    {
+      "id": 807,
+      "label": "Vigilance",
+      "level": 5
+    },
+    {
+      "id": 808,
+      "label": "Salience",
+      "level": 5
+    },
+    {
+      "id": 809,
+      "label": "Executive control",
+      "level": 5
+    },
+    {
+      "id": 810,
+      "label": "Divided attention",
+      "level": 5
+    },
+    {
+      "id": 811,
+      "label": "Memory",
+      "level": 4
+    },
+    {
+      "id": 812,
+      "label": "Encoding",
+      "level": 5
+    },
+    {
+      "id": 813,
+      "label": "Storage",
+      "level": 5
+    },
+    {
+      "id": 814,
+      "label": "Retrieval",
+      "level": 5
+    },
+    {
+      "id": 815,
+      "label": "Forgetting",
+      "level": 5
+    },
+    {
+      "id": 816,
+      "label": "Perception",
+      "level": 4
+    },
+    {
+      "id": 817,
+      "label": "Psychophysics",
+      "level": 5
+    },
+    {
+      "id": 818,
+      "label": "Perceptual grouping",
+      "level": 5
+    },
+    {
+      "id": 819,
+      "label": "Depth perception",
+      "level": 5
+    },
+    {
+      "id": 820,
+      "label": "Object recognition",
+      "level": 5
+    },
+    {
+      "id": 821,
+      "label": "Language",
+      "level": 4
+    },
+    {
+      "id": 822,
+      "label": "Comprehension",
+      "level": 5
+    },
+    {
+      "id": 823,
+      "label": "Production",
+      "level": 5
+    },
+    {
+      "id": 824,
+      "label": "Acquisition",
+      "level": 5
+    },
+    {
+      "id": 825,
+      "label": "Mental lexicon",
+      "level": 5
+    },
+    {
+      "id": 826,
+      "label": "Developmental psychology",
+      "level": 3
+    },
+    {
+      "id": 827,
+      "label": "Cognitive development",
+      "level": 4
+    },
+    {
+      "id": 828,
+      "label": "Object permanence",
+      "level": 5
+    },
+    {
+      "id": 829,
+      "label": "Conservation",
+      "level": 5
+    },
+    {
+      "id": 830,
+      "label": "Assimilation",
+      "level": 5
+    },
+    {
+      "id": 831,
+      "label": "Accommodation",
+      "level": 5
+    },
+    {
+      "id": 832,
+      "label": "Moral development",
+      "level": 4
+    },
+    {
+      "id": 833,
+      "label": "Preconventional morality",
+      "level": 5
+    },
+    {
+      "id": 834,
+      "label": "Conventional morality",
+      "level": 5
+    },
+    {
+      "id": 835,
+      "label": "Postconventional morality",
+      "level": 5
+    },
+    {
+      "id": 836,
+      "label": "Attachment",
+      "level": 4
+    },
+    {
+      "id": 837,
+      "label": "Secure attachment",
+      "level": 5
+    },
+    {
+      "id": 838,
+      "label": "Avoidant attachment",
+      "level": 5
+    },
+    {
+      "id": 839,
+      "label": "Ambivalent attachment",
+      "level": 5
+    },
+    {
+      "id": 840,
+      "label": "Disorganized attachment",
+      "level": 5
+    },
+    {
+      "id": 841,
+      "label": "Identity development",
+      "level": 4
+    },
+    {
+      "id": 842,
+      "label": "Foreclosure",
+      "level": 5
+    },
+    {
+      "id": 843,
+      "label": "Diffusion",
+      "level": 5
+    },
+    {
+      "id": 844,
+      "label": "Moratorium",
+      "level": 5
+    },
+    {
+      "id": 845,
+      "label": "Achievement",
+      "level": 5
+    },
+    {
+      "id": 846,
+      "label": "Social psychology",
+      "level": 3
+    },
+    {
+      "id": 847,
+      "label": "Social influence",
+      "level": 4
+    },
+    {
+      "id": 848,
+      "label": "Conformity",
+      "level": 5
+    },
+    {
+      "id": 849,
+      "label": "Compliance",
+      "level": 5
+    },
+    {
+      "id": 850,
+      "label": "Obedience",
+      "level": 5
+    },
+    {
+      "id": 851,
+      "label": "Attitudes",
+      "level": 4
+    },
+    {
+      "id": 852,
+      "label": "Persuasion",
+      "level": 5
+    },
+    {
+      "id": 853,
+      "label": "Cognitive dissonance",
+      "level": 5
+    },
+    {
+      "id": 854,
+      "label": "Implicit bias",
+      "level": 5
+    },
+    {
+      "id": 855,
+      "label": "Group dynamics",
+      "level": 4
+    },
+    {
+      "id": 856,
+      "label": "Social facilitation",
+      "level": 5
+    },
+    {
+      "id": 857,
+      "label": "Social loafing",
+      "level": 5
+    },
+    {
+      "id": 858,
+      "label": "Group polarization",
+      "level": 5
+    },
+    {
+      "id": 859,
+      "label": "Groupthink",
+      "level": 5
+    },
+    {
+      "id": 860,
+      "label": "Interpersonal attraction",
+      "level": 4
+    },
+    {
+      "id": 861,
+      "label": "Proximity",
+      "level": 5
+    },
+    {
+      "id": 862,
+      "label": "Familiarity",
+      "level": 5
+    },
+    {
+      "id": 863,
+      "label": "Prosocial behaviour",
+      "level": 4
+    },
+    {
+      "id": 864,
+      "label": "Altruism",
+      "level": 5
+    },
+    {
+      "id": 865,
+      "label": "Bystander effect",
+      "level": 5
+    },
+    {
+      "id": 866,
+      "label": "Diffusion of responsibility",
+      "level": 5
+    },
+    {
+      "id": 867,
+      "label": "Personality psychology",
+      "level": 3
+    },
+    {
+      "id": 868,
+      "label": "Trait theory",
+      "level": 4
+    },
+    {
+      "id": 869,
+      "label": "Extraversion",
+      "level": 5
+    },
+    {
+      "id": 870,
+      "label": "Neuroticism",
+      "level": 5
+    },
+    {
+      "id": 871,
+      "label": "Conscientiousness",
+      "level": 5
+    },
+    {
+      "id": 872,
+      "label": "Agreeableness",
+      "level": 5
+    },
+    {
+      "id": 873,
+      "label": "Openness",
+      "level": 5
+    },
+    {
+      "id": 874,
+      "label": "Psychoanalytic theory",
+      "level": 4
+    },
+    {
+      "id": 875,
+      "label": "Id",
+      "level": 5
+    },
+    {
+      "id": 876,
+      "label": "Ego",
+      "level": 5
+    },
+    {
+      "id": 877,
+      "label": "Superego",
+      "level": 5
+    },
+    {
+      "id": 878,
+      "label": "Repression",
+      "level": 5
+    },
+    {
+      "id": 879,
+      "label": "Projection",
+      "level": 5
+    },
+    {
+      "id": 880,
+      "label": "Humanistic theory",
+      "level": 4
+    },
+    {
+      "id": 881,
+      "label": "Self-actualisation",
+      "level": 5
+    },
+    {
+      "id": 882,
+      "label": "Conditions of worth",
+      "level": 5
+    },
+    {
+      "id": 883,
+      "label": "Social cognitive theory",
+      "level": 4
+    },
+    {
+      "id": 884,
+      "label": "Reciprocal determinism",
+      "level": 5
+    },
+    {
+      "id": 885,
+      "label": "Self-efficacy",
+      "level": 5
+    },
+    {
+      "id": 886,
+      "label": "Locus of control",
+      "level": 5
+    },
+    {
+      "id": 887,
+      "label": "Behavioural psychology",
+      "level": 3
+    },
+    {
+      "id": 888,
+      "label": "Classical conditioning",
+      "level": 4
+    },
+    {
+      "id": 889,
+      "label": "Extinction",
+      "level": 5
+    },
+    {
+      "id": 890,
+      "label": "Spontaneous recovery",
+      "level": 5
+    },
+    {
+      "id": 891,
+      "label": "Generalisation",
+      "level": 5
+    },
+    {
+      "id": 892,
+      "label": "Discrimination",
+      "level": 5
+    },
+    {
+      "id": 893,
+      "label": "Operant conditioning",
+      "level": 4
+    },
+    {
+      "id": 894,
+      "label": "Reinforcement",
+      "level": 5
+    },
+    {
+      "id": 895,
+      "label": "Punishment",
+      "level": 5
+    },
+    {
+      "id": 896,
+      "label": "Shaping",
+      "level": 5
+    },
+    {
+      "id": 897,
+      "label": "Schedules of reinforcement",
+      "level": 5
+    },
+    {
+      "id": 898,
+      "label": "Observational learning",
+      "level": 4
+    },
+    {
+      "id": 899,
+      "label": "Modelling",
+      "level": 5
+    },
+    {
+      "id": 900,
+      "label": "Vicarious reinforcement",
+      "level": 5
+    },
+    {
+      "id": 901,
+      "label": "Vicarious punishment",
+      "level": 5
+    },
+    {
+      "id": 902,
+      "label": "Biological psychology",
+      "level": 3
+    },
+    {
+      "id": 903,
+      "label": "Neural basis of behaviour",
+      "level": 4
+    },
+    {
+      "id": 904,
+      "label": "Hormones",
+      "level": 4
+    },
+    {
+      "id": 905,
+      "label": "Sensation",
+      "level": 4
+    },
+    {
+      "id": 906,
+      "label": "Arousal",
+      "level": 4
+    },
+    {
+      "id": 907,
+      "label": "Sleep",
+      "level": 4
+    },
+    {
+      "id": 908,
+      "label": "Evolutionary psychology",
+      "level": 3
+    },
+    {
+      "id": 909,
+      "label": "Adaptation",
+      "level": 4
+    },
+    {
+      "id": 910,
+      "label": "Sexual selection",
+      "level": 4
+    },
+    {
+      "id": 911,
+      "label": "Kin selection",
+      "level": 4
+    },
+    {
+      "id": 912,
+      "label": "Reciprocal altruism",
+      "level": 4
+    },
+    {
+      "id": 913,
+      "label": "Evolutionary developmental psychology",
+      "level": 4
     }
   ],
   "edges": [
@@ -7131,6 +7676,442 @@
     {
       "source": 798,
       "target": 804
+    },
+    {
+      "source": 197,
+      "target": 805
+    },
+    {
+      "source": 805,
+      "target": 806
+    },
+    {
+      "source": 806,
+      "target": 807
+    },
+    {
+      "source": 806,
+      "target": 808
+    },
+    {
+      "source": 806,
+      "target": 809
+    },
+    {
+      "source": 806,
+      "target": 810
+    },
+    {
+      "source": 805,
+      "target": 811
+    },
+    {
+      "source": 811,
+      "target": 812
+    },
+    {
+      "source": 811,
+      "target": 813
+    },
+    {
+      "source": 811,
+      "target": 814
+    },
+    {
+      "source": 811,
+      "target": 815
+    },
+    {
+      "source": 805,
+      "target": 816
+    },
+    {
+      "source": 816,
+      "target": 817
+    },
+    {
+      "source": 816,
+      "target": 818
+    },
+    {
+      "source": 816,
+      "target": 819
+    },
+    {
+      "source": 816,
+      "target": 820
+    },
+    {
+      "source": 805,
+      "target": 821
+    },
+    {
+      "source": 821,
+      "target": 822
+    },
+    {
+      "source": 821,
+      "target": 823
+    },
+    {
+      "source": 821,
+      "target": 824
+    },
+    {
+      "source": 821,
+      "target": 825
+    },
+    {
+      "source": 197,
+      "target": 826
+    },
+    {
+      "source": 826,
+      "target": 827
+    },
+    {
+      "source": 827,
+      "target": 828
+    },
+    {
+      "source": 827,
+      "target": 829
+    },
+    {
+      "source": 827,
+      "target": 830
+    },
+    {
+      "source": 827,
+      "target": 831
+    },
+    {
+      "source": 826,
+      "target": 832
+    },
+    {
+      "source": 832,
+      "target": 833
+    },
+    {
+      "source": 832,
+      "target": 834
+    },
+    {
+      "source": 832,
+      "target": 835
+    },
+    {
+      "source": 826,
+      "target": 836
+    },
+    {
+      "source": 836,
+      "target": 837
+    },
+    {
+      "source": 836,
+      "target": 838
+    },
+    {
+      "source": 836,
+      "target": 839
+    },
+    {
+      "source": 836,
+      "target": 840
+    },
+    {
+      "source": 826,
+      "target": 841
+    },
+    {
+      "source": 841,
+      "target": 842
+    },
+    {
+      "source": 841,
+      "target": 843
+    },
+    {
+      "source": 841,
+      "target": 844
+    },
+    {
+      "source": 841,
+      "target": 845
+    },
+    {
+      "source": 197,
+      "target": 846
+    },
+    {
+      "source": 846,
+      "target": 847
+    },
+    {
+      "source": 847,
+      "target": 848
+    },
+    {
+      "source": 847,
+      "target": 849
+    },
+    {
+      "source": 847,
+      "target": 850
+    },
+    {
+      "source": 846,
+      "target": 851
+    },
+    {
+      "source": 851,
+      "target": 852
+    },
+    {
+      "source": 851,
+      "target": 853
+    },
+    {
+      "source": 851,
+      "target": 854
+    },
+    {
+      "source": 846,
+      "target": 855
+    },
+    {
+      "source": 855,
+      "target": 856
+    },
+    {
+      "source": 855,
+      "target": 857
+    },
+    {
+      "source": 855,
+      "target": 858
+    },
+    {
+      "source": 855,
+      "target": 859
+    },
+    {
+      "source": 846,
+      "target": 860
+    },
+    {
+      "source": 860,
+      "target": 861
+    },
+    {
+      "source": 860,
+      "target": 862
+    },
+    {
+      "source": 846,
+      "target": 863
+    },
+    {
+      "source": 863,
+      "target": 864
+    },
+    {
+      "source": 863,
+      "target": 865
+    },
+    {
+      "source": 863,
+      "target": 866
+    },
+    {
+      "source": 197,
+      "target": 867
+    },
+    {
+      "source": 867,
+      "target": 868
+    },
+    {
+      "source": 868,
+      "target": 869
+    },
+    {
+      "source": 868,
+      "target": 870
+    },
+    {
+      "source": 868,
+      "target": 871
+    },
+    {
+      "source": 868,
+      "target": 872
+    },
+    {
+      "source": 868,
+      "target": 873
+    },
+    {
+      "source": 867,
+      "target": 874
+    },
+    {
+      "source": 874,
+      "target": 875
+    },
+    {
+      "source": 874,
+      "target": 876
+    },
+    {
+      "source": 874,
+      "target": 877
+    },
+    {
+      "source": 874,
+      "target": 878
+    },
+    {
+      "source": 874,
+      "target": 879
+    },
+    {
+      "source": 867,
+      "target": 880
+    },
+    {
+      "source": 880,
+      "target": 881
+    },
+    {
+      "source": 880,
+      "target": 882
+    },
+    {
+      "source": 867,
+      "target": 883
+    },
+    {
+      "source": 883,
+      "target": 884
+    },
+    {
+      "source": 883,
+      "target": 885
+    },
+    {
+      "source": 883,
+      "target": 886
+    },
+    {
+      "source": 197,
+      "target": 887
+    },
+    {
+      "source": 887,
+      "target": 888
+    },
+    {
+      "source": 888,
+      "target": 889
+    },
+    {
+      "source": 888,
+      "target": 890
+    },
+    {
+      "source": 888,
+      "target": 891
+    },
+    {
+      "source": 888,
+      "target": 892
+    },
+    {
+      "source": 887,
+      "target": 893
+    },
+    {
+      "source": 893,
+      "target": 894
+    },
+    {
+      "source": 893,
+      "target": 895
+    },
+    {
+      "source": 893,
+      "target": 896
+    },
+    {
+      "source": 893,
+      "target": 897
+    },
+    {
+      "source": 887,
+      "target": 898
+    },
+    {
+      "source": 898,
+      "target": 899
+    },
+    {
+      "source": 898,
+      "target": 900
+    },
+    {
+      "source": 898,
+      "target": 901
+    },
+    {
+      "source": 197,
+      "target": 902
+    },
+    {
+      "source": 902,
+      "target": 903
+    },
+    {
+      "source": 902,
+      "target": 904
+    },
+    {
+      "source": 902,
+      "target": 905
+    },
+    {
+      "source": 902,
+      "target": 906
+    },
+    {
+      "source": 902,
+      "target": 907
+    },
+    {
+      "source": 197,
+      "target": 908
+    },
+    {
+      "source": 908,
+      "target": 909
+    },
+    {
+      "source": 908,
+      "target": 910
+    },
+    {
+      "source": 908,
+      "target": 911
+    },
+    {
+      "source": 908,
+      "target": 912
+    },
+    {
+      "source": 908,
+      "target": 913
     }
   ]
 }
