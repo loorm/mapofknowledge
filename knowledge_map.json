@@ -1292,7 +1292,7 @@
     },
     {
       "id": 272,
-      "label": "Agriculture",
+      "label": "Agronomy",
       "level": 2
     },
     {
@@ -7859,6 +7859,536 @@
       "id": 1599,
       "label": "Medium",
       "level": 4
+    },
+    {
+      "id": 1600,
+      "label": "Theory of computation",
+      "level": 3
+    },
+    {
+      "id": 1601,
+      "label": "Complexity theory",
+      "level": 4
+    },
+    {
+      "id": 1602,
+      "label": "Formal languages",
+      "level": 4
+    },
+    {
+      "id": 1603,
+      "label": "Logic in computation",
+      "level": 4
+    },
+    {
+      "id": 1604,
+      "label": "Algorithms",
+      "level": 3
+    },
+    {
+      "id": 1605,
+      "label": "Algorithm analysis",
+      "level": 4
+    },
+    {
+      "id": 1606,
+      "label": "Algorithm design paradigms",
+      "level": 4
+    },
+    {
+      "id": 1607,
+      "label": "Data structures",
+      "level": 4
+    },
+    {
+      "id": 1608,
+      "label": "Computational geometry",
+      "level": 4
+    },
+    {
+      "id": 1609,
+      "label": "Randomised algorithms",
+      "level": 4
+    },
+    {
+      "id": 1610,
+      "label": "Programming language theory",
+      "level": 3
+    },
+    {
+      "id": 1611,
+      "label": "Type theory",
+      "level": 4
+    },
+    {
+      "id": 1612,
+      "label": "Formal semantics",
+      "level": 4
+    },
+    {
+      "id": 1613,
+      "label": "Compiler theory",
+      "level": 4
+    },
+    {
+      "id": 1614,
+      "label": "Concurrency theory",
+      "level": 4
+    },
+    {
+      "id": 1615,
+      "label": "Computer architecture",
+      "level": 3
+    },
+    {
+      "id": 1616,
+      "label": "Instruction set architecture",
+      "level": 4
+    },
+    {
+      "id": 1617,
+      "label": "Memory hierarchy",
+      "level": 4
+    },
+    {
+      "id": 1618,
+      "label": "Parallel architecture",
+      "level": 4
+    },
+    {
+      "id": 1619,
+      "label": "Cache coherence",
+      "level": 4
+    },
+    {
+      "id": 1620,
+      "label": "Processor design",
+      "level": 4
+    },
+    {
+      "id": 1621,
+      "label": "Microarchitecture",
+      "level": 4
+    },
+    {
+      "id": 1622,
+      "label": "Operating systems",
+      "level": 3
+    },
+    {
+      "id": 1623,
+      "label": "Process management",
+      "level": 4
+    },
+    {
+      "id": 1624,
+      "label": "Memory management",
+      "level": 4
+    },
+    {
+      "id": 1625,
+      "label": "File systems",
+      "level": 4
+    },
+    {
+      "id": 1626,
+      "label": "Scheduling",
+      "level": 4
+    },
+    {
+      "id": 1627,
+      "label": "Virtualisation",
+      "level": 4
+    },
+    {
+      "id": 1628,
+      "label": "Distributed systems",
+      "level": 3
+    },
+    {
+      "id": 1629,
+      "label": "Consistency models",
+      "level": 4
+    },
+    {
+      "id": 1630,
+      "label": "Consensus algorithms",
+      "level": 4
+    },
+    {
+      "id": 1631,
+      "label": "Clock synchronisation",
+      "level": 4
+    },
+    {
+      "id": 1632,
+      "label": "Fault tolerance",
+      "level": 4
+    },
+    {
+      "id": 1633,
+      "label": "Relational theory",
+      "level": 3
+    },
+    {
+      "id": 1634,
+      "label": "Relational algebra",
+      "level": 4
+    },
+    {
+      "id": 1635,
+      "label": "Normalisation theory",
+      "level": 4
+    },
+    {
+      "id": 1636,
+      "label": "Query optimisation",
+      "level": 4
+    },
+    {
+      "id": 1637,
+      "label": "Transaction theory",
+      "level": 4
+    },
+    {
+      "id": 1638,
+      "label": "Soil science",
+      "level": 3
+    },
+    {
+      "id": 1639,
+      "label": "Soil physics",
+      "level": 4
+    },
+    {
+      "id": 1640,
+      "label": "Soil chemistry",
+      "level": 4
+    },
+    {
+      "id": 1641,
+      "label": "Soil biology",
+      "level": 4
+    },
+    {
+      "id": 1642,
+      "label": "Soil fertility",
+      "level": 4
+    },
+    {
+      "id": 1643,
+      "label": "Crop science",
+      "level": 3
+    },
+    {
+      "id": 1644,
+      "label": "Crop physiology",
+      "level": 4
+    },
+    {
+      "id": 1645,
+      "label": "Crop ecology",
+      "level": 4
+    },
+    {
+      "id": 1646,
+      "label": "Crop nutrition",
+      "level": 4
+    },
+    {
+      "id": 1647,
+      "label": "Crop protection",
+      "level": 4
+    },
+    {
+      "id": 1648,
+      "label": "Yield analysis",
+      "level": 4
+    },
+    {
+      "id": 1649,
+      "label": "Irrigation science",
+      "level": 3
+    },
+    {
+      "id": 1650,
+      "label": "Water requirements",
+      "level": 4
+    },
+    {
+      "id": 1651,
+      "label": "Irrigation methods",
+      "level": 4
+    },
+    {
+      "id": 1652,
+      "label": "Drainage",
+      "level": 4
+    },
+    {
+      "id": 1653,
+      "label": "Water use efficiency",
+      "level": 4
+    },
+    {
+      "id": 1654,
+      "label": "Salinity management",
+      "level": 4
+    },
+    {
+      "id": 1655,
+      "label": "Pest management",
+      "level": 3
+    },
+    {
+      "id": 1656,
+      "label": "Entomology in agriculture",
+      "level": 4
+    },
+    {
+      "id": 1657,
+      "label": "Weed science",
+      "level": 4
+    },
+    {
+      "id": 1658,
+      "label": "Plant pathology",
+      "level": 4
+    },
+    {
+      "id": 1659,
+      "label": "Biological control",
+      "level": 4
+    },
+    {
+      "id": 1660,
+      "label": "Plant breeding",
+      "level": 3
+    },
+    {
+      "id": 1661,
+      "label": "Selection theory",
+      "level": 4
+    },
+    {
+      "id": 1662,
+      "label": "Hybridisation",
+      "level": 4
+    },
+    {
+      "id": 1663,
+      "label": "Mutation breeding",
+      "level": 4
+    },
+    {
+      "id": 1664,
+      "label": "Variety development",
+      "level": 4
+    },
+    {
+      "id": 1665,
+      "label": "Seed technology",
+      "level": 4
+    },
+    {
+      "id": 1666,
+      "label": "Farming systems",
+      "level": 3
+    },
+    {
+      "id": 1667,
+      "label": "Cropping systems",
+      "level": 4
+    },
+    {
+      "id": 1668,
+      "label": "Mixed farming",
+      "level": 4
+    },
+    {
+      "id": 1669,
+      "label": "Subsistence farming",
+      "level": 4
+    },
+    {
+      "id": 1670,
+      "label": "Precision agriculture",
+      "level": 4
+    },
+    {
+      "id": 1671,
+      "label": "Structure-property relationships",
+      "level": 3
+    },
+    {
+      "id": 1672,
+      "label": "Crystal structure",
+      "level": 4
+    },
+    {
+      "id": 1673,
+      "label": "Microstructure",
+      "level": 4
+    },
+    {
+      "id": 1674,
+      "label": "Bonding types",
+      "level": 4
+    },
+    {
+      "id": 1675,
+      "label": "Defect structure",
+      "level": 4
+    },
+    {
+      "id": 1676,
+      "label": "Amorphous structure",
+      "level": 4
+    },
+    {
+      "id": 1677,
+      "label": "Phase theory",
+      "level": 3
+    },
+    {
+      "id": 1678,
+      "label": "Phase diagrams",
+      "level": 4
+    },
+    {
+      "id": 1679,
+      "label": "Phase transformations",
+      "level": 4
+    },
+    {
+      "id": 1680,
+      "label": "Thermodynamic equilibrium",
+      "level": 4
+    },
+    {
+      "id": 1681,
+      "label": "Nucleation",
+      "level": 4
+    },
+    {
+      "id": 1682,
+      "label": "Solidification",
+      "level": 4
+    },
+    {
+      "id": 1683,
+      "label": "Defect theory",
+      "level": 3
+    },
+    {
+      "id": 1684,
+      "label": "Point defects",
+      "level": 4
+    },
+    {
+      "id": 1685,
+      "label": "Dislocations",
+      "level": 4
+    },
+    {
+      "id": 1686,
+      "label": "Grain boundaries",
+      "level": 4
+    },
+    {
+      "id": 1687,
+      "label": "Surface defects",
+      "level": 4
+    },
+    {
+      "id": 1688,
+      "label": "Defect dynamics",
+      "level": 4
+    },
+    {
+      "id": 1689,
+      "label": "Mechanical behaviour",
+      "level": 3
+    },
+    {
+      "id": 1690,
+      "label": "Elasticity",
+      "level": 4
+    },
+    {
+      "id": 1691,
+      "label": "Plasticity",
+      "level": 4
+    },
+    {
+      "id": 1692,
+      "label": "Fracture mechanics",
+      "level": 4
+    },
+    {
+      "id": 1693,
+      "label": "Fatigue",
+      "level": 4
+    },
+    {
+      "id": 1694,
+      "label": "Creep",
+      "level": 4
+    },
+    {
+      "id": 1695,
+      "label": "Functional properties",
+      "level": 3
+    },
+    {
+      "id": 1696,
+      "label": "Electrical properties",
+      "level": 4
+    },
+    {
+      "id": 1697,
+      "label": "Magnetic properties",
+      "level": 4
+    },
+    {
+      "id": 1698,
+      "label": "Optical properties",
+      "level": 4
+    },
+    {
+      "id": 1699,
+      "label": "Thermal properties",
+      "level": 4
+    },
+    {
+      "id": 1700,
+      "label": "Materials characterisation",
+      "level": 3
+    },
+    {
+      "id": 1701,
+      "label": "Microscopy",
+      "level": 4
+    },
+    {
+      "id": 1702,
+      "label": "Diffraction methods",
+      "level": 4
+    },
+    {
+      "id": 1703,
+      "label": "Spectroscopy",
+      "level": 4
+    },
+    {
+      "id": 1704,
+      "label": "Thermal analysis",
+      "level": 4
+    },
+    {
+      "id": 1705,
+      "label": "Mechanical testing",
+      "level": 4
     }
   ],
   "edges": [
@@ -14133,6 +14663,430 @@
     {
       "source": 1594,
       "target": 1599
+    },
+    {
+      "source": 265,
+      "target": 1600
+    },
+    {
+      "source": 1600,
+      "target": 1601
+    },
+    {
+      "source": 1600,
+      "target": 1602
+    },
+    {
+      "source": 1600,
+      "target": 1603
+    },
+    {
+      "source": 265,
+      "target": 1604
+    },
+    {
+      "source": 1604,
+      "target": 1605
+    },
+    {
+      "source": 1604,
+      "target": 1606
+    },
+    {
+      "source": 1604,
+      "target": 1607
+    },
+    {
+      "source": 1604,
+      "target": 1608
+    },
+    {
+      "source": 1604,
+      "target": 1609
+    },
+    {
+      "source": 265,
+      "target": 1610
+    },
+    {
+      "source": 1610,
+      "target": 1611
+    },
+    {
+      "source": 1610,
+      "target": 1612
+    },
+    {
+      "source": 1610,
+      "target": 1613
+    },
+    {
+      "source": 1610,
+      "target": 1614
+    },
+    {
+      "source": 265,
+      "target": 1615
+    },
+    {
+      "source": 1615,
+      "target": 1616
+    },
+    {
+      "source": 1615,
+      "target": 1617
+    },
+    {
+      "source": 1615,
+      "target": 1618
+    },
+    {
+      "source": 1615,
+      "target": 1619
+    },
+    {
+      "source": 1615,
+      "target": 1620
+    },
+    {
+      "source": 1615,
+      "target": 1621
+    },
+    {
+      "source": 265,
+      "target": 1622
+    },
+    {
+      "source": 1622,
+      "target": 1623
+    },
+    {
+      "source": 1622,
+      "target": 1624
+    },
+    {
+      "source": 1622,
+      "target": 1625
+    },
+    {
+      "source": 1622,
+      "target": 1626
+    },
+    {
+      "source": 1622,
+      "target": 1627
+    },
+    {
+      "source": 265,
+      "target": 1628
+    },
+    {
+      "source": 1628,
+      "target": 1629
+    },
+    {
+      "source": 1628,
+      "target": 1630
+    },
+    {
+      "source": 1628,
+      "target": 1631
+    },
+    {
+      "source": 1628,
+      "target": 1632
+    },
+    {
+      "source": 265,
+      "target": 1633
+    },
+    {
+      "source": 1633,
+      "target": 1634
+    },
+    {
+      "source": 1633,
+      "target": 1635
+    },
+    {
+      "source": 1633,
+      "target": 1636
+    },
+    {
+      "source": 1633,
+      "target": 1637
+    },
+    {
+      "source": 272,
+      "target": 1638
+    },
+    {
+      "source": 1638,
+      "target": 1639
+    },
+    {
+      "source": 1638,
+      "target": 1640
+    },
+    {
+      "source": 1638,
+      "target": 1641
+    },
+    {
+      "source": 1638,
+      "target": 1642
+    },
+    {
+      "source": 272,
+      "target": 1643
+    },
+    {
+      "source": 1643,
+      "target": 1644
+    },
+    {
+      "source": 1643,
+      "target": 1645
+    },
+    {
+      "source": 1643,
+      "target": 1646
+    },
+    {
+      "source": 1643,
+      "target": 1647
+    },
+    {
+      "source": 1643,
+      "target": 1648
+    },
+    {
+      "source": 272,
+      "target": 1649
+    },
+    {
+      "source": 1649,
+      "target": 1650
+    },
+    {
+      "source": 1649,
+      "target": 1651
+    },
+    {
+      "source": 1649,
+      "target": 1652
+    },
+    {
+      "source": 1649,
+      "target": 1653
+    },
+    {
+      "source": 1649,
+      "target": 1654
+    },
+    {
+      "source": 272,
+      "target": 1655
+    },
+    {
+      "source": 1655,
+      "target": 1656
+    },
+    {
+      "source": 1655,
+      "target": 1657
+    },
+    {
+      "source": 1655,
+      "target": 1658
+    },
+    {
+      "source": 1655,
+      "target": 1659
+    },
+    {
+      "source": 272,
+      "target": 1660
+    },
+    {
+      "source": 1660,
+      "target": 1661
+    },
+    {
+      "source": 1660,
+      "target": 1662
+    },
+    {
+      "source": 1660,
+      "target": 1663
+    },
+    {
+      "source": 1660,
+      "target": 1664
+    },
+    {
+      "source": 1660,
+      "target": 1665
+    },
+    {
+      "source": 272,
+      "target": 1666
+    },
+    {
+      "source": 1666,
+      "target": 1667
+    },
+    {
+      "source": 1666,
+      "target": 1668
+    },
+    {
+      "source": 1666,
+      "target": 1669
+    },
+    {
+      "source": 1666,
+      "target": 1670
+    },
+    {
+      "source": 273,
+      "target": 1671
+    },
+    {
+      "source": 1671,
+      "target": 1672
+    },
+    {
+      "source": 1671,
+      "target": 1673
+    },
+    {
+      "source": 1671,
+      "target": 1674
+    },
+    {
+      "source": 1671,
+      "target": 1675
+    },
+    {
+      "source": 1671,
+      "target": 1676
+    },
+    {
+      "source": 273,
+      "target": 1677
+    },
+    {
+      "source": 1677,
+      "target": 1678
+    },
+    {
+      "source": 1677,
+      "target": 1679
+    },
+    {
+      "source": 1677,
+      "target": 1680
+    },
+    {
+      "source": 1677,
+      "target": 1681
+    },
+    {
+      "source": 1677,
+      "target": 1682
+    },
+    {
+      "source": 273,
+      "target": 1683
+    },
+    {
+      "source": 1683,
+      "target": 1684
+    },
+    {
+      "source": 1683,
+      "target": 1685
+    },
+    {
+      "source": 1683,
+      "target": 1686
+    },
+    {
+      "source": 1683,
+      "target": 1687
+    },
+    {
+      "source": 1683,
+      "target": 1688
+    },
+    {
+      "source": 273,
+      "target": 1689
+    },
+    {
+      "source": 1689,
+      "target": 1690
+    },
+    {
+      "source": 1689,
+      "target": 1691
+    },
+    {
+      "source": 1689,
+      "target": 1692
+    },
+    {
+      "source": 1689,
+      "target": 1693
+    },
+    {
+      "source": 1689,
+      "target": 1694
+    },
+    {
+      "source": 273,
+      "target": 1695
+    },
+    {
+      "source": 1695,
+      "target": 1696
+    },
+    {
+      "source": 1695,
+      "target": 1697
+    },
+    {
+      "source": 1695,
+      "target": 1698
+    },
+    {
+      "source": 1695,
+      "target": 1699
+    },
+    {
+      "source": 273,
+      "target": 1700
+    },
+    {
+      "source": 1700,
+      "target": 1701
+    },
+    {
+      "source": 1700,
+      "target": 1702
+    },
+    {
+      "source": 1700,
+      "target": 1703
+    },
+    {
+      "source": 1700,
+      "target": 1704
+    },
+    {
+      "source": 1700,
+      "target": 1705
     }
   ]
 }
