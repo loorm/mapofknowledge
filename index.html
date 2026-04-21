@@ -9,6 +9,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { background: #080810; font-family: system-ui, sans-serif; overflow: hidden; }
 #canvas { width: 100vw; height: 100vh; }
+#label-layer { position: fixed; top: 0; left: 0; pointer-events: none; overflow: hidden; width: 100vw; height: 100vh; }
 #tooltip {
   position: fixed; pointer-events: none;
   background: rgba(10,10,20,0.95); color: #e0e0f0;
@@ -35,6 +36,7 @@ body { background: #080810; font-family: system-ui, sans-serif; overflow: hidden
 </head>
 <body>
 <svg id="canvas"></svg>
+<svg id="label-layer"></svg>
 <div id="tooltip"></div>
 <div id="legend"></div>
 <div id="info">Scroll to zoom · Drag to pan · Click node to highlight · Search top right</div>
@@ -54,37 +56,32 @@ const CONTINENTS = {
   "Skills & Crafts": "#9A9890"
 };
 
-// Zoom thresholds: at what zoom scale each label level becomes visible
-// Level 1 (continents): visible from 0.1 to 0.8
-// Level 2: visible from 0.5 to 2.0
-// Level 3: visible from 1.2 to 4.0
-// Level 4: visible from 2.5 to 8.0
-// Level 5: visible from 4.0 upward
-const LABEL_RANGES = {
-  1: { min: 0.0, max: 99  },
-  2: { min: 0.0, max: 99  },
-  3: { min: 0.3, max: 99  },
-  4: { min: 0.6, max: 99  },
-  5: { min: 1.0, max: 99  },
-};
-
+// Opacity by level and zoom. Fixed fade width of 0.3 zoom units.
+// L1: always visible
+// L2: fades out when zooming out below 0.5, always visible when zooming in
+// L3: fades in above zoom 0.8
+// L4: fades in above zoom 1.5
+// L5: fades in above zoom 2.5
+const FADE = 0.25;
 function labelOpacity(level, zoom) {
-  const range = LABEL_RANGES[level];
-  if (!range) return 0;
-  const { min, max } = range;
-  if (zoom < min) return 0;
-  if (zoom > max) return 0;
-  const fadeWidth = (max - min) * 0.15;
-  const fadeIn  = Math.min(1, (zoom - min) / Math.max(fadeWidth, 0.01));
-  const fadeOut = max >= 90 ? 1 : Math.min(1, (max - zoom) / Math.max(fadeWidth, 0.01));
-  return Math.min(fadeIn, fadeOut);
+  if (level === 1) return 1;
+  if (level === 2) return Math.min(1, (zoom - 0.3) / FADE);
+  if (level === 3) return Math.min(1, Math.max(0, (zoom - 0.7) / FADE));
+  if (level === 4) return Math.min(1, Math.max(0, (zoom - 1.4) / FADE));
+  if (level === 5) return Math.min(1, Math.max(0, (zoom - 2.4) / FADE));
+  return 0;
 }
+
+// Fixed screen-space font sizes regardless of zoom
+const FONT_SIZE = { 1: 13, 2: 11, 3: 10, 4: 9, 5: 8 };
+const FONT_WEIGHT = { 1: 600, 2: 500, 3: 400, 4: 400, 5: 400 };
+const NODE_OFFSET = { 1: 20, 2: 13, 3: 10, 4: 8, 5: 7 };
 
 fetch('knowledge_map.json')
   .then(r => r.json())
   .then(data => init(data))
   .catch(() => {
-    document.body.innerHTML = '<div style="color:white;padding:20px">Could not load knowledge_map.json — place it in the same folder as this HTML file.</div>';
+    document.body.innerHTML = '<div style="color:white;padding:20px">Could not load knowledge_map.json</div>';
   });
 
 function init(data) {
@@ -97,51 +94,39 @@ function init(data) {
   edges.forEach(e => { if (!edgeMap[e.target]) edgeMap[e.target] = e.source; });
 
   function getContinent(id) {
-    let cur = id;
-    let visited = new Set();
-    while (edgeMap[cur] !== undefined && !visited.has(cur)) {
-      visited.add(cur);
-      cur = edgeMap[cur];
-    }
+    let cur = id, visited = new Set();
+    while (edgeMap[cur] !== undefined && !visited.has(cur)) { visited.add(cur); cur = edgeMap[cur]; }
     return nodeMap[cur] ? nodeMap[cur].label : "Unknown";
   }
-
-  nodes.forEach(n => {
-    n.continent = getContinent(n.id);
-    n.color = CONTINENTS[n.continent] || "#888";
-  });
+  nodes.forEach(n => { n.continent = getContinent(n.id); n.color = CONTINENTS[n.continent] || "#888"; });
 
   const w = window.innerWidth, h = window.innerHeight;
   const svg = d3.select("#canvas").attr("width", w).attr("height", h);
+  const labelSvg = d3.select("#label-layer").attr("width", w).attr("height", h);
   const g = svg.append("g");
 
-  let currentZoom = 1;
+  let currentTransform = d3.zoomIdentity;
 
   const zoomBehaviour = d3.zoom()
     .scaleExtent([0.1, 15])
     .on("zoom", e => {
       g.attr("transform", e.transform);
-      currentZoom = e.transform.k;
+      currentTransform = e.transform;
       updateLabels();
-      document.getElementById("zoom-level").textContent = `zoom: ${currentZoom.toFixed(2)}`;
+      document.getElementById("zoom-level").textContent = `zoom: ${e.transform.k.toFixed(2)}`;
     });
-
   svg.call(zoomBehaviour);
 
   const nodeRadius = d => d.level === 1 ? 16 : d.level === 2 ? 9 : d.level === 3 ? 5.5 : d.level === 4 ? 4 : 3;
 
-  // Pre-seed continent nodes in a circle so they start spread out
+  // Pre-seed continents in a circle
   const continentNames = Object.keys(CONTINENTS);
   const seedRadius = Math.min(w, h) * 0.32;
   const continentSeeds = {};
   continentNames.forEach((name, i) => {
     const angle = (i / continentNames.length) * 2 * Math.PI;
-    continentSeeds[name] = {
-      x: w / 2 + seedRadius * Math.cos(angle),
-      y: h / 2 + seedRadius * Math.sin(angle)
-    };
+    continentSeeds[name] = { x: w/2 + seedRadius * Math.cos(angle), y: h/2 + seedRadius * Math.sin(angle) };
   });
-
   nodes.forEach(n => {
     const seed = continentSeeds[n.continent];
     if (seed) {
@@ -157,7 +142,7 @@ function init(data) {
       return tl <= 2 ? 90 : tl === 3 ? 55 : tl === 4 ? 35 : 22;
     }).strength(0.8))
     .force("charge", d3.forceManyBody().strength(d => d.level === 1 ? -1200 : d.level === 2 ? -300 : d.level === 3 ? -80 : d.level === 4 ? -25 : -10))
-    .force("center", d3.forceCenter(w / 2, h / 2).strength(0.05))
+    .force("center", d3.forceCenter(w/2, h/2).strength(0.05))
     .force("collide", d3.forceCollide().radius(d => nodeRadius(d) + 4).strength(0.8))
     .force("x", d3.forceX(d => continentSeeds[d.continent] ? continentSeeds[d.continent].x : w/2).strength(d => d.level === 1 ? 0.15 : 0.04))
     .force("y", d3.forceY(d => continentSeeds[d.continent] ? continentSeeds[d.continent].y : h/2).strength(d => d.level === 1 ? 0.15 : 0.04))
@@ -165,18 +150,9 @@ function init(data) {
 
   const link = g.append("g").selectAll("line")
     .data(edges).join("line")
-    .attr("stroke", d => {
-      const src = typeof d.source === "object" ? d.source : nodeMap[d.source];
-      return src ? (CONTINENTS[src.continent] || "#444") : "#444";
-    })
-    .attr("stroke-opacity", d => {
-      const src = typeof d.source === "object" ? d.source : nodeMap[d.source];
-      return src?.level === 1 ? 0.5 : src?.level === 2 ? 0.35 : src?.level === 3 ? 0.2 : 0.12;
-    })
-    .attr("stroke-width", d => {
-      const src = typeof d.source === "object" ? d.source : nodeMap[d.source];
-      return src?.level === 1 ? 1.5 : src?.level === 2 ? 1 : 0.5;
-    });
+    .attr("stroke", d => { const src = typeof d.source === "object" ? d.source : nodeMap[d.source]; return src ? (CONTINENTS[src.continent] || "#444") : "#444"; })
+    .attr("stroke-opacity", d => { const src = typeof d.source === "object" ? d.source : nodeMap[d.source]; return src?.level === 1 ? 0.5 : src?.level === 2 ? 0.35 : src?.level === 3 ? 0.2 : 0.12; })
+    .attr("stroke-width", d => { const src = typeof d.source === "object" ? d.source : nodeMap[d.source]; return src?.level === 1 ? 1.5 : src?.level === 2 ? 1 : 0.5; });
 
   const node = g.append("g").selectAll("circle")
     .data(nodes).join("circle")
@@ -191,28 +167,21 @@ function init(data) {
       .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
       .on("end", (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
 
-  // Labels for ALL levels — opacity controlled by zoom
-  const label = g.append("g").selectAll("text")
+  // Labels live in a SEPARATE fixed SVG outside the zoom group
+  // We manually convert world coords to screen coords each tick
+  const label = labelSvg.selectAll("text")
     .data(nodes).join("text")
     .text(d => d.label)
-    .attr("font-size", d => d.level === 1 ? 13 : d.level === 2 ? 11 : d.level === 3 ? 10 : d.level === 4 ? 9 : 8)
-    .attr("font-weight", d => d.level <= 2 ? 600 : 400)
+    .attr("font-size", d => FONT_SIZE[d.level] || 9)
+    .attr("font-weight", d => FONT_WEIGHT[d.level] || 400)
     .attr("fill", "#fff")
     .attr("text-anchor", "middle")
-    .attr("dy", d => -(nodeRadius(d) + 3))
-    .attr("opacity", d => d.level <= 2 ? 1 : 0)
-    .style("pointer-events", "none")
+    .attr("opacity", 0)
     .style("user-select", "none");
 
   function updateLabels() {
-    label
-      .attr("opacity", d => labelOpacity(d.level, currentZoom))
-      .attr("font-size", d => {
-        const base = d.level === 1 ? 13 : d.level === 2 ? 11 : d.level === 3 ? 10 : d.level === 4 ? 9 : 8;
-        const minSize = d.level === 1 ? 11 : d.level === 2 ? 9 : 7;
-        return Math.max(minSize, base / currentZoom);
-      })
-      .attr("dy", d => -(nodeRadius(d) + 3) / currentZoom);
+    const k = currentTransform.k;
+    label.attr("opacity", d => labelOpacity(d.level, k));
   }
 
   const tt = document.getElementById("tooltip");
@@ -228,12 +197,8 @@ function init(data) {
   function resetHighlight() {
     selected = null;
     node.attr("fill-opacity", n => n.level === 1 ? 1 : n.level === 2 ? 0.85 : 0.7);
-    link.attr("stroke-opacity", l => {
-      const src = typeof l.source === "object" ? l.source : nodeMap[l.source];
-      return src?.level === 1 ? 0.5 : src?.level === 2 ? 0.35 : src?.level === 3 ? 0.2 : 0.12;
-    });
+    link.attr("stroke-opacity", l => { const src = typeof l.source === "object" ? l.source : nodeMap[l.source]; return src?.level === 1 ? 0.5 : src?.level === 2 ? 0.35 : src?.level === 3 ? 0.2 : 0.12; });
   }
-
   node.on("click", (e, d) => {
     e.stopPropagation();
     if (selected === d.id) { resetHighlight(); return; }
@@ -268,8 +233,15 @@ function init(data) {
       .attr("x1", d => d.source.x).attr("y1", d => d.source.y)
       .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
     node.attr("cx", d => d.x).attr("cy", d => d.y);
-    label.attr("x", d => d.x).attr("y", d => d.y);
+
+    // Convert world coords to screen coords for labels
+    label
+      .attr("x", d => currentTransform.applyX(d.x))
+      .attr("y", d => currentTransform.applyY(d.y) - (NODE_OFFSET[d.level] || 10));
   });
+
+  // Set initial label opacity
+  updateLabels();
 
   const legend = document.getElementById("legend");
   Object.entries(CONTINENTS).forEach(([name, color]) => {
@@ -279,6 +251,7 @@ function init(data) {
   window.addEventListener("resize", () => {
     const nw = window.innerWidth, nh = window.innerHeight;
     svg.attr("width", nw).attr("height", nh);
+    labelSvg.attr("width", nw).attr("height", nh);
     sim.force("center", d3.forceCenter(nw/2, nh/2)).alpha(0.1).restart();
   });
 }
