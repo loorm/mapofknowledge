@@ -6794,6 +6794,221 @@
       "id": 1370,
       "label": "Parsing",
       "level": 4
+    },
+    {
+      "id": 1371,
+      "label": "Philology",
+      "level": 2
+    },
+    {
+      "id": 1372,
+      "label": "Indo-European languages",
+      "level": 3
+    },
+    {
+      "id": 1373,
+      "label": "Romance languages",
+      "level": 4
+    },
+    {
+      "id": 1374,
+      "label": "Germanic languages",
+      "level": 4
+    },
+    {
+      "id": 1375,
+      "label": "Slavic languages",
+      "level": 4
+    },
+    {
+      "id": 1376,
+      "label": "Indo-Iranian languages",
+      "level": 4
+    },
+    {
+      "id": 1377,
+      "label": "Hellenic languages",
+      "level": 4
+    },
+    {
+      "id": 1378,
+      "label": "Baltic languages",
+      "level": 4
+    },
+    {
+      "id": 1379,
+      "label": "Celtic languages",
+      "level": 4
+    },
+    {
+      "id": 1380,
+      "label": "Armenian",
+      "level": 4
+    },
+    {
+      "id": 1381,
+      "label": "Albanian",
+      "level": 4
+    },
+    {
+      "id": 1382,
+      "label": "Afroasiatic languages",
+      "level": 3
+    },
+    {
+      "id": 1383,
+      "label": "Semitic languages",
+      "level": 4
+    },
+    {
+      "id": 1384,
+      "label": "Berber languages",
+      "level": 4
+    },
+    {
+      "id": 1385,
+      "label": "Cushitic languages",
+      "level": 4
+    },
+    {
+      "id": 1386,
+      "label": "Chadic languages",
+      "level": 4
+    },
+    {
+      "id": 1387,
+      "label": "Sino-Tibetan languages",
+      "level": 3
+    },
+    {
+      "id": 1388,
+      "label": "Sinitic languages",
+      "level": 4
+    },
+    {
+      "id": 1389,
+      "label": "Tibeto-Burman languages",
+      "level": 4
+    },
+    {
+      "id": 1390,
+      "label": "Turkic languages",
+      "level": 3
+    },
+    {
+      "id": 1391,
+      "label": "Mongolic languages",
+      "level": 3
+    },
+    {
+      "id": 1392,
+      "label": "Tungusic languages",
+      "level": 3
+    },
+    {
+      "id": 1393,
+      "label": "Japonic languages",
+      "level": 3
+    },
+    {
+      "id": 1394,
+      "label": "Koreanic languages",
+      "level": 3
+    },
+    {
+      "id": 1395,
+      "label": "Dravidian languages",
+      "level": 3
+    },
+    {
+      "id": 1396,
+      "label": "Austronesian languages",
+      "level": 3
+    },
+    {
+      "id": 1397,
+      "label": "Austroasiatic languages",
+      "level": 3
+    },
+    {
+      "id": 1398,
+      "label": "Tai-Kadai languages",
+      "level": 3
+    },
+    {
+      "id": 1399,
+      "label": "Niger-Congo languages",
+      "level": 3
+    },
+    {
+      "id": 1400,
+      "label": "Nilo-Saharan languages",
+      "level": 3
+    },
+    {
+      "id": 1401,
+      "label": "Khoisan languages",
+      "level": 3
+    },
+    {
+      "id": 1402,
+      "label": "Uralic languages",
+      "level": 3
+    },
+    {
+      "id": 1403,
+      "label": "Finno-Ugric languages",
+      "level": 4
+    },
+    {
+      "id": 1404,
+      "label": "Samoyedic languages",
+      "level": 4
+    },
+    {
+      "id": 1405,
+      "label": "Kartvelian languages",
+      "level": 3
+    },
+    {
+      "id": 1406,
+      "label": "Northwest Caucasian languages",
+      "level": 3
+    },
+    {
+      "id": 1407,
+      "label": "Northeast Caucasian languages",
+      "level": 3
+    },
+    {
+      "id": 1408,
+      "label": "Na-Den\u00e9 languages",
+      "level": 3
+    },
+    {
+      "id": 1409,
+      "label": "Algonquian languages",
+      "level": 3
+    },
+    {
+      "id": 1410,
+      "label": "Uto-Aztecan languages",
+      "level": 3
+    },
+    {
+      "id": 1411,
+      "label": "Mayan languages",
+      "level": 3
+    },
+    {
+      "id": 1412,
+      "label": "Quechuan languages",
+      "level": 3
+    },
+    {
+      "id": 1413,
+      "label": "Language isolates",
+      "level": 3
     }
   ],
   "edges": [
@@ -12216,6 +12431,178 @@
     {
       "source": 1365,
       "target": 1370
+    },
+    {
+      "source": 247,
+      "target": 1371
+    },
+    {
+      "source": 1371,
+      "target": 1372
+    },
+    {
+      "source": 1372,
+      "target": 1373
+    },
+    {
+      "source": 1372,
+      "target": 1374
+    },
+    {
+      "source": 1372,
+      "target": 1375
+    },
+    {
+      "source": 1372,
+      "target": 1376
+    },
+    {
+      "source": 1372,
+      "target": 1377
+    },
+    {
+      "source": 1372,
+      "target": 1378
+    },
+    {
+      "source": 1372,
+      "target": 1379
+    },
+    {
+      "source": 1372,
+      "target": 1380
+    },
+    {
+      "source": 1372,
+      "target": 1381
+    },
+    {
+      "source": 1371,
+      "target": 1382
+    },
+    {
+      "source": 1382,
+      "target": 1383
+    },
+    {
+      "source": 1382,
+      "target": 1384
+    },
+    {
+      "source": 1382,
+      "target": 1385
+    },
+    {
+      "source": 1382,
+      "target": 1386
+    },
+    {
+      "source": 1371,
+      "target": 1387
+    },
+    {
+      "source": 1387,
+      "target": 1388
+    },
+    {
+      "source": 1387,
+      "target": 1389
+    },
+    {
+      "source": 1371,
+      "target": 1390
+    },
+    {
+      "source": 1371,
+      "target": 1391
+    },
+    {
+      "source": 1371,
+      "target": 1392
+    },
+    {
+      "source": 1371,
+      "target": 1393
+    },
+    {
+      "source": 1371,
+      "target": 1394
+    },
+    {
+      "source": 1371,
+      "target": 1395
+    },
+    {
+      "source": 1371,
+      "target": 1396
+    },
+    {
+      "source": 1371,
+      "target": 1397
+    },
+    {
+      "source": 1371,
+      "target": 1398
+    },
+    {
+      "source": 1371,
+      "target": 1399
+    },
+    {
+      "source": 1371,
+      "target": 1400
+    },
+    {
+      "source": 1371,
+      "target": 1401
+    },
+    {
+      "source": 1371,
+      "target": 1402
+    },
+    {
+      "source": 1402,
+      "target": 1403
+    },
+    {
+      "source": 1402,
+      "target": 1404
+    },
+    {
+      "source": 1371,
+      "target": 1405
+    },
+    {
+      "source": 1371,
+      "target": 1406
+    },
+    {
+      "source": 1371,
+      "target": 1407
+    },
+    {
+      "source": 1371,
+      "target": 1408
+    },
+    {
+      "source": 1371,
+      "target": 1409
+    },
+    {
+      "source": 1371,
+      "target": 1410
+    },
+    {
+      "source": 1371,
+      "target": 1411
+    },
+    {
+      "source": 1371,
+      "target": 1412
+    },
+    {
+      "source": 1371,
+      "target": 1413
     }
   ]
 }
