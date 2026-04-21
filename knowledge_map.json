@@ -1196,11 +1196,6 @@
       "level": 2
     },
     {
-      "id": 252,
-      "label": "Theology",
-      "level": 2
-    },
-    {
       "id": 253,
       "label": "Arts",
       "level": 1
@@ -8566,10 +8561,6 @@
       "target": 251
     },
     {
-      "source": 247,
-      "target": 252
-    },
-    {
       "source": 253,
       "target": 254
     },
@@ -13314,10 +13305,6 @@
       "target": 1447
     },
     {
-      "source": 252,
-      "target": 1448
-    },
-    {
       "source": 1448,
       "target": 1449
     },
@@ -13346,10 +13333,6 @@
       "target": 1455
     },
     {
-      "source": 252,
-      "target": 1456
-    },
-    {
       "source": 1456,
       "target": 1457
     },
@@ -13364,10 +13347,6 @@
     {
       "source": 1456,
       "target": 1460
-    },
-    {
-      "source": 252,
-      "target": 1461
     },
     {
       "source": 1461,
@@ -13386,10 +13365,6 @@
       "target": 1465
     },
     {
-      "source": 252,
-      "target": 1466
-    },
-    {
       "source": 1466,
       "target": 1467
     },
@@ -13404,10 +13379,6 @@
     {
       "source": 1466,
       "target": 1470
-    },
-    {
-      "source": 252,
-      "target": 1471
     },
     {
       "source": 1471,
@@ -13692,6 +13663,26 @@
     {
       "source": 1541,
       "target": 1277
+    },
+    {
+      "source": 514,
+      "target": 1448
+    },
+    {
+      "source": 514,
+      "target": 1456
+    },
+    {
+      "source": 514,
+      "target": 1461
+    },
+    {
+      "source": 514,
+      "target": 1466
+    },
+    {
+      "source": 514,
+      "target": 1471
     }
   ]
 }
