@@ -172,7 +172,7 @@ function init(data) {
   const label = g.append("g").selectAll("text")
     .data(nodes).join("text")
     .text(d => d.label)
-    .attr("font-size", d => d.level === 1 ? 13 : d.level === 2 ? 10 : d.level === 3 ? 9 : d.level === 4 ? 8 : 7)
+    .attr("font-size", d => d.level === 1 ? 13 : d.level === 2 ? 11 : d.level === 3 ? 10 : d.level === 4 ? 9 : 8)
     .attr("font-weight", d => d.level <= 2 ? 600 : 400)
     .attr("fill", "#fff")
     .attr("text-anchor", "middle")
@@ -182,7 +182,13 @@ function init(data) {
     .style("user-select", "none");
 
   function updateLabels() {
-    label.attr("opacity", d => labelOpacity(d.level, currentZoom));
+    label
+      .attr("opacity", d => labelOpacity(d.level, currentZoom))
+      .attr("font-size", d => {
+        const base = d.level === 1 ? 13 : d.level === 2 ? 11 : d.level === 3 ? 10 : d.level === 4 ? 9 : 8;
+        return base / currentZoom;
+      })
+      .attr("dy", d => -(nodeRadius(d) + 3) / currentZoom);
   }
 
   const tt = document.getElementById("tooltip");
