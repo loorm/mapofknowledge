@@ -6449,6 +6449,351 @@
       "id": 1301,
       "label": "Product evaluation",
       "level": 5
+    },
+    {
+      "id": 1302,
+      "label": "Semiotics",
+      "level": 2
+    },
+    {
+      "id": 1303,
+      "label": "Sign",
+      "level": 3
+    },
+    {
+      "id": 1304,
+      "label": "Signifier",
+      "level": 3
+    },
+    {
+      "id": 1305,
+      "label": "Signified",
+      "level": 3
+    },
+    {
+      "id": 1306,
+      "label": "Iconicity",
+      "level": 3
+    },
+    {
+      "id": 1307,
+      "label": "Indexicality",
+      "level": 3
+    },
+    {
+      "id": 1308,
+      "label": "Arbitrariness",
+      "level": 3
+    },
+    {
+      "id": 1309,
+      "label": "Sign systems",
+      "level": 3
+    },
+    {
+      "id": 1310,
+      "label": "Semiosis",
+      "level": 3
+    },
+    {
+      "id": 1311,
+      "label": "Phonetics",
+      "level": 3
+    },
+    {
+      "id": 1312,
+      "label": "Articulatory phonetics",
+      "level": 4
+    },
+    {
+      "id": 1313,
+      "label": "Acoustic phonetics",
+      "level": 4
+    },
+    {
+      "id": 1314,
+      "label": "Auditory phonetics",
+      "level": 4
+    },
+    {
+      "id": 1315,
+      "label": "Phonetic transcription",
+      "level": 4
+    },
+    {
+      "id": 1316,
+      "label": "Prosody",
+      "level": 4
+    },
+    {
+      "id": 1317,
+      "label": "Phonology",
+      "level": 3
+    },
+    {
+      "id": 1318,
+      "label": "Phonemes",
+      "level": 4
+    },
+    {
+      "id": 1319,
+      "label": "Allophones",
+      "level": 4
+    },
+    {
+      "id": 1320,
+      "label": "Syllable structure",
+      "level": 4
+    },
+    {
+      "id": 1321,
+      "label": "Tone",
+      "level": 4
+    },
+    {
+      "id": 1322,
+      "label": "Stress",
+      "level": 4
+    },
+    {
+      "id": 1323,
+      "label": "Phonological rules",
+      "level": 4
+    },
+    {
+      "id": 1324,
+      "label": "Morphology",
+      "level": 3
+    },
+    {
+      "id": 1325,
+      "label": "Morphemes",
+      "level": 4
+    },
+    {
+      "id": 1326,
+      "label": "Inflection",
+      "level": 4
+    },
+    {
+      "id": 1327,
+      "label": "Derivation",
+      "level": 4
+    },
+    {
+      "id": 1328,
+      "label": "Compounding",
+      "level": 4
+    },
+    {
+      "id": 1329,
+      "label": "Word formation",
+      "level": 4
+    },
+    {
+      "id": 1330,
+      "label": "Syntax",
+      "level": 3
+    },
+    {
+      "id": 1331,
+      "label": "Phrase structure",
+      "level": 4
+    },
+    {
+      "id": 1332,
+      "label": "Grammatical relations",
+      "level": 4
+    },
+    {
+      "id": 1333,
+      "label": "Constituency",
+      "level": 4
+    },
+    {
+      "id": 1334,
+      "label": "Dependency",
+      "level": 4
+    },
+    {
+      "id": 1335,
+      "label": "Binding",
+      "level": 4
+    },
+    {
+      "id": 1336,
+      "label": "Semantics",
+      "level": 3
+    },
+    {
+      "id": 1337,
+      "label": "Lexical semantics",
+      "level": 4
+    },
+    {
+      "id": 1338,
+      "label": "Compositional semantics",
+      "level": 4
+    },
+    {
+      "id": 1339,
+      "label": "Reference",
+      "level": 4
+    },
+    {
+      "id": 1340,
+      "label": "Predication",
+      "level": 4
+    },
+    {
+      "id": 1341,
+      "label": "Presupposition",
+      "level": 4
+    },
+    {
+      "id": 1342,
+      "label": "Entailment",
+      "level": 4
+    },
+    {
+      "id": 1343,
+      "label": "Pragmatics",
+      "level": 3
+    },
+    {
+      "id": 1344,
+      "label": "Speech acts",
+      "level": 4
+    },
+    {
+      "id": 1345,
+      "label": "Implicature",
+      "level": 4
+    },
+    {
+      "id": 1346,
+      "label": "Deixis",
+      "level": 4
+    },
+    {
+      "id": 1347,
+      "label": "Discourse structure",
+      "level": 4
+    },
+    {
+      "id": 1348,
+      "label": "Historical linguistics",
+      "level": 3
+    },
+    {
+      "id": 1349,
+      "label": "Sound change",
+      "level": 4
+    },
+    {
+      "id": 1350,
+      "label": "Grammaticalisation",
+      "level": 4
+    },
+    {
+      "id": 1351,
+      "label": "Language reconstruction",
+      "level": 4
+    },
+    {
+      "id": 1352,
+      "label": "Language families",
+      "level": 4
+    },
+    {
+      "id": 1353,
+      "label": "Etymology",
+      "level": 4
+    },
+    {
+      "id": 1354,
+      "label": "Sociolinguistics",
+      "level": 3
+    },
+    {
+      "id": 1355,
+      "label": "Language variation",
+      "level": 4
+    },
+    {
+      "id": 1356,
+      "label": "Language change",
+      "level": 4
+    },
+    {
+      "id": 1357,
+      "label": "Diglossia",
+      "level": 4
+    },
+    {
+      "id": 1358,
+      "label": "Code-switching",
+      "level": 4
+    },
+    {
+      "id": 1359,
+      "label": "Typology",
+      "level": 3
+    },
+    {
+      "id": 1360,
+      "label": "Word order",
+      "level": 4
+    },
+    {
+      "id": 1361,
+      "label": "Morphological typology",
+      "level": 4
+    },
+    {
+      "id": 1362,
+      "label": "Syntactic universals",
+      "level": 4
+    },
+    {
+      "id": 1363,
+      "label": "Semantic universals",
+      "level": 4
+    },
+    {
+      "id": 1364,
+      "label": "Implicational universals",
+      "level": 4
+    },
+    {
+      "id": 1365,
+      "label": "Formal linguistics",
+      "level": 3
+    },
+    {
+      "id": 1366,
+      "label": "Formal grammars",
+      "level": 4
+    },
+    {
+      "id": 1367,
+      "label": "Chomsky hierarchy",
+      "level": 4
+    },
+    {
+      "id": 1368,
+      "label": "Automata theory",
+      "level": 4
+    },
+    {
+      "id": 1369,
+      "label": "Generative grammar",
+      "level": 4
+    },
+    {
+      "id": 1370,
+      "label": "Parsing",
+      "level": 4
     }
   ],
   "edges": [
@@ -11595,6 +11940,282 @@
     {
       "source": 1297,
       "target": 1301
+    },
+    {
+      "source": 247,
+      "target": 1302
+    },
+    {
+      "source": 1302,
+      "target": 1303
+    },
+    {
+      "source": 1302,
+      "target": 1304
+    },
+    {
+      "source": 1302,
+      "target": 1305
+    },
+    {
+      "source": 1302,
+      "target": 1306
+    },
+    {
+      "source": 1302,
+      "target": 1307
+    },
+    {
+      "source": 1302,
+      "target": 1308
+    },
+    {
+      "source": 1302,
+      "target": 1309
+    },
+    {
+      "source": 1302,
+      "target": 1310
+    },
+    {
+      "source": 251,
+      "target": 1311
+    },
+    {
+      "source": 1311,
+      "target": 1312
+    },
+    {
+      "source": 1311,
+      "target": 1313
+    },
+    {
+      "source": 1311,
+      "target": 1314
+    },
+    {
+      "source": 1311,
+      "target": 1315
+    },
+    {
+      "source": 1311,
+      "target": 1316
+    },
+    {
+      "source": 251,
+      "target": 1317
+    },
+    {
+      "source": 1317,
+      "target": 1318
+    },
+    {
+      "source": 1317,
+      "target": 1319
+    },
+    {
+      "source": 1317,
+      "target": 1320
+    },
+    {
+      "source": 1317,
+      "target": 1321
+    },
+    {
+      "source": 1317,
+      "target": 1322
+    },
+    {
+      "source": 1317,
+      "target": 1323
+    },
+    {
+      "source": 251,
+      "target": 1324
+    },
+    {
+      "source": 1324,
+      "target": 1325
+    },
+    {
+      "source": 1324,
+      "target": 1326
+    },
+    {
+      "source": 1324,
+      "target": 1327
+    },
+    {
+      "source": 1324,
+      "target": 1328
+    },
+    {
+      "source": 1324,
+      "target": 1329
+    },
+    {
+      "source": 251,
+      "target": 1330
+    },
+    {
+      "source": 1330,
+      "target": 1331
+    },
+    {
+      "source": 1330,
+      "target": 1332
+    },
+    {
+      "source": 1330,
+      "target": 1333
+    },
+    {
+      "source": 1330,
+      "target": 1334
+    },
+    {
+      "source": 1330,
+      "target": 1335
+    },
+    {
+      "source": 251,
+      "target": 1336
+    },
+    {
+      "source": 1336,
+      "target": 1337
+    },
+    {
+      "source": 1336,
+      "target": 1338
+    },
+    {
+      "source": 1336,
+      "target": 1339
+    },
+    {
+      "source": 1336,
+      "target": 1340
+    },
+    {
+      "source": 1336,
+      "target": 1341
+    },
+    {
+      "source": 1336,
+      "target": 1342
+    },
+    {
+      "source": 251,
+      "target": 1343
+    },
+    {
+      "source": 1343,
+      "target": 1344
+    },
+    {
+      "source": 1343,
+      "target": 1345
+    },
+    {
+      "source": 1343,
+      "target": 1346
+    },
+    {
+      "source": 1343,
+      "target": 1347
+    },
+    {
+      "source": 251,
+      "target": 1348
+    },
+    {
+      "source": 1348,
+      "target": 1349
+    },
+    {
+      "source": 1348,
+      "target": 1350
+    },
+    {
+      "source": 1348,
+      "target": 1351
+    },
+    {
+      "source": 1348,
+      "target": 1352
+    },
+    {
+      "source": 1348,
+      "target": 1353
+    },
+    {
+      "source": 251,
+      "target": 1354
+    },
+    {
+      "source": 1354,
+      "target": 1355
+    },
+    {
+      "source": 1354,
+      "target": 1356
+    },
+    {
+      "source": 1354,
+      "target": 1357
+    },
+    {
+      "source": 1354,
+      "target": 1358
+    },
+    {
+      "source": 251,
+      "target": 1359
+    },
+    {
+      "source": 1359,
+      "target": 1360
+    },
+    {
+      "source": 1359,
+      "target": 1361
+    },
+    {
+      "source": 1359,
+      "target": 1362
+    },
+    {
+      "source": 1359,
+      "target": 1363
+    },
+    {
+      "source": 1359,
+      "target": 1364
+    },
+    {
+      "source": 251,
+      "target": 1365
+    },
+    {
+      "source": 1365,
+      "target": 1366
+    },
+    {
+      "source": 1365,
+      "target": 1367
+    },
+    {
+      "source": 1365,
+      "target": 1368
+    },
+    {
+      "source": 1365,
+      "target": 1369
+    },
+    {
+      "source": 1365,
+      "target": 1370
     }
   ]
 }
