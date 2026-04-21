@@ -108,7 +108,7 @@ function init(data) {
   let currentTransform = d3.zoomIdentity;
 
   const zoomBehaviour = d3.zoom()
-    .scaleExtent([0.1, 15])
+    .scaleExtent([0.1, 5])
     .on("zoom", e => {
       g.attr("transform", e.transform);
       currentTransform = e.transform;
