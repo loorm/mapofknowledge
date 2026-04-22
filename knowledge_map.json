@@ -2191,36 +2191,6 @@
       "level": 2
     },
     {
-      "id": 468,
-      "label": "Planetary science",
-      "level": 3
-    },
-    {
-      "id": 469,
-      "label": "Stellar astronomy",
-      "level": 3
-    },
-    {
-      "id": 470,
-      "label": "Solar physics",
-      "level": 4
-    },
-    {
-      "id": 471,
-      "label": "Galactic astronomy",
-      "level": 3
-    },
-    {
-      "id": 472,
-      "label": "Extragalactic astronomy",
-      "level": 3
-    },
-    {
-      "id": 473,
-      "label": "Cosmology",
-      "level": 3
-    },
-    {
       "id": 474,
       "label": "Geology",
       "level": 2
@@ -11749,6 +11719,186 @@
       "id": 2430,
       "label": "Rhetorical argumentation",
       "level": 4
+    },
+    {
+      "id": 2431,
+      "label": "Planetary science",
+      "level": 3
+    },
+    {
+      "id": 2432,
+      "label": "Planetary formation",
+      "level": 4
+    },
+    {
+      "id": 2433,
+      "label": "Planetary atmospheres",
+      "level": 4
+    },
+    {
+      "id": 2434,
+      "label": "Planetary interiors",
+      "level": 4
+    },
+    {
+      "id": 2435,
+      "label": "Moons and ring systems",
+      "level": 4
+    },
+    {
+      "id": 2436,
+      "label": "Small bodies",
+      "level": 4
+    },
+    {
+      "id": 2437,
+      "label": "Exoplanetology",
+      "level": 3
+    },
+    {
+      "id": 2438,
+      "label": "Detection methods",
+      "level": 4
+    },
+    {
+      "id": 2439,
+      "label": "Planetary system architecture",
+      "level": 4
+    },
+    {
+      "id": 2440,
+      "label": "Exoplanet atmospheres",
+      "level": 4
+    },
+    {
+      "id": 2441,
+      "label": "Population statistics",
+      "level": 4
+    },
+    {
+      "id": 2442,
+      "label": "Habitability",
+      "level": 4
+    },
+    {
+      "id": 2443,
+      "label": "Stellar astronomy",
+      "level": 3
+    },
+    {
+      "id": 2444,
+      "label": "Stellar structure",
+      "level": 4
+    },
+    {
+      "id": 2445,
+      "label": "Stellar evolution",
+      "level": 4
+    },
+    {
+      "id": 2446,
+      "label": "Stellar classification",
+      "level": 4
+    },
+    {
+      "id": 2447,
+      "label": "Variable stars",
+      "level": 4
+    },
+    {
+      "id": 2448,
+      "label": "Stellar remnants",
+      "level": 4
+    },
+    {
+      "id": 2449,
+      "label": "Galactic astronomy",
+      "level": 3
+    },
+    {
+      "id": 2450,
+      "label": "Milky Way structure",
+      "level": 4
+    },
+    {
+      "id": 2451,
+      "label": "Star clusters",
+      "level": 4
+    },
+    {
+      "id": 2452,
+      "label": "Interstellar medium",
+      "level": 4
+    },
+    {
+      "id": 2453,
+      "label": "Galactic dynamics",
+      "level": 4
+    },
+    {
+      "id": 2454,
+      "label": "Dark matter in galaxies",
+      "level": 4
+    },
+    {
+      "id": 2455,
+      "label": "Extragalactic astronomy",
+      "level": 3
+    },
+    {
+      "id": 2456,
+      "label": "Galaxy classification",
+      "level": 4
+    },
+    {
+      "id": 2457,
+      "label": "Galaxy formation",
+      "level": 4
+    },
+    {
+      "id": 2458,
+      "label": "Active galactic nuclei",
+      "level": 4
+    },
+    {
+      "id": 2459,
+      "label": "Galaxy clusters",
+      "level": 4
+    },
+    {
+      "id": 2460,
+      "label": "Large-scale structure",
+      "level": 4
+    },
+    {
+      "id": 2461,
+      "label": "Cosmology",
+      "level": 3
+    },
+    {
+      "id": 2462,
+      "label": "Big Bang theory",
+      "level": 4
+    },
+    {
+      "id": 2463,
+      "label": "Cosmic microwave background",
+      "level": 4
+    },
+    {
+      "id": 2464,
+      "label": "Dark energy",
+      "level": 4
+    },
+    {
+      "id": 2465,
+      "label": "Cosmic inflation",
+      "level": 4
+    },
+    {
+      "id": 2466,
+      "label": "Nucleosynthesis",
+      "level": 4
     }
   ],
   "edges": [
@@ -13491,30 +13641,6 @@
     {
       "source": 274,
       "target": 467
-    },
-    {
-      "source": 467,
-      "target": 468
-    },
-    {
-      "source": 467,
-      "target": 469
-    },
-    {
-      "source": 469,
-      "target": 470
-    },
-    {
-      "source": 467,
-      "target": 471
-    },
-    {
-      "source": 467,
-      "target": 472
-    },
-    {
-      "source": 467,
-      "target": 473
     },
     {
       "source": 274,
@@ -21135,6 +21261,150 @@
     {
       "source": 1896,
       "target": 2430
+    },
+    {
+      "source": 467,
+      "target": 2431
+    },
+    {
+      "source": 2431,
+      "target": 2432
+    },
+    {
+      "source": 2431,
+      "target": 2433
+    },
+    {
+      "source": 2431,
+      "target": 2434
+    },
+    {
+      "source": 2431,
+      "target": 2435
+    },
+    {
+      "source": 2431,
+      "target": 2436
+    },
+    {
+      "source": 467,
+      "target": 2437
+    },
+    {
+      "source": 2437,
+      "target": 2438
+    },
+    {
+      "source": 2437,
+      "target": 2439
+    },
+    {
+      "source": 2437,
+      "target": 2440
+    },
+    {
+      "source": 2437,
+      "target": 2441
+    },
+    {
+      "source": 2437,
+      "target": 2442
+    },
+    {
+      "source": 467,
+      "target": 2443
+    },
+    {
+      "source": 2443,
+      "target": 2444
+    },
+    {
+      "source": 2443,
+      "target": 2445
+    },
+    {
+      "source": 2443,
+      "target": 2446
+    },
+    {
+      "source": 2443,
+      "target": 2447
+    },
+    {
+      "source": 2443,
+      "target": 2448
+    },
+    {
+      "source": 467,
+      "target": 2449
+    },
+    {
+      "source": 2449,
+      "target": 2450
+    },
+    {
+      "source": 2449,
+      "target": 2451
+    },
+    {
+      "source": 2449,
+      "target": 2452
+    },
+    {
+      "source": 2449,
+      "target": 2453
+    },
+    {
+      "source": 2449,
+      "target": 2454
+    },
+    {
+      "source": 467,
+      "target": 2455
+    },
+    {
+      "source": 2455,
+      "target": 2456
+    },
+    {
+      "source": 2455,
+      "target": 2457
+    },
+    {
+      "source": 2455,
+      "target": 2458
+    },
+    {
+      "source": 2455,
+      "target": 2459
+    },
+    {
+      "source": 2455,
+      "target": 2460
+    },
+    {
+      "source": 467,
+      "target": 2461
+    },
+    {
+      "source": 2461,
+      "target": 2462
+    },
+    {
+      "source": 2461,
+      "target": 2463
+    },
+    {
+      "source": 2461,
+      "target": 2464
+    },
+    {
+      "source": 2461,
+      "target": 2465
+    },
+    {
+      "source": 2461,
+      "target": 2466
     }
   ]
 }
