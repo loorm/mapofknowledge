@@ -9689,6 +9689,131 @@
       "id": 1981,
       "label": "Legal transplants",
       "level": 4
+    },
+    {
+      "id": 1982,
+      "label": "Cultural anthropology",
+      "level": 3
+    },
+    {
+      "id": 1983,
+      "label": "Ethnography",
+      "level": 4
+    },
+    {
+      "id": 1984,
+      "label": "Kinship and social organisation",
+      "level": 4
+    },
+    {
+      "id": 1985,
+      "label": "Religion and ritual",
+      "level": 4
+    },
+    {
+      "id": 1986,
+      "label": "Economic anthropology",
+      "level": 4
+    },
+    {
+      "id": 1987,
+      "label": "Political anthropology",
+      "level": 4
+    },
+    {
+      "id": 1988,
+      "label": "Symbolism and meaning",
+      "level": 4
+    },
+    {
+      "id": 1989,
+      "label": "Cultural change",
+      "level": 4
+    },
+    {
+      "id": 1990,
+      "label": "Biological anthropology",
+      "level": 3
+    },
+    {
+      "id": 1991,
+      "label": "Human evolution",
+      "level": 4
+    },
+    {
+      "id": 1992,
+      "label": "Primatology",
+      "level": 4
+    },
+    {
+      "id": 1993,
+      "label": "Human genetics",
+      "level": 4
+    },
+    {
+      "id": 1994,
+      "label": "Osteology",
+      "level": 4
+    },
+    {
+      "id": 1995,
+      "label": "Paleoanthropology",
+      "level": 4
+    },
+    {
+      "id": 1996,
+      "label": "Human variation",
+      "level": 4
+    },
+    {
+      "id": 1997,
+      "label": "Linguistic anthropology",
+      "level": 3
+    },
+    {
+      "id": 1998,
+      "label": "Language and culture",
+      "level": 4
+    },
+    {
+      "id": 1999,
+      "label": "Discourse analysis",
+      "level": 4
+    },
+    {
+      "id": 2000,
+      "label": "Language socialisation",
+      "level": 4
+    },
+    {
+      "id": 2001,
+      "label": "Multilingualism",
+      "level": 4
+    },
+    {
+      "id": 2002,
+      "label": "Language ideology",
+      "level": 4
+    },
+    {
+      "id": 2003,
+      "label": "Narrative and identity",
+      "level": 4
+    },
+    {
+      "id": 2004,
+      "label": "Anthropological methods",
+      "level": 3
+    },
+    {
+      "id": 2005,
+      "label": "Participant observation",
+      "level": 4
+    },
+    {
+      "id": 2006,
+      "label": "Comparative method",
+      "level": 4
     }
   ],
   "edges": [
@@ -17427,6 +17552,106 @@
     {
       "source": 1975,
       "target": 1981
+    },
+    {
+      "source": 201,
+      "target": 1982
+    },
+    {
+      "source": 1982,
+      "target": 1984
+    },
+    {
+      "source": 1982,
+      "target": 1985
+    },
+    {
+      "source": 1982,
+      "target": 1986
+    },
+    {
+      "source": 1982,
+      "target": 1987
+    },
+    {
+      "source": 1982,
+      "target": 1988
+    },
+    {
+      "source": 1982,
+      "target": 1989
+    },
+    {
+      "source": 201,
+      "target": 1990
+    },
+    {
+      "source": 1990,
+      "target": 1991
+    },
+    {
+      "source": 1990,
+      "target": 1992
+    },
+    {
+      "source": 1990,
+      "target": 1993
+    },
+    {
+      "source": 1990,
+      "target": 1994
+    },
+    {
+      "source": 1990,
+      "target": 1995
+    },
+    {
+      "source": 1990,
+      "target": 1996
+    },
+    {
+      "source": 201,
+      "target": 1997
+    },
+    {
+      "source": 1997,
+      "target": 1998
+    },
+    {
+      "source": 1997,
+      "target": 1999
+    },
+    {
+      "source": 1997,
+      "target": 2000
+    },
+    {
+      "source": 1997,
+      "target": 2001
+    },
+    {
+      "source": 1997,
+      "target": 2002
+    },
+    {
+      "source": 1997,
+      "target": 2003
+    },
+    {
+      "source": 201,
+      "target": 2004
+    },
+    {
+      "source": 2004,
+      "target": 1983
+    },
+    {
+      "source": 2004,
+      "target": 2005
+    },
+    {
+      "source": 2004,
+      "target": 2006
     }
   ]
 }
