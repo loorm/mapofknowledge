@@ -9814,6 +9814,336 @@
       "id": 2006,
       "label": "Comparative method",
       "level": 4
+    },
+    {
+      "id": 2007,
+      "label": "Political theory",
+      "level": 3
+    },
+    {
+      "id": 2008,
+      "label": "Classical political thought",
+      "level": 4
+    },
+    {
+      "id": 2009,
+      "label": "Modern political thought",
+      "level": 4
+    },
+    {
+      "id": 2010,
+      "label": "Contemporary political theory",
+      "level": 4
+    },
+    {
+      "id": 2011,
+      "label": "Normative theory",
+      "level": 4
+    },
+    {
+      "id": 2012,
+      "label": "Analytical political theory",
+      "level": 4
+    },
+    {
+      "id": 2013,
+      "label": "Comparative politics",
+      "level": 3
+    },
+    {
+      "id": 2014,
+      "label": "Political systems",
+      "level": 4
+    },
+    {
+      "id": 2015,
+      "label": "Electoral systems",
+      "level": 4
+    },
+    {
+      "id": 2016,
+      "label": "Political parties",
+      "level": 4
+    },
+    {
+      "id": 2017,
+      "label": "Political institutions",
+      "level": 4
+    },
+    {
+      "id": 2018,
+      "label": "Regime types",
+      "level": 4
+    },
+    {
+      "id": 2019,
+      "label": "Collective action theory",
+      "level": 4
+    },
+    {
+      "id": 2020,
+      "label": "International relations",
+      "level": 3
+    },
+    {
+      "id": 2021,
+      "label": "International system theory",
+      "level": 4
+    },
+    {
+      "id": 2022,
+      "label": "Power and security",
+      "level": 4
+    },
+    {
+      "id": 2023,
+      "label": "International institutions",
+      "level": 4
+    },
+    {
+      "id": 2024,
+      "label": "Foreign policy analysis",
+      "level": 4
+    },
+    {
+      "id": 2025,
+      "label": "Strategic studies",
+      "level": 4
+    },
+    {
+      "id": 2026,
+      "label": "Public administration",
+      "level": 3
+    },
+    {
+      "id": 2027,
+      "label": "Bureaucracy theory",
+      "level": 4
+    },
+    {
+      "id": 2028,
+      "label": "Principal-agent theory",
+      "level": 4
+    },
+    {
+      "id": 2029,
+      "label": "Policy analysis",
+      "level": 4
+    },
+    {
+      "id": 2030,
+      "label": "Governance theory",
+      "level": 4
+    },
+    {
+      "id": 2031,
+      "label": "Political economy",
+      "level": 3
+    },
+    {
+      "id": 2032,
+      "label": "Public choice theory",
+      "level": 4
+    },
+    {
+      "id": 2033,
+      "label": "Distributive politics",
+      "level": 4
+    },
+    {
+      "id": 2034,
+      "label": "Comparative political economy",
+      "level": 4
+    },
+    {
+      "id": 2035,
+      "label": "State and market relations",
+      "level": 4
+    },
+    {
+      "id": 2036,
+      "label": "Political methodology",
+      "level": 3
+    },
+    {
+      "id": 2037,
+      "label": "Qualitative methods",
+      "level": 4
+    },
+    {
+      "id": 2038,
+      "label": "Quantitative methods",
+      "level": 4
+    },
+    {
+      "id": 2039,
+      "label": "Formal modelling",
+      "level": 4
+    },
+    {
+      "id": 2040,
+      "label": "Causal inference in politics",
+      "level": 4
+    },
+    {
+      "id": 2041,
+      "label": "Strategy",
+      "level": 3
+    },
+    {
+      "id": 2042,
+      "label": "Grand strategy",
+      "level": 4
+    },
+    {
+      "id": 2043,
+      "label": "Deterrence theory",
+      "level": 4
+    },
+    {
+      "id": 2044,
+      "label": "Strategic culture",
+      "level": 4
+    },
+    {
+      "id": 2045,
+      "label": "Theory of victory",
+      "level": 4
+    },
+    {
+      "id": 2046,
+      "label": "Coercion theory",
+      "level": 4
+    },
+    {
+      "id": 2047,
+      "label": "Operational art",
+      "level": 3
+    },
+    {
+      "id": 2048,
+      "label": "Centre of gravity analysis",
+      "level": 4
+    },
+    {
+      "id": 2049,
+      "label": "Campaign planning",
+      "level": 4
+    },
+    {
+      "id": 2050,
+      "label": "Lines of operation",
+      "level": 4
+    },
+    {
+      "id": 2051,
+      "label": "Sequencing theory",
+      "level": 4
+    },
+    {
+      "id": 2052,
+      "label": "Tactics",
+      "level": 3
+    },
+    {
+      "id": 2053,
+      "label": "Manoeuvre theory",
+      "level": 4
+    },
+    {
+      "id": 2054,
+      "label": "Firepower theory",
+      "level": 4
+    },
+    {
+      "id": 2055,
+      "label": "Principles of war",
+      "level": 4
+    },
+    {
+      "id": 2056,
+      "label": "Decision theory in combat",
+      "level": 4
+    },
+    {
+      "id": 2057,
+      "label": "Military logistics",
+      "level": 3
+    },
+    {
+      "id": 2058,
+      "label": "Force projection",
+      "level": 4
+    },
+    {
+      "id": 2059,
+      "label": "Sustainment theory",
+      "level": 4
+    },
+    {
+      "id": 2060,
+      "label": "Lines of supply",
+      "level": 4
+    },
+    {
+      "id": 2061,
+      "label": "Logistics constraints",
+      "level": 4
+    },
+    {
+      "id": 2062,
+      "label": "Intelligence theory",
+      "level": 3
+    },
+    {
+      "id": 2063,
+      "label": "Fog of war",
+      "level": 4
+    },
+    {
+      "id": 2064,
+      "label": "Intelligence cycle",
+      "level": 4
+    },
+    {
+      "id": 2065,
+      "label": "Deception theory",
+      "level": 4
+    },
+    {
+      "id": 2066,
+      "label": "Information advantage",
+      "level": 4
+    },
+    {
+      "id": 2067,
+      "label": "Military doctrine",
+      "level": 3
+    },
+    {
+      "id": 2068,
+      "label": "Doctrine development",
+      "level": 4
+    },
+    {
+      "id": 2069,
+      "label": "Revolutions in military affairs",
+      "level": 4
+    },
+    {
+      "id": 2070,
+      "label": "Combined arms theory",
+      "level": 4
+    },
+    {
+      "id": 2071,
+      "label": "Joint operations theory",
+      "level": 4
+    },
+    {
+      "id": 2072,
+      "label": "Just war theory",
+      "level": 5
     }
   ],
   "edges": [
@@ -17652,6 +17982,270 @@
     {
       "source": 2004,
       "target": 2006
+    },
+    {
+      "source": 202,
+      "target": 2007
+    },
+    {
+      "source": 2007,
+      "target": 2008
+    },
+    {
+      "source": 2007,
+      "target": 2009
+    },
+    {
+      "source": 2007,
+      "target": 2010
+    },
+    {
+      "source": 2007,
+      "target": 2011
+    },
+    {
+      "source": 2007,
+      "target": 2012
+    },
+    {
+      "source": 202,
+      "target": 2013
+    },
+    {
+      "source": 2013,
+      "target": 2014
+    },
+    {
+      "source": 2013,
+      "target": 2015
+    },
+    {
+      "source": 2013,
+      "target": 2016
+    },
+    {
+      "source": 2013,
+      "target": 2017
+    },
+    {
+      "source": 2013,
+      "target": 2018
+    },
+    {
+      "source": 2013,
+      "target": 2019
+    },
+    {
+      "source": 202,
+      "target": 2020
+    },
+    {
+      "source": 2020,
+      "target": 2021
+    },
+    {
+      "source": 2020,
+      "target": 2022
+    },
+    {
+      "source": 2020,
+      "target": 2023
+    },
+    {
+      "source": 2020,
+      "target": 2024
+    },
+    {
+      "source": 2020,
+      "target": 2025
+    },
+    {
+      "source": 202,
+      "target": 2026
+    },
+    {
+      "source": 2026,
+      "target": 2027
+    },
+    {
+      "source": 2026,
+      "target": 2028
+    },
+    {
+      "source": 2026,
+      "target": 2029
+    },
+    {
+      "source": 2026,
+      "target": 2030
+    },
+    {
+      "source": 202,
+      "target": 2031
+    },
+    {
+      "source": 2031,
+      "target": 2032
+    },
+    {
+      "source": 2031,
+      "target": 2033
+    },
+    {
+      "source": 2031,
+      "target": 2034
+    },
+    {
+      "source": 2031,
+      "target": 2035
+    },
+    {
+      "source": 202,
+      "target": 2036
+    },
+    {
+      "source": 2036,
+      "target": 2037
+    },
+    {
+      "source": 2036,
+      "target": 2038
+    },
+    {
+      "source": 2036,
+      "target": 2039
+    },
+    {
+      "source": 2036,
+      "target": 2040
+    },
+    {
+      "source": 205,
+      "target": 2041
+    },
+    {
+      "source": 2041,
+      "target": 2042
+    },
+    {
+      "source": 2041,
+      "target": 2043
+    },
+    {
+      "source": 2041,
+      "target": 2044
+    },
+    {
+      "source": 2041,
+      "target": 2045
+    },
+    {
+      "source": 2041,
+      "target": 2046
+    },
+    {
+      "source": 205,
+      "target": 2047
+    },
+    {
+      "source": 2047,
+      "target": 2048
+    },
+    {
+      "source": 2047,
+      "target": 2049
+    },
+    {
+      "source": 2047,
+      "target": 2050
+    },
+    {
+      "source": 2047,
+      "target": 2051
+    },
+    {
+      "source": 205,
+      "target": 2052
+    },
+    {
+      "source": 2052,
+      "target": 2053
+    },
+    {
+      "source": 2052,
+      "target": 2054
+    },
+    {
+      "source": 2052,
+      "target": 2055
+    },
+    {
+      "source": 2052,
+      "target": 2056
+    },
+    {
+      "source": 205,
+      "target": 2057
+    },
+    {
+      "source": 2057,
+      "target": 2058
+    },
+    {
+      "source": 2057,
+      "target": 2059
+    },
+    {
+      "source": 2057,
+      "target": 2060
+    },
+    {
+      "source": 2057,
+      "target": 2061
+    },
+    {
+      "source": 205,
+      "target": 2062
+    },
+    {
+      "source": 2062,
+      "target": 2063
+    },
+    {
+      "source": 2062,
+      "target": 2064
+    },
+    {
+      "source": 2062,
+      "target": 2065
+    },
+    {
+      "source": 2062,
+      "target": 2066
+    },
+    {
+      "source": 205,
+      "target": 2067
+    },
+    {
+      "source": 2067,
+      "target": 2068
+    },
+    {
+      "source": 2067,
+      "target": 2069
+    },
+    {
+      "source": 2067,
+      "target": 2070
+    },
+    {
+      "source": 2067,
+      "target": 2071
+    },
+    {
+      "source": 692,
+      "target": 2072
     }
   ]
 }
