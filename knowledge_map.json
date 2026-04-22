@@ -9151,11 +9151,6 @@
       "level": 3
     },
     {
-      "id": 1874,
-      "label": "Music history",
-      "level": 3
-    },
-    {
       "id": 1875,
       "label": "Performance practice",
       "level": 3
@@ -9183,11 +9178,6 @@
     {
       "id": 1880,
       "label": "Art theory",
-      "level": 3
-    },
-    {
-      "id": 1881,
-      "label": "Art history",
       "level": 3
     },
     {
@@ -9223,11 +9213,6 @@
     {
       "id": 1888,
       "label": "Architectural theory",
-      "level": 3
-    },
-    {
-      "id": 1889,
-      "label": "Architectural history",
       "level": 3
     },
     {
@@ -9286,11 +9271,6 @@
       "level": 3
     },
     {
-      "id": 1901,
-      "label": "Theater history",
-      "level": 3
-    },
-    {
       "id": 1902,
       "label": "Stage design theory",
       "level": 3
@@ -9313,11 +9293,6 @@
     {
       "id": 1906,
       "label": "Dance notation",
-      "level": 3
-    },
-    {
-      "id": 1907,
-      "label": "Dance history",
       "level": 3
     },
     {
@@ -9391,11 +9366,6 @@
       "level": 3
     },
     {
-      "id": 1922,
-      "label": "Sculpture history",
-      "level": 3
-    },
-    {
       "id": 1923,
       "label": "Spatial composition",
       "level": 3
@@ -9408,11 +9378,6 @@
     {
       "id": 1925,
       "label": "Photo theory",
-      "level": 3
-    },
-    {
-      "id": 1926,
-      "label": "Photography history",
       "level": 3
     },
     {
@@ -11016,31 +10981,6 @@
       "level": 4
     },
     {
-      "id": 2247,
-      "label": "Ancient and medieval music",
-      "level": 4
-    },
-    {
-      "id": 2248,
-      "label": "Renaissance music",
-      "level": 4
-    },
-    {
-      "id": 2249,
-      "label": "Baroque music",
-      "level": 4
-    },
-    {
-      "id": 2250,
-      "label": "Classical and Romantic music",
-      "level": 4
-    },
-    {
-      "id": 2251,
-      "label": "Modern and contemporary music",
-      "level": 4
-    },
-    {
       "id": 2252,
       "label": "Historical performance",
       "level": 4
@@ -11128,31 +11068,6 @@
     {
       "id": 2269,
       "label": "Aesthetic judgement in art",
-      "level": 4
-    },
-    {
-      "id": 2270,
-      "label": "Ancient art",
-      "level": 4
-    },
-    {
-      "id": 2271,
-      "label": "Medieval art",
-      "level": 4
-    },
-    {
-      "id": 2272,
-      "label": "Renaissance art",
-      "level": 4
-    },
-    {
-      "id": 2273,
-      "label": "Modern art",
-      "level": 4
-    },
-    {
-      "id": 2274,
-      "label": "Contemporary art",
       "level": 4
     },
     {
@@ -11273,26 +11188,6 @@
     {
       "id": 2298,
       "label": "Critical regionalism",
-      "level": 4
-    },
-    {
-      "id": 2299,
-      "label": "Ancient architecture",
-      "level": 4
-    },
-    {
-      "id": 2300,
-      "label": "Medieval architecture",
-      "level": 4
-    },
-    {
-      "id": 2301,
-      "label": "Renaissance and Baroque architecture",
-      "level": 4
-    },
-    {
-      "id": 2302,
-      "label": "Modern architecture",
       "level": 4
     },
     {
@@ -11471,26 +11366,6 @@
       "level": 4
     },
     {
-      "id": 2338,
-      "label": "Ancient theater",
-      "level": 4
-    },
-    {
-      "id": 2339,
-      "label": "Medieval theater",
-      "level": 4
-    },
-    {
-      "id": 2340,
-      "label": "Early modern theater",
-      "level": 4
-    },
-    {
-      "id": 2341,
-      "label": "Modern theater",
-      "level": 4
-    },
-    {
       "id": 2342,
       "label": "Scenography",
       "level": 4
@@ -11568,26 +11443,6 @@
     {
       "id": 2357,
       "label": "Digital notation",
-      "level": 4
-    },
-    {
-      "id": 2358,
-      "label": "Court dance",
-      "level": 4
-    },
-    {
-      "id": 2359,
-      "label": "Ballet history",
-      "level": 4
-    },
-    {
-      "id": 2360,
-      "label": "Modern dance history",
-      "level": 4
-    },
-    {
-      "id": 2361,
-      "label": "World dance traditions",
       "level": 4
     },
     {
@@ -11816,26 +11671,6 @@
       "level": 4
     },
     {
-      "id": 2407,
-      "label": "Ancient sculpture",
-      "level": 4
-    },
-    {
-      "id": 2408,
-      "label": "Classical sculpture",
-      "level": 4
-    },
-    {
-      "id": 2409,
-      "label": "Modern sculpture",
-      "level": 4
-    },
-    {
-      "id": 2410,
-      "label": "Contemporary sculpture",
-      "level": 4
-    },
-    {
       "id": 2411,
       "label": "Positive and negative space",
       "level": 4
@@ -11873,26 +11708,6 @@
     {
       "id": 2418,
       "label": "Photography and truth",
-      "level": 4
-    },
-    {
-      "id": 2419,
-      "label": "Early photography",
-      "level": 4
-    },
-    {
-      "id": 2420,
-      "label": "Pictorialism",
-      "level": 4
-    },
-    {
-      "id": 2421,
-      "label": "Modernist photography",
-      "level": 4
-    },
-    {
-      "id": 2422,
-      "label": "Contemporary photography",
       "level": 4
     },
     {
@@ -19243,10 +19058,6 @@
     },
     {
       "source": 1872,
-      "target": 1874
-    },
-    {
-      "source": 1872,
       "target": 1875
     },
     {
@@ -19268,10 +19079,6 @@
     {
       "source": 1879,
       "target": 1880
-    },
-    {
-      "source": 1879,
-      "target": 1881
     },
     {
       "source": 1879,
@@ -19300,10 +19107,6 @@
     {
       "source": 1887,
       "target": 1888
-    },
-    {
-      "source": 1887,
-      "target": 1889
     },
     {
       "source": 1887,
@@ -19351,10 +19154,6 @@
     },
     {
       "source": 1899,
-      "target": 1901
-    },
-    {
-      "source": 1899,
       "target": 1902
     },
     {
@@ -19372,10 +19171,6 @@
     {
       "source": 1904,
       "target": 1906
-    },
-    {
-      "source": 1904,
-      "target": 1907
     },
     {
       "source": 1904,
@@ -19435,10 +19230,6 @@
     },
     {
       "source": 1919,
-      "target": 1922
-    },
-    {
-      "source": 1919,
       "target": 1923
     },
     {
@@ -19448,10 +19239,6 @@
     {
       "source": 1924,
       "target": 1925
-    },
-    {
-      "source": 1924,
-      "target": 1926
     },
     {
       "source": 1924,
@@ -20734,26 +20521,6 @@
       "target": 2246
     },
     {
-      "source": 1874,
-      "target": 2247
-    },
-    {
-      "source": 1874,
-      "target": 2248
-    },
-    {
-      "source": 1874,
-      "target": 2249
-    },
-    {
-      "source": 1874,
-      "target": 2250
-    },
-    {
-      "source": 1874,
-      "target": 2251
-    },
-    {
       "source": 1875,
       "target": 2252
     },
@@ -20824,26 +20591,6 @@
     {
       "source": 1880,
       "target": 2269
-    },
-    {
-      "source": 1881,
-      "target": 2270
-    },
-    {
-      "source": 1881,
-      "target": 2271
-    },
-    {
-      "source": 1881,
-      "target": 2272
-    },
-    {
-      "source": 1881,
-      "target": 2273
-    },
-    {
-      "source": 1881,
-      "target": 2274
     },
     {
       "source": 1882,
@@ -20940,22 +20687,6 @@
     {
       "source": 1888,
       "target": 2298
-    },
-    {
-      "source": 1889,
-      "target": 2299
-    },
-    {
-      "source": 1889,
-      "target": 2300
-    },
-    {
-      "source": 1889,
-      "target": 2301
-    },
-    {
-      "source": 1889,
-      "target": 2302
     },
     {
       "source": 1890,
@@ -21098,22 +20829,6 @@
       "target": 2337
     },
     {
-      "source": 1901,
-      "target": 2338
-    },
-    {
-      "source": 1901,
-      "target": 2339
-    },
-    {
-      "source": 1901,
-      "target": 2340
-    },
-    {
-      "source": 1901,
-      "target": 2341
-    },
-    {
       "source": 1902,
       "target": 2342
     },
@@ -21176,22 +20891,6 @@
     {
       "source": 1906,
       "target": 2357
-    },
-    {
-      "source": 1907,
-      "target": 2358
-    },
-    {
-      "source": 1907,
-      "target": 2359
-    },
-    {
-      "source": 1907,
-      "target": 2360
-    },
-    {
-      "source": 1907,
-      "target": 2361
     },
     {
       "source": 1908,
@@ -21374,22 +21073,6 @@
       "target": 2406
     },
     {
-      "source": 1922,
-      "target": 2407
-    },
-    {
-      "source": 1922,
-      "target": 2408
-    },
-    {
-      "source": 1922,
-      "target": 2409
-    },
-    {
-      "source": 1922,
-      "target": 2410
-    },
-    {
       "source": 1923,
       "target": 2411
     },
@@ -21420,22 +21103,6 @@
     {
       "source": 1925,
       "target": 2418
-    },
-    {
-      "source": 1926,
-      "target": 2419
-    },
-    {
-      "source": 1926,
-      "target": 2420
-    },
-    {
-      "source": 1926,
-      "target": 2421
-    },
-    {
-      "source": 1926,
-      "target": 2422
     },
     {
       "source": 1927,
