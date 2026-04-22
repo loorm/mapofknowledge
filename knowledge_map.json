@@ -9419,6 +9419,276 @@
       "id": 1927,
       "label": "Visual composition",
       "level": 3
+    },
+    {
+      "id": 1928,
+      "label": "Jurisprudence",
+      "level": 3
+    },
+    {
+      "id": 1929,
+      "label": "Legal positivism",
+      "level": 4
+    },
+    {
+      "id": 1930,
+      "label": "Legal realism",
+      "level": 4
+    },
+    {
+      "id": 1931,
+      "label": "Critical legal theory",
+      "level": 4
+    },
+    {
+      "id": 1932,
+      "label": "Normative logic",
+      "level": 4
+    },
+    {
+      "id": 1933,
+      "label": "Legal hermeneutics",
+      "level": 4
+    },
+    {
+      "id": 1934,
+      "label": "Teleology of law",
+      "level": 4
+    },
+    {
+      "id": 1935,
+      "label": "Legal personality",
+      "level": 3
+    },
+    {
+      "id": 1936,
+      "label": "Legal capacity",
+      "level": 4
+    },
+    {
+      "id": 1937,
+      "label": "Rights and duties",
+      "level": 4
+    },
+    {
+      "id": 1938,
+      "label": "Legal personhood",
+      "level": 4
+    },
+    {
+      "id": 1939,
+      "label": "Legal standing",
+      "level": 4
+    },
+    {
+      "id": 1940,
+      "label": "Obligations",
+      "level": 3
+    },
+    {
+      "id": 1941,
+      "label": "Voluntary obligations",
+      "level": 4
+    },
+    {
+      "id": 1942,
+      "label": "Non-voluntary obligations",
+      "level": 4
+    },
+    {
+      "id": 1943,
+      "label": "Unjust enrichment",
+      "level": 4
+    },
+    {
+      "id": 1944,
+      "label": "Breach and remedies",
+      "level": 4
+    },
+    {
+      "id": 1945,
+      "label": "Property",
+      "level": 3
+    },
+    {
+      "id": 1946,
+      "label": "Ownership",
+      "level": 4
+    },
+    {
+      "id": 1947,
+      "label": "Possession",
+      "level": 4
+    },
+    {
+      "id": 1948,
+      "label": "Transfer of property",
+      "level": 4
+    },
+    {
+      "id": 1949,
+      "label": "Security interests",
+      "level": 4
+    },
+    {
+      "id": 1950,
+      "label": "Succession",
+      "level": 4
+    },
+    {
+      "id": 1951,
+      "label": "Wrongs and sanctions",
+      "level": 3
+    },
+    {
+      "id": 1952,
+      "label": "Civil wrongs",
+      "level": 4
+    },
+    {
+      "id": 1953,
+      "label": "Criminal wrongs",
+      "level": 4
+    },
+    {
+      "id": 1954,
+      "label": "Fault and intent",
+      "level": 4
+    },
+    {
+      "id": 1955,
+      "label": "Defences",
+      "level": 4
+    },
+    {
+      "id": 1956,
+      "label": "Punishment theory",
+      "level": 4
+    },
+    {
+      "id": 1957,
+      "label": "Dispute resolution",
+      "level": 3
+    },
+    {
+      "id": 1958,
+      "label": "Adjudication",
+      "level": 4
+    },
+    {
+      "id": 1959,
+      "label": "Evidence theory",
+      "level": 4
+    },
+    {
+      "id": 1960,
+      "label": "Adversarial vs inquisitorial logic",
+      "level": 4
+    },
+    {
+      "id": 1961,
+      "label": "Alternative dispute resolution",
+      "level": 4
+    },
+    {
+      "id": 1962,
+      "label": "Public authority",
+      "level": 3
+    },
+    {
+      "id": 1963,
+      "label": "Constitutional principles",
+      "level": 4
+    },
+    {
+      "id": 1964,
+      "label": "Separation of powers",
+      "level": 4
+    },
+    {
+      "id": 1965,
+      "label": "Fundamental rights",
+      "level": 4
+    },
+    {
+      "id": 1966,
+      "label": "Administrative law",
+      "level": 4
+    },
+    {
+      "id": 1967,
+      "label": "Judicial review",
+      "level": 4
+    },
+    {
+      "id": 1968,
+      "label": "Legitimacy theory",
+      "level": 4
+    },
+    {
+      "id": 1969,
+      "label": "International law",
+      "level": 3
+    },
+    {
+      "id": 1970,
+      "label": "Treaty law",
+      "level": 4
+    },
+    {
+      "id": 1971,
+      "label": "Customary international law",
+      "level": 4
+    },
+    {
+      "id": 1972,
+      "label": "State responsibility",
+      "level": 4
+    },
+    {
+      "id": 1973,
+      "label": "Diplomatic law",
+      "level": 4
+    },
+    {
+      "id": 1974,
+      "label": "International humanitarian law",
+      "level": 4
+    },
+    {
+      "id": 1975,
+      "label": "World legal systems",
+      "level": 3
+    },
+    {
+      "id": 1976,
+      "label": "Common law",
+      "level": 4
+    },
+    {
+      "id": 1977,
+      "label": "Civil law",
+      "level": 4
+    },
+    {
+      "id": 1978,
+      "label": "Islamic law",
+      "level": 4
+    },
+    {
+      "id": 1979,
+      "label": "Customary law",
+      "level": 4
+    },
+    {
+      "id": 1980,
+      "label": "Mixed systems",
+      "level": 4
+    },
+    {
+      "id": 1981,
+      "label": "Legal transplants",
+      "level": 4
     }
   ],
   "edges": [
@@ -16941,6 +17211,222 @@
     {
       "source": 1924,
       "target": 1927
+    },
+    {
+      "source": 203,
+      "target": 1928
+    },
+    {
+      "source": 1928,
+      "target": 1929
+    },
+    {
+      "source": 1928,
+      "target": 1930
+    },
+    {
+      "source": 1928,
+      "target": 1931
+    },
+    {
+      "source": 1928,
+      "target": 1932
+    },
+    {
+      "source": 1928,
+      "target": 1933
+    },
+    {
+      "source": 1928,
+      "target": 1934
+    },
+    {
+      "source": 203,
+      "target": 1935
+    },
+    {
+      "source": 1935,
+      "target": 1936
+    },
+    {
+      "source": 1935,
+      "target": 1937
+    },
+    {
+      "source": 1935,
+      "target": 1938
+    },
+    {
+      "source": 1935,
+      "target": 1939
+    },
+    {
+      "source": 203,
+      "target": 1940
+    },
+    {
+      "source": 1940,
+      "target": 1941
+    },
+    {
+      "source": 1940,
+      "target": 1942
+    },
+    {
+      "source": 1940,
+      "target": 1943
+    },
+    {
+      "source": 1940,
+      "target": 1944
+    },
+    {
+      "source": 203,
+      "target": 1945
+    },
+    {
+      "source": 1945,
+      "target": 1946
+    },
+    {
+      "source": 1945,
+      "target": 1947
+    },
+    {
+      "source": 1945,
+      "target": 1948
+    },
+    {
+      "source": 1945,
+      "target": 1949
+    },
+    {
+      "source": 1945,
+      "target": 1950
+    },
+    {
+      "source": 203,
+      "target": 1951
+    },
+    {
+      "source": 1951,
+      "target": 1952
+    },
+    {
+      "source": 1951,
+      "target": 1953
+    },
+    {
+      "source": 1951,
+      "target": 1954
+    },
+    {
+      "source": 1951,
+      "target": 1955
+    },
+    {
+      "source": 1951,
+      "target": 1956
+    },
+    {
+      "source": 203,
+      "target": 1957
+    },
+    {
+      "source": 1957,
+      "target": 1958
+    },
+    {
+      "source": 1957,
+      "target": 1959
+    },
+    {
+      "source": 1957,
+      "target": 1960
+    },
+    {
+      "source": 1957,
+      "target": 1961
+    },
+    {
+      "source": 203,
+      "target": 1962
+    },
+    {
+      "source": 1962,
+      "target": 1963
+    },
+    {
+      "source": 1962,
+      "target": 1964
+    },
+    {
+      "source": 1962,
+      "target": 1965
+    },
+    {
+      "source": 1962,
+      "target": 1966
+    },
+    {
+      "source": 1962,
+      "target": 1967
+    },
+    {
+      "source": 1962,
+      "target": 1968
+    },
+    {
+      "source": 203,
+      "target": 1969
+    },
+    {
+      "source": 1969,
+      "target": 1970
+    },
+    {
+      "source": 1969,
+      "target": 1971
+    },
+    {
+      "source": 1969,
+      "target": 1972
+    },
+    {
+      "source": 1969,
+      "target": 1973
+    },
+    {
+      "source": 1969,
+      "target": 1974
+    },
+    {
+      "source": 203,
+      "target": 1975
+    },
+    {
+      "source": 1975,
+      "target": 1976
+    },
+    {
+      "source": 1975,
+      "target": 1977
+    },
+    {
+      "source": 1975,
+      "target": 1978
+    },
+    {
+      "source": 1975,
+      "target": 1979
+    },
+    {
+      "source": 1975,
+      "target": 1980
+    },
+    {
+      "source": 1975,
+      "target": 1981
     }
   ]
 }
