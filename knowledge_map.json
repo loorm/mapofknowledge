@@ -1026,31 +1026,6 @@
       "level": 3
     },
     {
-      "id": 217,
-      "label": "Biochemistry",
-      "level": 2
-    },
-    {
-      "id": 218,
-      "label": "Metabolism",
-      "level": 3
-    },
-    {
-      "id": 219,
-      "label": "Proteins & enzymes",
-      "level": 3
-    },
-    {
-      "id": 220,
-      "label": "Molecular biology",
-      "level": 3
-    },
-    {
-      "id": 221,
-      "label": "Cell signalling",
-      "level": 3
-    },
-    {
       "id": 222,
       "label": "Pathology",
       "level": 2
@@ -2303,21 +2278,6 @@
     {
       "id": 496,
       "label": "Chemical oceanography",
-      "level": 3
-    },
-    {
-      "id": 497,
-      "label": "Marine biology",
-      "level": 3
-    },
-    {
-      "id": 498,
-      "label": "Marine ecology",
-      "level": 3
-    },
-    {
-      "id": 499,
-      "label": "Marine geology",
       "level": 3
     },
     {
@@ -10386,91 +10346,6 @@
       "level": 4
     },
     {
-      "id": 2134,
-      "label": "Glycolysis",
-      "level": 4
-    },
-    {
-      "id": 2135,
-      "label": "Citric acid cycle",
-      "level": 4
-    },
-    {
-      "id": 2136,
-      "label": "Oxidative phosphorylation",
-      "level": 4
-    },
-    {
-      "id": 2137,
-      "label": "Lipid metabolism",
-      "level": 4
-    },
-    {
-      "id": 2138,
-      "label": "Amino acid metabolism",
-      "level": 4
-    },
-    {
-      "id": 2139,
-      "label": "Protein structure",
-      "level": 4
-    },
-    {
-      "id": 2140,
-      "label": "Enzyme kinetics",
-      "level": 4
-    },
-    {
-      "id": 2141,
-      "label": "Enzyme inhibition",
-      "level": 4
-    },
-    {
-      "id": 2142,
-      "label": "Protein folding",
-      "level": 4
-    },
-    {
-      "id": 2143,
-      "label": "DNA replication",
-      "level": 4
-    },
-    {
-      "id": 2144,
-      "label": "Transcription",
-      "level": 4
-    },
-    {
-      "id": 2145,
-      "label": "Translation",
-      "level": 4
-    },
-    {
-      "id": 2146,
-      "label": "Gene regulation",
-      "level": 4
-    },
-    {
-      "id": 2147,
-      "label": "Signal transduction",
-      "level": 4
-    },
-    {
-      "id": 2148,
-      "label": "Receptor types",
-      "level": 4
-    },
-    {
-      "id": 2149,
-      "label": "Second messengers",
-      "level": 4
-    },
-    {
-      "id": 2150,
-      "label": "Signalling cascades",
-      "level": 4
-    },
-    {
       "id": 2151,
       "label": "Hypoxia",
       "level": 4
@@ -11899,6 +11774,236 @@
       "id": 2466,
       "label": "Nucleosynthesis",
       "level": 4
+    },
+    {
+      "id": 2467,
+      "label": "Solar physics",
+      "level": 4
+    },
+    {
+      "id": 2468,
+      "label": "Ocean circulation",
+      "level": 4
+    },
+    {
+      "id": 2469,
+      "label": "Waves and tides",
+      "level": 4
+    },
+    {
+      "id": 2470,
+      "label": "Thermohaline circulation",
+      "level": 4
+    },
+    {
+      "id": 2471,
+      "label": "Ocean-atmosphere interaction",
+      "level": 4
+    },
+    {
+      "id": 2472,
+      "label": "Coastal dynamics",
+      "level": 4
+    },
+    {
+      "id": 2473,
+      "label": "Seawater composition",
+      "level": 4
+    },
+    {
+      "id": 2474,
+      "label": "Biogeochemical cycles",
+      "level": 4
+    },
+    {
+      "id": 2475,
+      "label": "Ocean acidification",
+      "level": 4
+    },
+    {
+      "id": 2476,
+      "label": "Dissolved gases",
+      "level": 4
+    },
+    {
+      "id": 2477,
+      "label": "Trace elements in seawater",
+      "level": 4
+    },
+    {
+      "id": 2487,
+      "label": "Cell structure",
+      "level": 4
+    },
+    {
+      "id": 2488,
+      "label": "Cell cycle",
+      "level": 4
+    },
+    {
+      "id": 2489,
+      "label": "Organelle function",
+      "level": 4
+    },
+    {
+      "id": 2490,
+      "label": "Cell membrane biology",
+      "level": 4
+    },
+    {
+      "id": 2491,
+      "label": "Population genetics",
+      "level": 4
+    },
+    {
+      "id": 2492,
+      "label": "Quantitative genetics",
+      "level": 4
+    },
+    {
+      "id": 2493,
+      "label": "Cytogenetics",
+      "level": 4
+    },
+    {
+      "id": 2494,
+      "label": "Molecular genetics",
+      "level": 4
+    },
+    {
+      "id": 2495,
+      "label": "Transmission genetics",
+      "level": 4
+    },
+    {
+      "id": 2496,
+      "label": "Plant morphology",
+      "level": 4
+    },
+    {
+      "id": 2497,
+      "label": "Plant physiology",
+      "level": 4
+    },
+    {
+      "id": 2498,
+      "label": "Plant systematics",
+      "level": 4
+    },
+    {
+      "id": 2499,
+      "label": "Plant reproduction",
+      "level": 4
+    },
+    {
+      "id": 2500,
+      "label": "Phycology",
+      "level": 4
+    },
+    {
+      "id": 2501,
+      "label": "Animal morphology",
+      "level": 4
+    },
+    {
+      "id": 2502,
+      "label": "Animal systematics",
+      "level": 4
+    },
+    {
+      "id": 2503,
+      "label": "Comparative anatomy",
+      "level": 4
+    },
+    {
+      "id": 2504,
+      "label": "Entomology",
+      "level": 4
+    },
+    {
+      "id": 2505,
+      "label": "Ethology",
+      "level": 4
+    },
+    {
+      "id": 2506,
+      "label": "Animal physiology",
+      "level": 4
+    },
+    {
+      "id": 2507,
+      "label": "Bacteriology",
+      "level": 4
+    },
+    {
+      "id": 2508,
+      "label": "Virology",
+      "level": 4
+    },
+    {
+      "id": 2509,
+      "label": "Mycology",
+      "level": 4
+    },
+    {
+      "id": 2510,
+      "label": "Protistology",
+      "level": 4
+    },
+    {
+      "id": 2511,
+      "label": "Microbial physiology",
+      "level": 4
+    },
+    {
+      "id": 2512,
+      "label": "Natural selection",
+      "level": 4
+    },
+    {
+      "id": 2513,
+      "label": "Speciation",
+      "level": 4
+    },
+    {
+      "id": 2514,
+      "label": "Phylogenetics",
+      "level": 4
+    },
+    {
+      "id": 2515,
+      "label": "Macroevolution",
+      "level": 4
+    },
+    {
+      "id": 2516,
+      "label": "Coevolution",
+      "level": 4
+    },
+    {
+      "id": 2517,
+      "label": "Population ecology",
+      "level": 4
+    },
+    {
+      "id": 2518,
+      "label": "Community ecology",
+      "level": 4
+    },
+    {
+      "id": 2519,
+      "label": "Ecosystem ecology",
+      "level": 4
+    },
+    {
+      "id": 2520,
+      "label": "Trophic dynamics",
+      "level": 4
+    },
+    {
+      "id": 2521,
+      "label": "Soil ecology",
+      "level": 4
     }
   ],
   "edges": [
@@ -12717,26 +12822,6 @@
     {
       "source": 212,
       "target": 216
-    },
-    {
-      "source": 206,
-      "target": 217
-    },
-    {
-      "source": 217,
-      "target": 218
-    },
-    {
-      "source": 217,
-      "target": 219
-    },
-    {
-      "source": 217,
-      "target": 220
-    },
-    {
-      "source": 217,
-      "target": 221
     },
     {
       "source": 206,
@@ -13733,18 +13818,6 @@
     {
       "source": 494,
       "target": 496
-    },
-    {
-      "source": 494,
-      "target": 497
-    },
-    {
-      "source": 494,
-      "target": 498
-    },
-    {
-      "source": 494,
-      "target": 499
     },
     {
       "source": 500,
@@ -20195,74 +20268,6 @@
       "target": 2133
     },
     {
-      "source": 218,
-      "target": 2134
-    },
-    {
-      "source": 218,
-      "target": 2135
-    },
-    {
-      "source": 218,
-      "target": 2136
-    },
-    {
-      "source": 218,
-      "target": 2137
-    },
-    {
-      "source": 218,
-      "target": 2138
-    },
-    {
-      "source": 219,
-      "target": 2139
-    },
-    {
-      "source": 219,
-      "target": 2140
-    },
-    {
-      "source": 219,
-      "target": 2141
-    },
-    {
-      "source": 219,
-      "target": 2142
-    },
-    {
-      "source": 220,
-      "target": 2143
-    },
-    {
-      "source": 220,
-      "target": 2144
-    },
-    {
-      "source": 220,
-      "target": 2145
-    },
-    {
-      "source": 220,
-      "target": 2146
-    },
-    {
-      "source": 221,
-      "target": 2147
-    },
-    {
-      "source": 221,
-      "target": 2148
-    },
-    {
-      "source": 221,
-      "target": 2149
-    },
-    {
-      "source": 221,
-      "target": 2150
-    },
-    {
       "source": 223,
       "target": 2151
     },
@@ -21405,6 +21410,190 @@
     {
       "source": 2461,
       "target": 2466
+    },
+    {
+      "source": 2443,
+      "target": 2467
+    },
+    {
+      "source": 495,
+      "target": 2468
+    },
+    {
+      "source": 495,
+      "target": 2469
+    },
+    {
+      "source": 495,
+      "target": 2470
+    },
+    {
+      "source": 495,
+      "target": 2471
+    },
+    {
+      "source": 495,
+      "target": 2472
+    },
+    {
+      "source": 496,
+      "target": 2473
+    },
+    {
+      "source": 496,
+      "target": 2474
+    },
+    {
+      "source": 496,
+      "target": 2475
+    },
+    {
+      "source": 496,
+      "target": 2476
+    },
+    {
+      "source": 496,
+      "target": 2477
+    },
+    {
+      "source": 459,
+      "target": 2487
+    },
+    {
+      "source": 459,
+      "target": 2488
+    },
+    {
+      "source": 459,
+      "target": 2489
+    },
+    {
+      "source": 459,
+      "target": 2490
+    },
+    {
+      "source": 461,
+      "target": 2491
+    },
+    {
+      "source": 461,
+      "target": 2492
+    },
+    {
+      "source": 461,
+      "target": 2493
+    },
+    {
+      "source": 461,
+      "target": 2494
+    },
+    {
+      "source": 461,
+      "target": 2495
+    },
+    {
+      "source": 462,
+      "target": 2496
+    },
+    {
+      "source": 462,
+      "target": 2497
+    },
+    {
+      "source": 462,
+      "target": 2498
+    },
+    {
+      "source": 462,
+      "target": 2499
+    },
+    {
+      "source": 462,
+      "target": 2500
+    },
+    {
+      "source": 463,
+      "target": 2501
+    },
+    {
+      "source": 463,
+      "target": 2502
+    },
+    {
+      "source": 463,
+      "target": 2503
+    },
+    {
+      "source": 463,
+      "target": 2504
+    },
+    {
+      "source": 463,
+      "target": 2505
+    },
+    {
+      "source": 463,
+      "target": 2506
+    },
+    {
+      "source": 464,
+      "target": 2507
+    },
+    {
+      "source": 464,
+      "target": 2508
+    },
+    {
+      "source": 464,
+      "target": 2509
+    },
+    {
+      "source": 464,
+      "target": 2510
+    },
+    {
+      "source": 464,
+      "target": 2511
+    },
+    {
+      "source": 465,
+      "target": 2512
+    },
+    {
+      "source": 465,
+      "target": 2513
+    },
+    {
+      "source": 465,
+      "target": 2514
+    },
+    {
+      "source": 465,
+      "target": 2515
+    },
+    {
+      "source": 465,
+      "target": 2516
+    },
+    {
+      "source": 466,
+      "target": 2517
+    },
+    {
+      "source": 466,
+      "target": 2518
+    },
+    {
+      "source": 466,
+      "target": 2519
+    },
+    {
+      "source": 466,
+      "target": 2520
+    },
+    {
+      "source": 466,
+      "target": 2521
     }
   ]
 }
