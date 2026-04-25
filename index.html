@@ -4,7 +4,83 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Map of Human Knowledge</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js">
+  // ── Screensaver ─────────────────────────────────────────────────────────────
+  let screensaverTimer = null;
+  let screensaverActive = false;
+  let screensaverLoop = null;
+  const IDLE_TIMEOUT = 60000; // 1 minute
+
+  function resetIdleTimer() {
+    if (screensaverActive) stopScreensaver();
+    clearTimeout(screensaverTimer);
+    screensaverTimer = setTimeout(startScreensaver, IDLE_TIMEOUT);
+  }
+
+  function startScreensaver() {
+    screensaverActive = true;
+    runScreensaverStep();
+  }
+
+  function stopScreensaver() {
+    screensaverActive = false;
+    clearTimeout(screensaverLoop);
+  }
+
+  function runScreensaverStep() {
+    if (!screensaverActive) return;
+
+    // Pick a random strategy: continent overview or deep node zoom
+    const strategy = Math.random();
+    let targetNode, targetZoom;
+
+    if (strategy < 0.3) {
+      // Zoom out to show a continent (L1 node)
+      const continentNodes = nodes.filter(n => n.level === 1);
+      targetNode = continentNodes[Math.floor(Math.random() * continentNodes.length)];
+      targetZoom = 0.3 + Math.random() * 0.3;
+    } else if (strategy < 0.6) {
+      // Mid-level zoom on L2 or L3 node
+      const midNodes = nodes.filter(n => n.level === 2 || n.level === 3);
+      targetNode = midNodes[Math.floor(Math.random() * midNodes.length)];
+      targetZoom = 0.8 + Math.random() * 0.8;
+    } else {
+      // Deep zoom on L4 or L5 node
+      const deepNodes = nodes.filter(n => n.level === 4 || n.level === 5);
+      targetNode = deepNodes[Math.floor(Math.random() * deepNodes.length)];
+      targetZoom = 2.0 + Math.random() * 2.0;
+    }
+
+    if (!targetNode) { runScreensaverStep(); return; }
+
+    const tx = w / 2 - targetNode.x * targetZoom;
+    const ty = h / 2 - targetNode.y * targetZoom;
+    const transform = d3.zoomIdentity.translate(tx, ty).scale(targetZoom);
+
+    const duration = 3000 + Math.random() * 3000;
+    const pause = 2000 + Math.random() * 2000;
+
+    svg.transition()
+      .duration(duration)
+      .ease(d3.easeCubicInOut)
+      .call(zoomBehaviour.transform, transform)
+      .on("end", () => {
+        if (screensaverActive) {
+          screensaverLoop = setTimeout(runScreensaverStep, pause);
+        }
+      });
+  }
+
+  // Listen for user activity
+  ["mousemove", "mousedown", "wheel", "touchstart", "keydown"].forEach(evt => {
+    window.addEventListener(evt, resetIdleTimer, { passive: true });
+  });
+
+  // Start the idle timer
+  resetIdleTimer();
+  // ── End Screensaver ──────────────────────────────────────────────────────────
+
+</script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { background: #080810; font-family: system-ui, sans-serif; overflow: hidden; }
@@ -258,6 +334,82 @@ function init(data) {
     sim.force("center", d3.forceCenter(nw/2, nh/2)).alpha(0.1).restart();
   });
 }
+
+  // ── Screensaver ─────────────────────────────────────────────────────────────
+  let screensaverTimer = null;
+  let screensaverActive = false;
+  let screensaverLoop = null;
+  const IDLE_TIMEOUT = 60000; // 1 minute
+
+  function resetIdleTimer() {
+    if (screensaverActive) stopScreensaver();
+    clearTimeout(screensaverTimer);
+    screensaverTimer = setTimeout(startScreensaver, IDLE_TIMEOUT);
+  }
+
+  function startScreensaver() {
+    screensaverActive = true;
+    runScreensaverStep();
+  }
+
+  function stopScreensaver() {
+    screensaverActive = false;
+    clearTimeout(screensaverLoop);
+  }
+
+  function runScreensaverStep() {
+    if (!screensaverActive) return;
+
+    // Pick a random strategy: continent overview or deep node zoom
+    const strategy = Math.random();
+    let targetNode, targetZoom;
+
+    if (strategy < 0.3) {
+      // Zoom out to show a continent (L1 node)
+      const continentNodes = nodes.filter(n => n.level === 1);
+      targetNode = continentNodes[Math.floor(Math.random() * continentNodes.length)];
+      targetZoom = 0.3 + Math.random() * 0.3;
+    } else if (strategy < 0.6) {
+      // Mid-level zoom on L2 or L3 node
+      const midNodes = nodes.filter(n => n.level === 2 || n.level === 3);
+      targetNode = midNodes[Math.floor(Math.random() * midNodes.length)];
+      targetZoom = 0.8 + Math.random() * 0.8;
+    } else {
+      // Deep zoom on L4 or L5 node
+      const deepNodes = nodes.filter(n => n.level === 4 || n.level === 5);
+      targetNode = deepNodes[Math.floor(Math.random() * deepNodes.length)];
+      targetZoom = 2.0 + Math.random() * 2.0;
+    }
+
+    if (!targetNode) { runScreensaverStep(); return; }
+
+    const tx = w / 2 - targetNode.x * targetZoom;
+    const ty = h / 2 - targetNode.y * targetZoom;
+    const transform = d3.zoomIdentity.translate(tx, ty).scale(targetZoom);
+
+    const duration = 3000 + Math.random() * 3000;
+    const pause = 2000 + Math.random() * 2000;
+
+    svg.transition()
+      .duration(duration)
+      .ease(d3.easeCubicInOut)
+      .call(zoomBehaviour.transform, transform)
+      .on("end", () => {
+        if (screensaverActive) {
+          screensaverLoop = setTimeout(runScreensaverStep, pause);
+        }
+      });
+  }
+
+  // Listen for user activity
+  ["mousemove", "mousedown", "wheel", "touchstart", "keydown"].forEach(evt => {
+    window.addEventListener(evt, resetIdleTimer, { passive: true });
+  });
+
+  // Start the idle timer
+  resetIdleTimer();
+  // ── End Screensaver ──────────────────────────────────────────────────────────
+
 </script>
 </body>
 </html>
