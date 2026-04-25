@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Map of Human Knowledge</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js">
+ontent="width=device-width, initial-scale=1.0">
+<title>Map of Human Knowledge</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js">
   // ── Screensaver ─────────────────────────────────────────────────────────────
   let screensaverTimer = null;
   let screensaverActive = false;
@@ -333,6 +336,75 @@ function init(data) {
     labelSvg.attr("width", nw).attr("height", nh);
     sim.force("center", d3.forceCenter(nw/2, nh/2)).alpha(0.1).restart();
   });
+
+  // ── Screensaver ─────────────────────────────────────────────────────────────
+  let screensaverTimer = null;
+  let screensaverActive = false;
+  let screensaverLoop = null;
+  const IDLE_TIMEOUT = 60000;
+
+  function resetIdleTimer() {
+    if (screensaverActive) stopScreensaver();
+    clearTimeout(screensaverTimer);
+    screensaverTimer = setTimeout(startScreensaver, IDLE_TIMEOUT);
+  }
+
+  function startScreensaver() {
+    screensaverActive = true;
+    runScreensaverStep();
+  }
+
+  function stopScreensaver() {
+    screensaverActive = false;
+    clearTimeout(screensaverLoop);
+    svg.interrupt();
+  }
+
+  function runScreensaverStep() {
+    if (!screensaverActive) return;
+
+    const strategy = Math.random();
+    let targetNode, targetZoom;
+
+    if (strategy < 0.3) {
+      const continentNodes = nodes.filter(n => n.level === 1);
+      targetNode = continentNodes[Math.floor(Math.random() * continentNodes.length)];
+      targetZoom = 0.3 + Math.random() * 0.3;
+    } else if (strategy < 0.6) {
+      const midNodes = nodes.filter(n => n.level === 2 || n.level === 3);
+      targetNode = midNodes[Math.floor(Math.random() * midNodes.length)];
+      targetZoom = 0.8 + Math.random() * 0.8;
+    } else {
+      const deepNodes = nodes.filter(n => n.level === 4 || n.level === 5);
+      targetNode = deepNodes[Math.floor(Math.random() * deepNodes.length)];
+      targetZoom = 2.0 + Math.random() * 2.0;
+    }
+
+    if (!targetNode || !targetNode.x) { screensaverLoop = setTimeout(runScreensaverStep, 500); return; }
+
+    const cw = window.innerWidth, ch = window.innerHeight;
+    const tx = cw / 2 - targetNode.x * targetZoom;
+    const ty = ch / 2 - targetNode.y * targetZoom;
+    const transform = d3.zoomIdentity.translate(tx, ty).scale(targetZoom);
+
+    const duration = 3000 + Math.random() * 3000;
+    const pause = 2000 + Math.random() * 2000;
+
+    svg.transition()
+      .duration(duration)
+      .ease(d3.easeCubicInOut)
+      .call(zoomBehaviour.transform, transform)
+      .on("end", () => {
+        if (screensaverActive) screensaverLoop = setTimeout(runScreensaverStep, pause);
+      });
+  }
+
+  ["mousemove", "mousedown", "wheel", "touchstart", "keydown"].forEach(evt => {
+    window.addEventListener(evt, resetIdleTimer, { passive: true });
+  });
+
+  resetIdleTimer();
+  // ── End Screensaver ──────────────────────────────────────────────────────────
 }
 
   // ── Screensaver ─────────────────────────────────────────────────────────────
