@@ -87,3 +87,131 @@ Collisions found: 17
    New use: Same phrase used in two geographic contexts
    Resolution: Aeolian geomorphology keeps "Wind erosion"; Soil erosion entry renamed to "Aeolian soil erosion"
 
+
+
+=== PHILOSOPHY — LABEL COLLISIONS LOG ===
+Generated: 2026-04-27
+Collisions found: 20
+
+1. COLLISION: "Type theory"
+   Existing node: id=1611 L4: Type theory
+   Proposed as L5 under parent id=556 (Higher-order logic)
+   Resolution: Skipped (label already exists in map)
+
+2. COLLISION: "Four-dimensionalism"
+   Existing node: id=4007 L5: Four-dimensionalism
+   Proposed as L5 under parent id=589 (Eternalism)
+   Resolution: Skipped (label already exists in map)
+
+3. COLLISION: "Manipulation argument"
+   Existing node: id=4108 L5: Manipulation argument
+   Proposed as L5 under parent id=612 (Moral responsibility)
+   Resolution: Skipped (label already exists in map)
+
+4. COLLISION: "Trust in testimony"
+   Existing node: id=4287 L5: Trust in testimony
+   Proposed as L5 under parent id=659 (Trust)
+   Resolution: Skipped (label already exists in map)
+
+5. COLLISION: "Error theory"
+   Existing node: id=4269 L5: Error theory
+   Proposed as L5 under parent id=677 (Moral anti-realism)
+   Resolution: Skipped (label already exists in map)
+
+6. COLLISION: "Non-cognitivism"
+   Existing node: id=4270 L5: Non-cognitivism
+   Proposed as L5 under parent id=677 (Moral anti-realism)
+   Resolution: Skipped (label already exists in map)
+
+7. COLLISION: "A priori moral knowledge"
+   Existing node: id=4390 L5: A priori moral knowledge
+   Proposed as L5 under parent id=682 (Moral epistemology)
+   Resolution: Skipped (label already exists in map)
+
+8. COLLISION: "Omnipotence paradox"
+   Existing node: id=3733 L5: Omnipotence paradox
+   Proposed as L5 under parent id=691 (Divine command theory)
+   Resolution: Skipped (label already exists in map)
+
+9. COLLISION: "Hermeneutics"
+   Existing node: id=1479 L4: Hermeneutics
+   Proposed as L5 under parent id=725 (Criticism)
+   Resolution: Skipped (label already exists in map)
+
+10. COLLISION: "Legal positivism"
+   Existing node: id=1929 L4: Legal positivism
+   Proposed as L5 under parent id=738 (Legal rights)
+   Resolution: Skipped (label already exists in map)
+
+11. COLLISION: "Property rights"
+   Existing node: id=1099 L4: Property rights
+   Proposed as L5 under parent id=741 (Negative rights)
+   Resolution: Skipped (label already exists in map)
+
+12. COLLISION: "Non-domination"
+   Existing node: id=748 L4: Non-domination
+   Proposed as L5 under parent id=746 (Republican liberty)
+   Resolution: Skipped (label already exists in map)
+
+13. COLLISION: "Scanlon's contractualism"
+   Existing node: id=4426 L5: Scanlon's contractualism
+   Proposed as L5 under parent id=764 (Hypothetical contract)
+   Resolution: Skipped (label already exists in map)
+
+14. COLLISION: "Sense data theory"
+   Existing node: id=778 L4: Sense data theory
+   Proposed as L5 under parent id=776 (Indirect realism)
+   Resolution: Skipped (label already exists in map)
+
+15. COLLISION: "Humean theory of motivation"
+   Existing node: id=4406 L5: Humean theory of motivation
+   Proposed as L5 under parent id=783 (Desire-belief model)
+   Resolution: Skipped (label already exists in map)
+
+16. COLLISION: "Property dualism"
+   Existing node: id=800 L4: Property dualism
+   Proposed as L5 under parent id=800 (Property dualism)
+   Resolution: Skipped (label already exists in map)
+
+17. COLLISION: "Turing test"
+   Existing node: id=4283 L5: Turing test
+   Proposed as L5 under parent id=802 (Functionalism)
+   Resolution: Skipped (label already exists in map)
+
+18. COLLISION: "Abrahamic religions"
+   Existing node: id=1415 L3: Abrahamic religions
+   Proposed as L5 under parent id=1464 (Typology of religions)
+   Resolution: Skipped (label already exists in map)
+
+19. COLLISION: "Dharmic religions"
+   Existing node: id=1420 L3: Dharmic religions
+   Proposed as L5 under parent id=1464 (Typology of religions)
+   Resolution: Skipped (label already exists in map)
+
+20. COLLISION: "Case-based reasoning"
+   Existing node: id=3959 L5: Case-based reasoning
+   Proposed as L5 under parent id=1470 (Casuistry)
+   Resolution: Skipped (label already exists in map)
+
+
+[PHILOSOPHY PATCH — collision replacements]
+  id=5012: "Polymorphic type systems" added to parent id=556
+  id=5013: "B-series ontology" added to parent id=589
+  id=5014: "Zygote argument" added to parent id=612
+  id=5015: "Default trust principle" added to parent id=659
+  id=5016: "Projectivism" added to parent id=677
+  id=5017: "Ayer's emotivism" added to parent id=677
+  id=5018: "Intuitionist moral epistemology" added to parent id=682
+  id=5019: "Theological voluntarism" added to parent id=691
+  id=5020: "Critical evaluation in art" added to parent id=725
+  id=5021: "Positive legal entitlements" added to parent id=738
+  id=5022: "Right against coercion" added to parent id=741
+  id=5023: "Civic non-domination" added to parent id=746
+  id=5024: "Ideal rational agreement" added to parent id=764
+  id=5025: "Representational intermediaries" added to parent id=776
+  id=5026: "Pro-attitudes & belief" added to parent id=783
+  id=5027: "Computational functionalism" added to parent id=802
+  id=5028: "Ethnic vs universal religions" added to parent id=1464
+  id=5029: "Salvation-centred typology" added to parent id=1464
+  id=5030: "Practical moral reasoning" added to parent id=1470
+  id=5031: "Davidson's dual-aspect theory" added to parent id=800 (Property dualism)
