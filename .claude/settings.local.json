@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"\nconst fs = require\\('fs'\\);\nconst data = JSON.parse\\(fs.readFileSync\\('C:/Users/Citywalker/Documents/KaiQ/Map of Meaning/visual/knowledge_map.json', 'utf8'\\)\\);\nconst nodes = data.nodes;\nconst edges = data.edges;\n\n// Build child sets\nconst hasChildren = new Set\\(edges.map\\(e => e.source\\)\\);\n\n// Find L4 nodes without children\nconst l4NoChildren = nodes.filter\\(n => n.level === 4 && !hasChildren.has\\(n.id\\)\\);\nconsole.log\\('L4 nodes without children:', l4NoChildren.length\\);\n\n// Find L4 nodes WITH children\nconst l4WithChildren = nodes.filter\\(n => n.level === 4 && hasChildren.has\\(n.id\\)\\);\nconsole.log\\('L4 nodes with children \\(already have L5\\):', l4WithChildren.length\\);\n\n// Show L4 nodes with children to identify Physics branch\nconsole.log\\('\\\\\\\\nL4 nodes already with children:'\\);\nl4WithChildren.forEach\\(n => console.log\\(n.id, n.label\\)\\);\n\")"
+    ]
+  }
+}
