@@ -1,0 +1,89 @@
+=== NATURAL SCIENCES — LABEL COLLISIONS LOG ===
+Generated: 2026-04-27
+Collisions found: 17
+
+1. COLLISION: "Perturbation theory"
+   Existing node: id=176 — Math > Applied mathematics > Mathematical Physics > Perturbation theory (L4)
+   New use: Proposed as L5 under Chemistry > Physical chemistry > Quantum chemistry
+   Resolution: Renamed to "Quantum perturbation theory"
+
+2. COLLISION: "Distillation"
+   Existing node: id=1809 — Applied Sciences > Chemical Engineering > Separation processes > Distillation (L4)
+   New use: Proposed as L5 under Chemistry > Analytical chemistry > Separation science
+   Resolution: Renamed to "Distillation techniques"
+
+3. COLLISION: "Membrane separation"
+   Existing node: id=1812 — Applied Sciences > Chemical Engineering > Separation processes > Membrane separation (L4)
+   New use: Proposed as L5 under Chemistry > Analytical chemistry > Separation science
+   Resolution: Renamed to "Membrane filtration"
+
+4. COLLISION: "Signal processing"
+   Existing node: id=1784 — Applied Sciences > Electrical Engineering > Signal processing (L3)
+   New use: Proposed as L5 under Chemistry > Analytical chemistry > Chemometrics
+   Resolution: Renamed to "Chemometric signal processing"
+
+5. COLLISION: "Action potentials"
+   Existing node: id=2119 — Medicine > Physiology > Cellular physiology > Action potentials (L4)
+   New use: Proposed as L5 under Biology > Cellular Biology > Neurobiology
+   Resolution: Renamed to "Action potential generation"
+
+6. COLLISION: "Membrane transport"
+   Existing node: id=2118 — Medicine > Physiology > Cellular physiology > Membrane transport (L4)
+   New use: Proposed as L5 under Biology > Cellular Biology > Cell membrane biology
+   Resolution: Renamed to "Active & passive transport"
+
+7. COLLISION: "Epigenetics"
+   Existing node: id=2191 — Medicine > Genetics & genomics > Inheritance > Epigenetics (L4)
+   New use: Proposed as L5 under Biology > Genetics > Molecular genetics
+   Resolution: Renamed to "Epigenetic regulation"
+
+8. COLLISION: "Mendelian inheritance"
+   Existing node: id=2189 — Medicine > Genetics & genomics > Inheritance > Mendelian inheritance (L4)
+   New use: Proposed as L5 under Biology > Genetics > Transmission genetics
+   Resolution: Renamed to "Mendel's laws of heredity"
+
+9. COLLISION: "Maximum likelihood"
+   Existing node: id=973 — Mathematics > Applied mathematics > Statistics > Estimation > Maximum likelihood (L5)
+   New use: Proposed as L5 under Biology > Evolutionary Biology > Phylogenetics
+   Resolution: Renamed to "Maximum likelihood phylogeny"
+
+10. COLLISION: "Optical properties"
+   Existing node: id=1698 — Applied Sciences > Materials science > Functional properties > Optical properties (L4)
+   New use: Proposed as L5 under Geology > Mineralogy > Mineral properties
+   Resolution: Renamed to "Optical mineral properties"
+
+11. COLLISION: "Magnetic properties"
+   Existing node: id=1697 — Applied Sciences > Materials science > Functional properties > Magnetic properties (L4)
+   New use: Proposed as L5 under Geology > Mineralogy > Mineral properties
+   Resolution: Renamed to "Magnetic mineral properties"
+
+12. COLLISION: "Electrical properties"
+   Existing node: id=1696 — Applied Sciences > Materials science > Functional properties > Electrical properties (L4)
+   New use: Proposed as L5 under Geology > Mineralogy > Mineral properties
+   Resolution: Renamed to "Electrical mineral properties"
+
+13. COLLISION: "Thermal properties"
+   Existing node: id=1699 — Applied Sciences > Materials science > Functional properties > Thermal properties (L4)
+   New use: Proposed as L5 under Geology > Mineralogy > Mineral properties
+   Resolution: Renamed to "Thermal mineral properties"
+
+14. COLLISION: "Generalisation"
+   Existing node: id=891 — Social Sciences > Psychology > Behavioural psychology > Classical conditioning > Generalisation (L5)
+   New use: Proposed as L5 under Geography > Cartography > Map scale
+   Resolution: Renamed to "Cartographic generalisation"
+
+15. COLLISION: "Urban morphology"
+   Existing node: id=2310 — Arts > Architecture > Urban design > Urban morphology (L4)
+   New use: Proposed as L5 under Geography > Human Geography > Urban geography
+   Resolution: Renamed to "Urban form & built environment"
+
+16. COLLISION: "Surface waves (internal duplicate)"
+   Existing node: Internal: proposed twice — Seismology and Oceanography
+   New use: Same phrase used for seismic surface waves and ocean surface waves
+   Resolution: Seismology entry renamed to "Seismic surface waves"; Oceanography keeps "Surface waves"
+
+17. COLLISION: "Wind erosion (internal duplicate)"
+   Existing node: Internal: proposed twice — Aeolian geomorphology and Soil erosion
+   New use: Same phrase used in two geographic contexts
+   Resolution: Aeolian geomorphology keeps "Wind erosion"; Soil erosion entry renamed to "Aeolian soil erosion"
+
