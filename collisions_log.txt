@@ -215,3 +215,40 @@ Collisions found: 20
   id=5029: "Salvation-centred typology" added to parent id=1464
   id=5030: "Practical moral reasoning" added to parent id=1470
   id=5031: "Davidson's dual-aspect theory" added to parent id=800 (Property dualism)
+
+
+=== MATHEMATICS — LABEL COLLISIONS LOG ===
+Generated: 2026-05-01
+Collisions found: 6
+Parents skipped (already have L5): 
+
+1. COLLISION: "Laws of exponents"
+   Existing: id=5061 L5: Laws of exponents
+   Proposed under parent id=23 (Exponents)
+   Resolution: Skipped
+
+2. COLLISION: "Divisibility rules"
+   Existing: id=5077 L5: Divisibility rules
+   Proposed under parent id=48 (Divisibility)
+   Resolution: Skipped
+
+3. COLLISION: "Conditional independence"
+   Existing: id=5524 L5: Conditional independence
+   Proposed under parent id=119 (Independence)
+   Resolution: Skipped
+
+4. COLLISION: "Bayes factor"
+   Existing: id=5529 L5: Bayes factor
+   Proposed under parent id=161 (Bayesian statistics)
+   Resolution: Skipped
+
+5. COLLISION: "Stationarity"
+   Existing: id=980 L5: Stationarity
+   Proposed under parent id=163 (Time series)
+   Resolution: Skipped
+
+6. COLLISION: "Symmetry groups"
+   Existing: id=5215 L5: Symmetry groups
+   Proposed under parent id=174 (Group theory)
+   Resolution: Skipped
+
