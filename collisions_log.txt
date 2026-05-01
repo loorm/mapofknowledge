@@ -252,3 +252,18 @@ Parents skipped (already have L5):
    Proposed under parent id=174 (Group theory)
    Resolution: Skipped
 
+
+--- Medicine collisions ---
+SKIPPED: "Glial cells" (parent=2109) — label already exists
+SKIPPED: "Ion channels" (parent=2118) — label already exists
+SKIPPED: "Cell cycle checkpoints" (parent=2121) — label already exists
+SKIPPED: "Progression" (parent=2159) — label already exists
+SKIPPED: "Antibiotic resistance" (parent=2177) — label already exists
+SKIPPED: "Viral replication" (parent=2178) — label already exists
+SKIPPED: "Hardy-Weinberg equilibrium" (parent=2189) — label already exists
+SKIPPED: "Pedigree analysis" (parent=2189) — label already exists
+SKIPPED: "Cytogenetics" (parent=2192) — label already exists
+SKIPPED: "Informed consent" (parent=2200) — label already exists
+SKIPPED: "Causal inference" (parent=2205) — label already exists
+SKIPPED: "Hypothesis testing" (parent=2210) — label already exists
+SKIPPED: "Confidence intervals" (parent=2210) — label already exists
