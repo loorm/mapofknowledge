@@ -139,7 +139,7 @@ function init(data) {
 
   // ── Continent pre-seeding ─────────────────────────────────────────────────
   const continentNames = Object.keys(CONTINENTS);
-  const seedRadius = Math.min(w, h) * 0.52;
+  const seedRadius = Math.min(w, h) * 0.75;
   const continentSeeds = {};
   continentNames.forEach((name, i) => {
     const angle = (i / continentNames.length) * 2 * Math.PI;
