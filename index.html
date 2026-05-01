@@ -342,7 +342,7 @@ function init(data) {
     if (node) node.attr("cx", d => d.x).attr("cy", d => d.y);
     if (expander) expander
       .attr("x", d => d.x)
-      .attr("y", d => d.y + nodeRadius(d) + 6)
+      .attr("y", d => d.y)
       .text(d => d.expanded ? "−" : "+");
     repositionLabels();
   }
