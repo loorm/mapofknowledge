@@ -267,3 +267,13 @@ SKIPPED: "Informed consent" (parent=2200) — label already exists
 SKIPPED: "Causal inference" (parent=2205) — label already exists
 SKIPPED: "Hypothesis testing" (parent=2210) — label already exists
 SKIPPED: "Confidence intervals" (parent=2210) — label already exists
+
+--- Arts collisions ---
+SKIPPED: "Aesthetic evaluation" (parent=2260) — label already exists
+SKIPPED: "Emotional expression in art" (parent=2268) — label already exists
+SKIPPED: "Aesthetic experience" (parent=2269) — label already exists
+SKIPPED: "Structural analysis" (parent=2314) — label already exists
+SKIPPED: "Metonymy" (parent=2321) — label already exists
+SKIPPED: "Proximity" (parent=2384) — label already exists
+SKIPPED: "Equilibrium" (parent=2413) — label already exists
+SKIPPED: "Formalist criticism" (parent=2427) — label already exists
