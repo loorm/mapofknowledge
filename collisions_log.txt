@@ -277,3 +277,17 @@ SKIPPED: "Metonymy" (parent=2321) — label already exists
 SKIPPED: "Proximity" (parent=2384) — label already exists
 SKIPPED: "Equilibrium" (parent=2413) — label already exists
 SKIPPED: "Formalist criticism" (parent=2427) — label already exists
+
+--- Humanities collisions ---
+SKIPPED: "Assimilation" (parent=1323)
+SKIPPED: "Tree diagrams" (parent=1333)
+SKIPPED: "Fusion" (parent=1350)
+SKIPPED: "Comparative method" (parent=1351)
+SKIPPED: "Implicational universals" (parent=1362)
+SKIPPED: "Turing machines" (parent=1368)
+SKIPPED: "Contingency" (parent=1484)
+SKIPPED: "Random sampling" (parent=1516)
+SKIPPED: "Aerial photography" (parent=1538)
+SKIPPED: "Discourse analysis" (parent=1596)
+SKIPPED: "Ubykh" (parent=7253)
+SKIPPED: "Eyak" (parent=7262)
