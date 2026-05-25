@@ -52,8 +52,8 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
 /* ── TOP BAR ──────────────────────────────── */
 #top-bar {
   position: fixed; top: 0; left: 0; right: 0; height: 52px;
-  background: #F2EDE6;
-  border-bottom: 1px solid rgba(58,48,40,0.10);
+  background: linear-gradient(to right, #F5EAE3 0%, #EDE6F0 55%, #E4EBF5 100%);
+  border-bottom: 1px solid rgba(58,48,40,0.09);
   box-shadow: 0 2px 16px rgba(58,48,40,0.07);
   display: flex; align-items: center; gap: 16px;
   padding: 0 16px;
@@ -66,7 +66,7 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
 }
 .topbar-logo-icon {
   width: 30px; height: 30px;
-  background: #C4826A;
+  background: linear-gradient(135deg, #D4906A 0%, #C4729A 100%);
   border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
@@ -130,10 +130,11 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
   flex-shrink: 0;
 }
 .topbar-icon-btn:hover { background: rgba(58,48,40,0.07); color: #3A3028; }
+.topbar-burger { width: 36px; height: 36px; border-radius: 9px; }
 
 /* ── FLOATING CONTROLS – shared card style ── */
 .ctrl-card {
-  background: rgba(242,237,230,0.93);
+  background: linear-gradient(145deg, rgba(248,242,236,0.95) 0%, rgba(237,232,246,0.95) 100%);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(58,48,40,0.10);
@@ -177,7 +178,7 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
 #sidebar {
   position: fixed; top: 52px; right: 0;
   width: 320px; height: calc(100vh - 52px);
-  background: #F2EDE6;
+  background: linear-gradient(to bottom, #F5EAE3 0%, #EDE6F0 55%, #E4EBF5 100%);
   border-left: 1px solid rgba(58,48,40,0.09);
   box-shadow: -6px 0 32px rgba(58,48,40,0.09);
   display: flex; flex-direction: column;
@@ -225,7 +226,7 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
 
 /* Knowledge card */
 .sb-knowledge-card {
-  background: #fff;
+  background: linear-gradient(135deg, #ffffff 0%, #F8F0F5 100%);
   border: 1px solid rgba(58,48,40,0.08);
   border-radius: 14px;
   padding: 16px;
@@ -256,7 +257,7 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
 /* Toggle row */
 .sb-toggle-row {
   display: flex; align-items: center; justify-content: space-between;
-  background: #fff;
+  background: linear-gradient(135deg, #ffffff 0%, #F0EDF8 100%);
   border: 1px solid rgba(58,48,40,0.08);
   border-radius: 14px;
   padding: 14px 16px;
@@ -283,7 +284,7 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
 /* Test me button */
 .sb-test-btn {
   width: 100%; padding: 13px 16px;
-  background: #9B8FB5;
+  background: linear-gradient(135deg, #B09CC8 0%, #9182B0 100%);
   color: #fff;
   border: none; border-radius: 14px;
   font-size: 14px; font-weight: 600;
@@ -293,13 +294,13 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
   letter-spacing: 0.1px;
   transition: background 0.15s, transform 0.1s;
 }
-.sb-test-btn:hover { background: #8A7EA4; transform: translateY(-1px); }
+.sb-test-btn:hover { background: linear-gradient(135deg, #A08CB8 0%, #8172A0 100%); transform: translateY(-1px); }
 .sb-test-btn:active { transform: translateY(0); }
 
 /* Overview */
 .sb-section-title {
   font-size: 11px; font-weight: 700; letter-spacing: 0.7px;
-  text-transform: uppercase; color: #B0A496;
+  text-transform: uppercase; color: #7A6E65;
   margin-bottom: 8px;
 }
 .sb-overview-text {
