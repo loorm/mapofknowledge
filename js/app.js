@@ -355,11 +355,7 @@ function init(data) {
 
   function resetHighlight() {
     selected = null;
-    if (node) refreshNodeColors();
-    if (link) link.attr("stroke-opacity", l => {
-      const src = allNodes[typeof l.source === "object" ? l.source.id : l.source];
-      return src?.level === 1 ? 0.5 : src?.level === 2 ? 0.35 : src?.level === 3 ? 0.2 : 0.12;
-    });
+    refreshNodeColors();
   }
 
   svg.on("click", () => { resetHighlight(); closeSidebar(); });
@@ -401,12 +397,6 @@ function init(data) {
     const k = currentTransform.k;
     label.attr("opacity", d => labelOpacity(d.level, k));
   }
-
-  // ── Legend ─────────────────────────────────────────────────────────────────
-  const legend = document.getElementById("legend");
-  Object.entries(CONTINENTS).forEach(([name, color]) => {
-    legend.innerHTML += `<div class="leg-item"><div class="leg-dot" style="background:${color}"></div>${name}</div>`;
-  });
 
   // ── Resize ─────────────────────────────────────────────────────────────────
   window.addEventListener("resize", () => {
@@ -488,6 +478,22 @@ function init(data) {
       .attr('fill-opacity', d => {
         const base = d.level === 1 ? 1 : d.level === 2 ? 0.85 : 0.7;
         return (!activeFilterSet || nodePassesFilter(d.id)) ? base : 0.3;
+      });
+    if (!link) return;
+    link
+      .attr('stroke', d => {
+        const srcId = typeof d.source === 'object' ? d.source.id : d.source;
+        const tgtId = typeof d.target === 'object' ? d.target.id : d.target;
+        if (activeFilterSet && !(nodePassesFilter(srcId) && nodePassesFilter(tgtId))) return '#585858';
+        const src = allNodes[srcId];
+        return src ? (CONTINENTS[src.continent] || '#444') : '#444';
+      })
+      .attr('stroke-opacity', d => {
+        const srcId = typeof d.source === 'object' ? d.source.id : d.source;
+        const tgtId = typeof d.target === 'object' ? d.target.id : d.target;
+        if (activeFilterSet && !(nodePassesFilter(srcId) && nodePassesFilter(tgtId))) return 0.06;
+        const src = allNodes[srcId];
+        return src?.level === 1 ? 0.5 : src?.level === 2 ? 0.35 : src?.level === 3 ? 0.2 : 0.12;
       });
   }
 
