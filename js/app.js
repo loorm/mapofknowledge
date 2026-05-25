@@ -7,7 +7,7 @@ const CONTINENTS = {
   "Arts":             "#D4537E",
   "Applied Sciences": "#7ABF3C",
   "Natural Sciences": "#5BC8D8",
-  "Skills & Crafts":  "#9A9890"
+  "Skills & Crafts":  "#C4A55A"
 };
 
 const FADE = 0.25;
@@ -326,7 +326,6 @@ function init(data) {
 
     if (d.level === 4 && hasHiddenChildren(d.id)) {
       toggleExpand(d);
-      return;
     }
 
     if (selected === d.id) {
