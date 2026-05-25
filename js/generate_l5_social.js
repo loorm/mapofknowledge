@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const filePath = path.join(__dirname, 'knowledge_map.json');
+const filePath = path.join(__dirname, '..', 'knowledge_map.json');
 const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
 
 const nodeById = {};
@@ -402,11 +402,11 @@ Object.keys(byParent).map(Number).forEach(pid => {
   lines.push(`  [L4: ${pid}] ${nodeById2[pid] ? nodeById2[pid].label : '?'}`);
   byParent[pid].forEach(a => lines.push(`    id=${a.id} "${a.label}"`));
 });
-fs.appendFileSync(path.join(__dirname, 'additions_log.txt'), lines.join('\n') + '\n');
+fs.appendFileSync(path.join(__dirname, '..', 'additions_log.txt'), lines.join('\n') + '\n');
 
 if (collisions.length > 0) {
   const cLines = ['\n--- Social Sciences collisions ---'];
   collisions.forEach(c => cLines.push(`SKIPPED: "${c.label}" (parent=${c.parentId})`));
-  fs.appendFileSync(path.join(__dirname, 'collisions_log.txt'), cLines.join('\n') + '\n');
+  fs.appendFileSync(path.join(__dirname, '..', 'collisions_log.txt'), cLines.join('\n') + '\n');
 }
 console.log('Logs updated.');
