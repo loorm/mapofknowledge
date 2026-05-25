@@ -40,49 +40,127 @@
       color: '#8BAD7E',
       // Estonian National Curriculum for Basic School (grades 1–9, ages 7–15).
       // Source: https://oppekava.ee/pohikool-2023/
-      // 8 subject areas: Language & Literature, Foreign Languages, Mathematics,
-      // Natural Sciences, Social Studies, Arts, Technology, Physical Education.
+      // Labels are at L3 or L4 level to avoid over-including entire academic domains.
       labels: new Set([
-        /* Mathematics — specific L3/L4 nodes only (not the L1 domain) */
-        // Arithmetic (L3) — all of it is basic school
+
+        /* ── MATHEMATICS ── */
+        // Arithmetic (L3): all appropriate for basic school
         'Arithmetic',
-        // Algebra (L3 children): basic concepts only, excludes Matrices/Determinants/Vectors/Logarithms/Series
+        // Algebra (L4 nodes): basic concepts only — excludes Matrices, Determinants, Vectors, Logarithms, Series
         'Variables', 'Expressions', 'Equations', 'Inequalities',
         'Functions', 'Polynomials', 'Systems of equations', 'Exponents', 'Sequences',
-        // Geometry (L3 children): Euclidean only, excludes Trigonometry/Vectors/Projective/Non-Euclidean
+        // Geometry (L4 nodes): Euclidean plane/solid only — excludes Trigonometry, Vectors, Projective, Non-Euclidean
         'Points, lines & planes', 'Angles', 'Polygons', 'Triangles', 'Quadrilaterals',
         'Circles', 'Perimeter & area', 'Volume & surface area',
         'Congruence', 'Similarity', 'Symmetry', 'Transformations', 'Coordinate geometry',
-        // Statistics & Probability: introductory topics only
-        'Descriptive statistics',  // L4 under Statistics
-        'Sample spaces', 'Events', 'Probability axioms',  // L4 under Probability
-        /* Natural Sciences (loodusained) */
-        'Biology',               // bioloogia
-        'Chemistry',             // keemia
-        'Physics',               // füüsika
-        'Geography',             // geograafia (loodusõpetus / maateadus)
-        /* Social Studies (sotsiaalained) */
-        'History',               // ajalugu
-        'Political Science',     // ühiskonnaõpetus (civics)
-        'Sociology',             // social structure component of ühiskonnaõpetus
-        'Psychology',            // inimeseõpetus (human studies)
-        'Ethics',                // moral component of inimeseõpetus
-        /* Arts (kunstiained) */
-        'Music',                 // muusika
-        'Visual arts',           // kunst (visual arts)
-        /* Language & Literature (keel ja kirjandus) */
-        'Linguistics',           // keeleteadus — Estonian language study
-        'Literature',            // kirjandus
-        'Philology',             // filoloogia — language arts, text study
-        /* Technology & Crafts (tehnoloogia) */
-        'Design',                // tööõpetus / disain
-        'Culinary Crafts',       // käsitöö ja kodundus
-        'Manufacturing & engineering trades', // tööõpetus
-        /* Physical Education (kehaline kasvatus) */
-        'Sports Science',        // kehaline kasvatus
-        /* Informatics — optional subject (informaatika) */
-        'Computer Science',      // informaatika
-        'Digital & ICT',         // digioskused
+        // Statistics & Probability (L4): introductory only
+        'Descriptive statistics',
+        'Sample spaces', 'Events', 'Probability axioms',
+
+        /* ── PHYSICS ── */
+        // Mechanics, thermodynamics, sound — whole L3 appropriate
+        'Classical mechanics', 'Thermodynamics', 'Acoustics',
+        // Electricity & magnetism (L4): excludes Maxwell's equations and Electrodynamics
+        'Electric charge & fields', 'Magnetism', 'Electromagnetic induction',
+        // Optics (L4): geometric and wave optics; excludes Quantum optics
+        'Geometric optics', 'Wave optics', 'Colour & perception',
+        // Quantum mechanics and Relativity are NOT basic school
+
+        /* ── CHEMISTRY ── */
+        // Basic concepts only (L4); excludes Quantum chemistry, Theoretical/Computational chemistry
+        'Thermochemistry', 'Chemical kinetics',   // Physical chemistry basics
+        'Functional group chemistry',              // Organic chemistry basics
+        'Main group chemistry',                    // Inorganic: elements, periodic table, bonding
+        'Electrochemical cells', 'Electrolysis', 'Redox thermodynamics',
+
+        /* ── BIOLOGY ── */
+        // Excludes Molecular Biology (university-level)
+        'Botany', 'Zoology', 'Evolutionary Biology', 'Ecology', 'Genetics',
+        // Cellular Biology (L4): excludes Neurobiology
+        'Cell structure', 'Cell cycle', 'Organelle function', 'Cell membrane biology',
+        // Microbiology (L4): disease-relevant basics only
+        'Bacteriology', 'Virology',
+
+        /* ── GEOGRAPHY ── */
+        // Whole L2: basic school covers physical + human geography, maps, water, soil
+        'Geography',
+
+        /* ── PSYCHOLOGY (inimeseõpetus) ── */
+        // Human development
+        'Developmental psychology',
+        // Basic cognitive (L4)
+        'Attention', 'Memory', 'Perception',
+        // Basic social behaviour (L4)
+        'Social influence', 'Group dynamics', 'Prosocial behaviour',
+        // Basic biological/health (L4)
+        'Sleep', 'Arousal',
+
+        /* ── SOCIOLOGY ── */
+        // Family, culture, basic stratification — excludes Social theory and Research methods
+        'Family sociology', 'Culture and society', 'Social stratification',
+
+        /* ── POLITICAL SCIENCE (ühiskonnaõpetus) ── */
+        // Political systems — excludes Methodology, Political economy, IR theory
+        'Comparative politics',
+        // International institutions (L4): EU, UN context
+        'International institutions',
+
+        /* ── ECONOMICS (basic economic literacy in civics) ── */
+        // Microeconomics basics (L4)
+        'Consumer theory', 'Producer theory',
+        // Macroeconomics basics (L4)
+        'Money', 'Inflation', 'Unemployment', 'National income accounting',
+        // Public economics basics (L4)
+        'Public goods', 'Externalities', 'Taxation',
+
+        /* ── ETHICS (moral component of inimeseõpetus) ── */
+        // Normative ethics (L3): virtue, consequentialism, deontology basics
+        'Normative ethics',
+        // Applied ethics (L4): environmental, digital, animal — topics in curriculum
+        'Environmental ethics', 'Technology ethics', 'Animal ethics', 'Bioethics',
+
+        /* ── HISTORY (ajalugu) ── */
+        // World historical periods (L3): Prehistory → Contemporary — excludes historiography/methodology
+        'World historical periods',
+
+        /* ── LINGUISTICS (keel) ── */
+        // Basic grammar study only; excludes Historical linguistics, Sociolinguistics, Typology, Formal linguistics
+        'Morphology', 'Syntax', 'Semantics',
+
+        /* ── PHILOLOGY ── */
+        // Only language families taught or relevant in Estonian basic school; NOT all 6000 languages
+        'Uralic languages',      // Estonian, Finnish, Hungarian — Finno-Ugric family (L3)
+        'Germanic languages',    // English — primary foreign language (L4)
+        'Slavic languages',      // Russian — widely taught in Estonia (L4)
+        'Baltic languages',      // Latvian, Lithuanian — neighbours (L4)
+
+        /* ── LITERATURE (kirjandus) ── */
+        // Practical literary skills only; excludes Literary theory (Structuralism etc.) and Comparative literature
+        'Poetics', 'Rhetoric', 'Narrative theory',
+
+        /* ── MUSIC (muusika) ── */
+        // Theory and performance; excludes Conducting, Musicology, Ethnomusicology
+        'Music theory', 'Performance practice',
+
+        /* ── VISUAL ARTS (kunst) ── */
+        // Practical art-making subjects; excludes Art theory and Iconography
+        'Colour theory', 'Drawing', 'Painting', 'Printmaking',
+
+        /* ── DIGITAL & ICT (digioskused) ── */
+        'Digital & ICT',
+
+        /* ── COMPUTER SCIENCE / INFORMATICS (optional, grades 7–9) ── */
+        // Basic algorithmic thinking only; excludes Theory of computation, Architecture, Distributed systems
+        'Algorithms',
+
+        /* ── PHYSICAL EDUCATION (kehaline kasvatus) ── */
+        'Sports Science',
+
+        /* ── TECHNOLOGY & CRAFTS (tehnoloogia / käsitöö) ── */
+        'Design',
+        'Culinary Crafts',
+        'Manufacturing & engineering trades',
+
       ])
     }
 
