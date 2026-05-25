@@ -201,6 +201,7 @@ function init(data) {
       .on("mouseout",  () => { tt.style.display = "none"; })
       .on("click", onNodeClick);
     node = nodeEnter.merge(node);
+    refreshNodeColors();
 
     const expanderData = simNodes.filter(n => n.level === 4 && hasHiddenChildren(n.id));
     expander = gExpand.selectAll("text").data(expanderData, d => d.id);
@@ -354,7 +355,7 @@ function init(data) {
 
   function resetHighlight() {
     selected = null;
-    if (node) node.attr("fill-opacity", n => n.level === 1 ? 1 : n.level === 2 ? 0.85 : 0.7);
+    if (node) refreshNodeColors();
     if (link) link.attr("stroke-opacity", l => {
       const src = allNodes[typeof l.source === "object" ? l.source.id : l.source];
       return src?.level === 1 ? 0.5 : src?.level === 2 ? 0.35 : src?.level === 3 ? 0.2 : 0.12;
@@ -467,6 +468,33 @@ function init(data) {
     window.addEventListener(evt, resetIdleTimer, { passive: true });
   });
   resetIdleTimer();
+
+  // ── Filter ─────────────────────────────────────────────────────────────────
+  let activeFilterSet = null;
+
+  function nodePassesFilter(nodeId) {
+    let cur = nodeId;
+    while (cur !== undefined) {
+      if (allNodes[cur] && activeFilterSet.has(allNodes[cur].label)) return true;
+      cur = parentOf[cur];
+    }
+    return false;
+  }
+
+  function refreshNodeColors() {
+    if (!node) return;
+    node
+      .attr('fill', d => (!activeFilterSet || nodePassesFilter(d.id)) ? d.color : '#585858')
+      .attr('fill-opacity', d => {
+        const base = d.level === 1 ? 1 : d.level === 2 ? 0.85 : 0.7;
+        return (!activeFilterSet || nodePassesFilter(d.id)) ? base : 0.3;
+      });
+  }
+
+  window.setMapFilter = function(labelSet) {
+    activeFilterSet = labelSet;
+    refreshNodeColors();
+  };
 
   // ── Initial build ──────────────────────────────────────────────────────────
   rebuild();
