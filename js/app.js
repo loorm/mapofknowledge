@@ -25,6 +25,21 @@ const FONT_WEIGHT = { 1: 600, 2: 500, 3: 400, 4: 400, 5: 400 };
 const NODE_OFFSET = { 1: 20, 2: 13, 3: 10, 4: 8, 5: 7 };
 const TOP_BAR_H   = 52;
 
+// ── Burger menu ───────────────────────────────────────────────────────────────
+(function() {
+  const btn      = document.getElementById("nav-menu");
+  const dropdown = document.getElementById("nav-dropdown");
+  btn.addEventListener("click", e => {
+    e.stopPropagation();
+    dropdown.classList.toggle("open");
+  });
+  document.addEventListener("click", e => {
+    if (!dropdown.contains(e.target) && e.target !== btn) {
+      dropdown.classList.remove("open");
+    }
+  });
+})();
+
 fetch('knowledge_map.json')
   .then(r => r.json())
   .then(init)
@@ -267,11 +282,16 @@ function init(data) {
     // Title
     document.getElementById("sb-title").textContent = d.label;
 
+    // Sidebar gradient derived from node colour
+    sidebar.style.background =
+      `linear-gradient(to bottom, ${d.color}30 0%, ${d.color}0C 30%, #F5EAE3 55%, #EDE6F0 75%, #E4EBF5 100%)`;
+
     sidebar.classList.add("open");
   }
 
   function closeSidebar() {
     sidebar.classList.remove("open");
+    sidebar.style.background = "";
   }
 
   // ── Click to highlight ─────────────────────────────────────────────────────
