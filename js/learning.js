@@ -63,7 +63,6 @@
     /* breadcrumb + title */
     $id('lm-path-crumb').textContent  = crumb || '';
     $id('lm-path-title').textContent  = (node && node.name) ? node.name : 'Learning Path';
-    $id('lm-path-subtitle').textContent = KNOBIT_DONE_COUNT + ' of ' + KNOBIT_TOTAL + ' knobits completed';
 
     /* progress bar */
     const pct = Math.round((KNOBIT_DONE_COUNT / KNOBIT_TOTAL) * 100);
@@ -87,13 +86,6 @@
         '</div>' +
         '<div class="kn-info">' +
           '<div class="kn-name">' + _esc(kb.name) + '</div>' +
-          (kb.tags.length
-            ? '<div class="kn-tags">' +
-                kb.tags.map(function (t) {
-                  return '<span class="kn-tag ' + t + '">' + _esc(t) + '</span>';
-                }).join('') +
-              '</div>'
-            : '') +
         '</div>' +
         '<svg class="kn-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none">' +
           '<path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>' +
