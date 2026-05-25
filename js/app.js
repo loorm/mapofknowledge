@@ -298,6 +298,17 @@ function init(data) {
     // Sidebar gradient derived from node colour — fully opaque tints
     sidebar.style.background = nodeGradient(d.color);
 
+    // Wire "Learn this" button to open learning mode for this node
+    const learnBtn = document.querySelector(".sb-learn-btn");
+    if (learnBtn) {
+      const crumb = (domainNode ? domainNode.label : "") +
+        (crumbParts.length ? " › " + crumbParts.join(" › ") : "");
+      learnBtn.onclick = function () {
+        closeSidebar();
+        openLearningMode(d, crumb);
+      };
+    }
+
     sidebar.classList.add("open");
   }
 
