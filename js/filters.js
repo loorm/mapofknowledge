@@ -43,8 +43,19 @@
       // 8 subject areas: Language & Literature, Foreign Languages, Mathematics,
       // Natural Sciences, Social Studies, Arts, Technology, Physical Education.
       labels: new Set([
-        /* Mathematics — entire domain (matemaatika) */
-        'Mathematics',           // L1 — catches Pure Mathematics + Applied mathematics
+        /* Mathematics — specific L3/L4 nodes only (not the L1 domain) */
+        // Arithmetic (L3) — all of it is basic school
+        'Arithmetic',
+        // Algebra (L3 children): basic concepts only, excludes Matrices/Determinants/Vectors/Logarithms/Series
+        'Variables', 'Expressions', 'Equations', 'Inequalities',
+        'Functions', 'Polynomials', 'Systems of equations', 'Exponents', 'Sequences',
+        // Geometry (L3 children): Euclidean only, excludes Trigonometry/Vectors/Projective/Non-Euclidean
+        'Points, lines & planes', 'Angles', 'Polygons', 'Triangles', 'Quadrilaterals',
+        'Circles', 'Perimeter & area', 'Volume & surface area',
+        'Congruence', 'Similarity', 'Symmetry', 'Transformations', 'Coordinate geometry',
+        // Statistics & Probability: introductory topics only
+        'Descriptive statistics',  // L4 under Statistics
+        'Sample spaces', 'Events', 'Probability axioms',  // L4 under Probability
         /* Natural Sciences (loodusained) */
         'Biology',               // bioloogia
         'Chemistry',             // keemia
