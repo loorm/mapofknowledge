@@ -370,5 +370,6 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
   display: flex; align-items: center; justify-content: center;
   color: #8A7E72;
   transition: background 0.15s;
+  z-index: 1;
 }
 #sb-close:hover { background: rgba(58,48,40,0.13); }
