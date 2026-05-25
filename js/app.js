@@ -25,6 +25,19 @@ const FONT_WEIGHT = { 1: 600, 2: 500, 3: 400, 4: 400, 5: 400 };
 const NODE_OFFSET = { 1: 20, 2: 13, 3: 10, 4: 8, 5: 7 };
 const TOP_BAR_H   = 52;
 
+// ── Sidebar gradient helper ────────────────────────────────────────────────────
+// Mixes the node hex colour with white at two opacities to produce a fully
+// opaque two-stop gradient (no translucency).
+function nodeGradient(hex) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const tint = (ch, p) => Math.round(255 * (1 - p) + ch * p);
+  const light = `rgb(${tint(r,.18)},${tint(g,.18)},${tint(b,.18)})`;
+  const deep  = `rgb(${tint(r,.42)},${tint(g,.42)},${tint(b,.42)})`;
+  return `linear-gradient(to bottom, ${light} 0%, ${deep} 100%)`;
+}
+
 // ── Burger menu ───────────────────────────────────────────────────────────────
 (function() {
   const btn      = document.getElementById("nav-menu");
@@ -282,9 +295,8 @@ function init(data) {
     // Title
     document.getElementById("sb-title").textContent = d.label;
 
-    // Sidebar gradient derived from node colour
-    sidebar.style.background =
-      `linear-gradient(to bottom, ${d.color}30 0%, ${d.color}0C 30%, #F5EAE3 55%, #EDE6F0 75%, #E4EBF5 100%)`;
+    // Sidebar gradient derived from node colour — fully opaque tints
+    sidebar.style.background = nodeGradient(d.color);
 
     sidebar.classList.add("open");
   }
