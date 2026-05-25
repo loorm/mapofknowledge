@@ -321,19 +321,7 @@ function init(data) {
   // ── Click to highlight ─────────────────────────────────────────────────────
   let selected = null;
 
-  function onNodeClick(e, d) {
-    e.stopPropagation();
-
-    if (d.level === 4 && hasHiddenChildren(d.id)) {
-      toggleExpand(d);
-    }
-
-    if (selected === d.id) {
-      resetHighlight();
-      closeSidebar();
-      return;
-    }
-
+  function highlightAndOpen(d) {
     selected = d.id;
     const connected = new Set([d.id]);
     simEdges.forEach(l => {
@@ -348,8 +336,35 @@ function init(data) {
       const t = typeof l.target === "object" ? l.target.id : l.target;
       return (s === d.id || t === d.id) ? 0.9 : 0.03;
     });
-
     openSidebar(d);
+  }
+
+  function onNodeClick(e, d) {
+    e.stopPropagation();
+
+    if (d.level === 4 && hasHiddenChildren(d.id)) {
+      const wasSelected = (selected === d.id);
+      toggleExpand(d);
+      /* rebuild() recreates D3 elements; defer highlight+sidebar to next tick
+         so the fresh node/link selections are fully settled before we touch them */
+      setTimeout(function () {
+        if (wasSelected) {
+          resetHighlight();
+          closeSidebar();
+        } else {
+          highlightAndOpen(d);
+        }
+      }, 0);
+      return;
+    }
+
+    if (selected === d.id) {
+      resetHighlight();
+      closeSidebar();
+      return;
+    }
+
+    highlightAndOpen(d);
   }
 
   function resetHighlight() {
