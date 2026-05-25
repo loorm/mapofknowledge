@@ -207,13 +207,12 @@ function init(data) {
     expander = gExpand.selectAll("text").data(expanderData, d => d.id);
     expander.exit().remove();
     expander = expander.enter().append("text")
-      .attr("font-size", 9)
+      .attr("font-size", 5)
       .attr("fill", "rgba(255,255,255,0.6)")
       .attr("text-anchor", "middle")
       .attr("dominant-baseline", "middle")
-      .style("cursor", "pointer")
+      .style("pointer-events", "none")
       .style("user-select", "none")
-      .on("click", (e, d) => { e.stopPropagation(); toggleExpand(d); })
       .merge(expander);
 
     label = labelSvg.selectAll("text").data(simNodes, d => d.id);
