@@ -221,7 +221,7 @@ function init(data, emergentData) {
   const emergentNodeRadius = d => d.level === 1 ? 15 : 9;
   let simEmergentNodes = [], simEmergentEdges = [];
   let connector, emergentLink, emergentNode, emergentExpander, emergentLabel;
-  let emergentLayerVisible = true;
+  let emergentLayerVisible = false;
 
   const simEmergent = d3.forceSimulation([])
     .force("link",    d3.forceLink([]).id(d => d.id).strength(0.5))
@@ -527,7 +527,9 @@ function init(data, emergentData) {
   function resetIdleTimer() {
     if (screensaverActive) stopScreensaver();
     clearTimeout(screensaverTimer);
-    screensaverTimer = setTimeout(startScreensaver, IDLE_TIMEOUT);
+    if (localStorage.getItem('screensaver_enabled') !== 'false') {
+      screensaverTimer = setTimeout(startScreensaver, IDLE_TIMEOUT);
+    }
   }
   function startScreensaver() {
     screensaverActive = true;
@@ -717,6 +719,14 @@ function init(data, emergentData) {
     simEmergent.force("link").links(simEmergentEdges);
     simEmergent.alpha(0.4).restart();
     repositionEmergentLabels();
+
+    // Enforce current visibility state
+    const eVis = emergentLayerVisible ? null : "none";
+    gConnectors.style("display", eVis);
+    gEmergentLinks.style("display", eVis);
+    gEmergentNodes.style("display", eVis);
+    gEmergentExpand.style("display", eVis);
+    if (emergentLabel) emergentLabel.style("display", eVis);
   }
 
   function repositionEmergentLabels() {
@@ -753,17 +763,23 @@ function init(data, emergentData) {
     }
   }
 
-  // ── Emergent layer toggle ──────────────────────────────────────────────────
-  document.getElementById('emergent-toggle-btn').addEventListener('click', function () {
-    emergentLayerVisible = !emergentLayerVisible;
-    this.classList.toggle('active', emergentLayerVisible);
-    const vis = emergentLayerVisible ? null : "none";
-    gConnectors.style("display", vis);
-    gEmergentLinks.style("display", vis);
-    gEmergentNodes.style("display", vis);
-    gEmergentExpand.style("display", vis);
-    labelSvg.selectAll(".emergent-label").style("display", vis);
-  });
+  // ── Layer visibility API (called by layers.js) ────────────────────────────
+  window.setLayerVisible = function (layerId, visible) {
+    const vis = visible ? null : "none";
+    if (layerId === 'emergent') {
+      emergentLayerVisible = visible;
+      gConnectors.style("display", vis);
+      gEmergentLinks.style("display", vis);
+      gEmergentNodes.style("display", vis);
+      gEmergentExpand.style("display", vis);
+      labelSvg.selectAll(".emergent-label").style("display", vis);
+    } else if (layerId === 'base') {
+      gLinks.style("display", vis);
+      gNodes.style("display", vis);
+      gExpand.style("display", vis);
+      labelSvg.selectAll(".base-label").style("display", vis);
+    }
+  };
 
   // ── Initial build ──────────────────────────────────────────────────────────
   rebuild();

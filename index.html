@@ -62,7 +62,7 @@
           Notifications
         </button>
         <div class="nav-dropdown-divider"></div>
-        <button class="nav-dropdown-item">
+        <button class="nav-dropdown-item" onclick="window.location='settings.html'">
           <img src="images/icon-settings.svg" width="15" height="15" alt="">
           Settings
         </button>
@@ -97,7 +97,7 @@
 
   <div class="ctrl-divider"></div>
 
-  <button class="ctrl-btn active" id="emergent-toggle-btn" title="Toggle emergent layer">
+  <button class="ctrl-btn" id="layers-btn" title="Layers">
     <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
       <path d="M7.5 2 L13 5.5 L7.5 9 L2 5.5 Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
       <path d="M2 9L7.5 12.5L13 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -111,6 +111,26 @@
   </button>
 
 
+</div>
+
+
+<!-- ════════════════════════════════════════
+     LAYER PANEL
+     ════════════════════════════════════════ -->
+<div id="layer-panel" class="ctrl-card">
+  <div class="fp-header">
+    <span class="fp-title">Layers</span>
+  </div>
+  <div class="fp-list">
+    <div class="layer-item" data-layer="base">
+      <div class="layer-checkbox checked" style="--lc-color:#6E9EDD"></div>
+      <span class="fp-label">Base Layer</span>
+    </div>
+    <div class="layer-item" data-layer="emergent">
+      <div class="layer-checkbox" style="--lc-color:#C4A55A"></div>
+      <span class="fp-label">Emergent Fields</span>
+    </div>
+  </div>
 </div>
 
 
@@ -572,6 +592,7 @@
 
 
 <script src="js/learning.js"></script>
+<script src="js/layers.js"></script>
 <script src="js/filters.js"></script>
 <script src="js/app.js"></script>
 </body>

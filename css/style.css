@@ -250,6 +250,50 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
 .fp-clear:hover { color: #6E6358; background: rgba(58,48,40,0.05); }
 .fp-clear.hidden { display: none; }
 
+/* ── LAYER PANEL ── */
+#layer-panel {
+  position: fixed; bottom: 24px; left: 72px;
+  z-index: 300;
+  min-width: 200px;
+  opacity: 0;
+  transform: translateX(-8px) scale(0.97);
+  transform-origin: left bottom;
+  pointer-events: none;
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+#layer-panel.open {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  pointer-events: auto;
+}
+
+.layer-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 10px; border-radius: 8px;
+  cursor: pointer; user-select: none;
+  transition: background 0.12s;
+}
+.layer-item:hover { background: rgba(58,48,40,0.06); }
+
+.layer-checkbox {
+  width: 15px; height: 15px; border-radius: 4px; flex-shrink: 0;
+  border: 1.5px solid rgba(58,48,40,0.25);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.14s, border-color 0.14s;
+}
+.layer-checkbox.checked {
+  background: var(--lc-color, #C4826A);
+  border-color: var(--lc-color, #C4826A);
+}
+.layer-checkbox.checked::after {
+  content: '';
+  display: block;
+  width: 8px; height: 4px;
+  border-left: 1.5px solid #fff;
+  border-bottom: 1.5px solid #fff;
+  transform: translateY(-1px) rotate(-45deg);
+}
+
 /* ── BOTTOM-RIGHT ZOOM ── */
 #ctrl-zoom {
   position: fixed; bottom: 24px; right: 20px;
