@@ -374,13 +374,24 @@ function init(data) {
   svg.on("click", () => { resetHighlight(); closeSidebar(); });
 
   // ── Search ─────────────────────────────────────────────────────────────────
-  document.getElementById("search-box").addEventListener("input", function() {
+  const searchBox   = document.getElementById("search-box");
+  const searchClear = document.getElementById("search-clear");
+
+  searchBox.addEventListener("input", function() {
+    searchClear.style.display = this.value ? "flex" : "none";
     const q = this.value.trim().toLowerCase();
     if (!q) { resetHighlight(); return; }
     const matches = new Set();
     simNodes.forEach(n => { if (n.label.toLowerCase().includes(q)) matches.add(n.id); });
     if (node) node.attr("fill-opacity", n => matches.has(n.id) ? 1 : 0.06);
     if (link) link.attr("stroke-opacity", 0.03);
+  });
+
+  searchClear.addEventListener("click", function() {
+    searchBox.value = "";
+    searchClear.style.display = "none";
+    resetHighlight();
+    searchBox.focus();
   });
 
   // ── Tick ───────────────────────────────────────────────────────────────────
