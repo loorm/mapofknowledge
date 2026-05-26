@@ -429,6 +429,13 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
 /* ═══════════════════════════════════════════
    MOBILE
    ═══════════════════════════════════════════ */
+/* ── Emergent layer connector pulse ── */
+@keyframes connector-pulse {
+  0%, 100% { opacity: 0.25; }
+  50%       { opacity: 0.55; }
+}
+.connector-line { animation: connector-pulse 3.5s ease-in-out infinite; }
+
 @media (max-width: 520px) {
   .topbar-logo-text { display: none; }
 }
