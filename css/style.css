@@ -70,25 +70,6 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
   white-space: nowrap;
 }
 
-.topbar-banner {
-  flex: 1;
-  display: flex; align-items: center; justify-content: center;
-  min-width: 0;
-}
-.topbar-banner-inner {
-  display: flex; align-items: center; gap: 8px;
-  background: rgba(196,130,106,0.09);
-  border: 1px solid rgba(196,130,106,0.20);
-  border-radius: 20px;
-  padding: 5px 14px;
-  font-size: 12px; color: #8A7260;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.topbar-banner-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: #C4826A; flex-shrink: 0;
-}
-
 .topbar-right {
   display: flex; align-items: center; gap: 6px; flex-shrink: 0;
 }
@@ -102,7 +83,7 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
   background: rgba(58,48,40,0.07);
   border: 1px solid rgba(58,48,40,0.11);
   border-radius: 8px;
-  padding: 6px 10px 6px 30px;
+  padding: 6px 28px 6px 30px;
   font-size: 12px; color: #3A3028;
   width: 180px; outline: none;
   transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
@@ -113,6 +94,16 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
   border-color: rgba(196,130,106,0.45);
   box-shadow: 0 0 0 3px rgba(196,130,106,0.10);
 }
+
+.search-clear {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(58,48,40,0.10); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: #8A7E72; font-size: 10px; line-height: 1;
+  transition: background 0.12s, color 0.12s;
+}
+.search-clear:hover { background: rgba(58,48,40,0.18); color: #3A3028; }
 
 .topbar-icon-btn {
   width: 32px; height: 32px; border-radius: 8px;
@@ -433,3 +424,13 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
   z-index: 1;
 }
 #sb-close:hover { background: rgba(58,48,40,0.13); }
+
+/* ═══════════════════════════════════════════
+   MOBILE
+   ═══════════════════════════════════════════ */
+@media (max-width: 600px) {
+  .topbar-search-wrap { display: none; }
+}
+@media (max-width: 380px) {
+  .topbar-logo-text { display: none; }
+}
