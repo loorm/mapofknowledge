@@ -1537,7 +1537,7 @@
     },
     {
       "id": 342,
-      "label": "Ampère's law",
+      "label": "Amp\u00e8re's law",
       "level": 5
     },
     {
@@ -1572,7 +1572,7 @@
     },
     {
       "id": 349,
-      "label": "Schrödinger equation",
+      "label": "Schr\u00f6dinger equation",
       "level": 4
     },
     {
@@ -1762,7 +1762,7 @@
     },
     {
       "id": 387,
-      "label": "Mass-energy equivalence (E=mc²)",
+      "label": "Mass-energy equivalence (E=mc\u00b2)",
       "level": 5
     },
     {
@@ -2164,71 +2164,6 @@
       "id": 500,
       "label": "Skills & Crafts",
       "level": 1
-    },
-    {
-      "id": 501,
-      "label": "Culinary Crafts",
-      "level": 2
-    },
-    {
-      "id": 502,
-      "label": "Construction & building",
-      "level": 2
-    },
-    {
-      "id": 503,
-      "label": "Agriculture & land management",
-      "level": 2
-    },
-    {
-      "id": 504,
-      "label": "Health & care",
-      "level": 2
-    },
-    {
-      "id": 505,
-      "label": "Public safety & security",
-      "level": 2
-    },
-    {
-      "id": 506,
-      "label": "Digital & ICT",
-      "level": 2
-    },
-    {
-      "id": 507,
-      "label": "Creative & media",
-      "level": 2
-    },
-    {
-      "id": 508,
-      "label": "Journalism",
-      "level": 3
-    },
-    {
-      "id": 509,
-      "label": "Advertising",
-      "level": 3
-    },
-    {
-      "id": 510,
-      "label": "Social Media",
-      "level": 3
-    },
-    {
-      "id": 511,
-      "label": "Videography",
-      "level": 3
-    },
-    {
-      "id": 512,
-      "label": "Transport & logistics",
-      "level": 2
-    },
-    {
-      "id": 513,
-      "label": "Manufacturing & engineering trades",
-      "level": 2
     },
     {
       "id": 514,
@@ -6662,7 +6597,7 @@
     },
     {
       "id": 1408,
-      "label": "Na-Dené languages",
+      "label": "Na-Den\u00e9 languages",
       "level": 3
     },
     {
@@ -6717,7 +6652,7 @@
     },
     {
       "id": 1419,
-      "label": "Bahá'í",
+      "label": "Bah\u00e1'\u00ed",
       "level": 4
     },
     {
@@ -18782,7 +18717,7 @@
     },
     {
       "id": 3901,
-      "label": "Gödel's completeness theorem",
+      "label": "G\u00f6del's completeness theorem",
       "level": 5
     },
     {
@@ -18827,7 +18762,7 @@
     },
     {
       "id": 3910,
-      "label": "Gödel's second incompleteness theorem",
+      "label": "G\u00f6del's second incompleteness theorem",
       "level": 5
     },
     {
@@ -18867,7 +18802,7 @@
     },
     {
       "id": 3918,
-      "label": "Löwenheim-Skolem theorem",
+      "label": "L\u00f6wenheim-Skolem theorem",
       "level": 5
     },
     {
@@ -25032,7 +24967,7 @@
     },
     {
       "id": 5151,
-      "label": "2×2 and 3×3 determinants",
+      "label": "2\u00d72 and 3\u00d73 determinants",
       "level": 5
     },
     {
@@ -25542,7 +25477,7 @@
     },
     {
       "id": 5253,
-      "label": "Bézout's identity",
+      "label": "B\u00e9zout's identity",
       "level": 5
     },
     {
@@ -25632,7 +25567,7 @@
     },
     {
       "id": 5271,
-      "label": "Möbius function",
+      "label": "M\u00f6bius function",
       "level": 5
     },
     {
@@ -25847,7 +25782,7 @@
     },
     {
       "id": 5314,
-      "label": "Möbius inversion",
+      "label": "M\u00f6bius inversion",
       "level": 5
     },
     {
@@ -26047,7 +25982,7 @@
     },
     {
       "id": 5354,
-      "label": "Prüfer sequences",
+      "label": "Pr\u00fcfer sequences",
       "level": 5
     },
     {
@@ -26057,7 +25992,7 @@
     },
     {
       "id": 5356,
-      "label": "König's theorem",
+      "label": "K\u00f6nig's theorem",
       "level": 5
     },
     {
@@ -26597,7 +26532,7 @@
     },
     {
       "id": 5464,
-      "label": "L'Hôpital's rule",
+      "label": "L'H\u00f4pital's rule",
       "level": 5
     },
     {
@@ -27447,7 +27382,7 @@
     },
     {
       "id": 5634,
-      "label": "Picard-Lindelöf theorem",
+      "label": "Picard-Lindel\u00f6f theorem",
       "level": 5
     },
     {
@@ -32772,7 +32707,7 @@
     },
     {
       "id": 6699,
-      "label": "Différance",
+      "label": "Diff\u00e9rance",
       "level": 5
     },
     {
@@ -32787,7 +32722,7 @@
     },
     {
       "id": 6702,
-      "label": "Écriture",
+      "label": "\u00c9criture",
       "level": 5
     },
     {
@@ -37067,7 +37002,7 @@
     },
     {
       "id": 7558,
-      "label": "Francoprovençal",
+      "label": "Francoproven\u00e7al",
       "level": 5
     },
     {
@@ -37672,7 +37607,7 @@
     },
     {
       "id": 7679,
-      "label": "Arbëreshë",
+      "label": "Arb\u00ebresh\u00eb",
       "level": 5
     },
     {
@@ -38312,7 +38247,7 @@
     },
     {
       "id": 7807,
-      "label": "Võro",
+      "label": "V\u00f5ro",
       "level": 5
     },
     {
@@ -38607,12 +38542,12 @@
     },
     {
       "id": 7866,
-      "label": "Bahá'í Faith",
+      "label": "Bah\u00e1'\u00ed Faith",
       "level": 5
     },
     {
       "id": 7867,
-      "label": "Azali Bábism",
+      "label": "Azali B\u00e1bism",
       "level": 5
     },
     {
@@ -38622,12 +38557,12 @@
     },
     {
       "id": 7869,
-      "label": "Bahá'í calendar",
+      "label": "Bah\u00e1'\u00ed calendar",
       "level": 5
     },
     {
       "id": 7870,
-      "label": "Bahá'í sacred writings",
+      "label": "Bah\u00e1'\u00ed sacred writings",
       "level": 5
     },
     {
@@ -39157,7 +39092,7 @@
     },
     {
       "id": 7976,
-      "label": "Ásatrú",
+      "label": "\u00c1satr\u00fa",
       "level": 5
     },
     {
@@ -39172,7 +39107,7 @@
     },
     {
       "id": 7979,
-      "label": "Seiðr magic",
+      "label": "Sei\u00f0r magic",
       "level": 5
     },
     {
@@ -39212,7 +39147,7 @@
     },
     {
       "id": 7987,
-      "label": "La Tène religion",
+      "label": "La T\u00e8ne religion",
       "level": 5
     },
     {
@@ -39237,7 +39172,7 @@
     },
     {
       "id": 7992,
-      "label": "Candomblé",
+      "label": "Candombl\u00e9",
       "level": 5
     },
     {
@@ -41797,7 +41732,7 @@
     },
     {
       "id": 8504,
-      "label": "Zamboangueño",
+      "label": "Zamboangue\u00f1o",
       "level": 5
     },
     {
@@ -41992,7 +41927,7 @@
     },
     {
       "id": 8543,
-      "label": "Māori",
+      "label": "M\u0101ori",
       "level": 5
     },
     {
@@ -42287,7 +42222,7 @@
     },
     {
       "id": 8602,
-      "label": "Lü",
+      "label": "L\u00fc",
       "level": 5
     },
     {
@@ -42302,7 +42237,7 @@
     },
     {
       "id": 8605,
-      "label": "Tai Dón",
+      "label": "Tai D\u00f3n",
       "level": 5
     },
     {
@@ -43192,7 +43127,7 @@
     },
     {
       "id": 8783,
-      "label": "Nǁng",
+      "label": "N\u01c1ng",
       "level": 5
     },
     {
@@ -43202,12 +43137,12 @@
     },
     {
       "id": 8785,
-      "label": "Juǀ'hoan",
+      "label": "Ju\u01c0'hoan",
       "level": 5
     },
     {
       "id": 8786,
-      "label": "ǂHoan",
+      "label": "\u01c2Hoan",
       "level": 5
     },
     {
@@ -43792,12 +43727,12 @@
     },
     {
       "id": 8903,
-      "label": "Cupeño",
+      "label": "Cupe\u00f1o",
       "level": 5
     },
     {
       "id": 8904,
-      "label": "Luiseño",
+      "label": "Luise\u00f1o",
       "level": 5
     },
     {
@@ -43872,7 +43807,7 @@
     },
     {
       "id": 8919,
-      "label": "Guarijío",
+      "label": "Guarij\u00edo",
       "level": 5
     },
     {
@@ -44032,7 +43967,7 @@
     },
     {
       "id": 8951,
-      "label": "Huánuco Quechua",
+      "label": "Hu\u00e1nuco Quechua",
       "level": 5
     },
     {
@@ -44042,7 +43977,7 @@
     },
     {
       "id": 8953,
-      "label": "Junín-Huanca Quechua",
+      "label": "Jun\u00edn-Huanca Quechua",
       "level": 5
     },
     {
@@ -54234,6 +54169,426 @@
       "id": 10991,
       "label": "Non-proliferation aspects of reprocessing",
       "level": 5
+    },
+    {
+      "id": 10992,
+      "label": "Foundational human skills",
+      "level": 2
+    },
+    {
+      "id": 10993,
+      "label": "Fine motor skills",
+      "level": 3
+    },
+    {
+      "id": 10994,
+      "label": "Gross motor skills",
+      "level": 3
+    },
+    {
+      "id": 10995,
+      "label": "Perceptual skills",
+      "level": 3
+    },
+    {
+      "id": 10996,
+      "label": "Basic self-care",
+      "level": 3
+    },
+    {
+      "id": 10997,
+      "label": "Basic social functioning",
+      "level": 3
+    },
+    {
+      "id": 10998,
+      "label": "Culinary crafts",
+      "level": 2
+    },
+    {
+      "id": 10999,
+      "label": "Cooking techniques",
+      "level": 3
+    },
+    {
+      "id": 11000,
+      "label": "Baking and pastry",
+      "level": 3
+    },
+    {
+      "id": 11001,
+      "label": "Fermentation",
+      "level": 3
+    },
+    {
+      "id": 11002,
+      "label": "Food preservation",
+      "level": 3
+    },
+    {
+      "id": 11003,
+      "label": "Knife skills",
+      "level": 3
+    },
+    {
+      "id": 11004,
+      "label": "Menu planning",
+      "level": 3
+    },
+    {
+      "id": 11005,
+      "label": "Construction trades",
+      "level": 2
+    },
+    {
+      "id": 11006,
+      "label": "Masonry",
+      "level": 3
+    },
+    {
+      "id": 11007,
+      "label": "Carpentry",
+      "level": 3
+    },
+    {
+      "id": 11008,
+      "label": "Plumbing",
+      "level": 3
+    },
+    {
+      "id": 11009,
+      "label": "Electrical installation",
+      "level": 3
+    },
+    {
+      "id": 11010,
+      "label": "Roofing",
+      "level": 3
+    },
+    {
+      "id": 11011,
+      "label": "Plastering and finishing",
+      "level": 3
+    },
+    {
+      "id": 11012,
+      "label": "Glazing",
+      "level": 3
+    },
+    {
+      "id": 11013,
+      "label": "Agricultural crafts",
+      "level": 2
+    },
+    {
+      "id": 11014,
+      "label": "Crop cultivation",
+      "level": 3
+    },
+    {
+      "id": 11015,
+      "label": "Animal husbandry practice",
+      "level": 3
+    },
+    {
+      "id": 11016,
+      "label": "Irrigation practice",
+      "level": 3
+    },
+    {
+      "id": 11017,
+      "label": "Harvesting",
+      "level": 3
+    },
+    {
+      "id": 11018,
+      "label": "Land preparation",
+      "level": 3
+    },
+    {
+      "id": 11019,
+      "label": "Garden cultivation",
+      "level": 3
+    },
+    {
+      "id": 11020,
+      "label": "Health & self-care",
+      "level": 2
+    },
+    {
+      "id": 11021,
+      "label": "Personal hygiene",
+      "level": 3
+    },
+    {
+      "id": 11022,
+      "label": "Physical fitness",
+      "level": 3
+    },
+    {
+      "id": 11023,
+      "label": "Nutrition practice",
+      "level": 3
+    },
+    {
+      "id": 11024,
+      "label": "Child care",
+      "level": 3
+    },
+    {
+      "id": 11025,
+      "label": "Elder care",
+      "level": 3
+    },
+    {
+      "id": 11026,
+      "label": "First aid",
+      "level": 3
+    },
+    {
+      "id": 11027,
+      "label": "Mental health self-management",
+      "level": 3
+    },
+    {
+      "id": 11028,
+      "label": "Safety & emergency skills",
+      "level": 2
+    },
+    {
+      "id": 11029,
+      "label": "Fire safety",
+      "level": 3
+    },
+    {
+      "id": 11030,
+      "label": "Emergency response",
+      "level": 3
+    },
+    {
+      "id": 11031,
+      "label": "Search and rescue",
+      "level": 3
+    },
+    {
+      "id": 11032,
+      "label": "Firearms handling",
+      "level": 3
+    },
+    {
+      "id": 11033,
+      "label": "Crowd management",
+      "level": 3
+    },
+    {
+      "id": 11034,
+      "label": "Hazardous materials handling",
+      "level": 3
+    },
+    {
+      "id": 11035,
+      "label": "Transport & navigation",
+      "level": 2
+    },
+    {
+      "id": 11036,
+      "label": "Road vehicle operation",
+      "level": 3
+    },
+    {
+      "id": 11037,
+      "label": "Maritime navigation",
+      "level": 3
+    },
+    {
+      "id": 11038,
+      "label": "Aviation skills",
+      "level": 3
+    },
+    {
+      "id": 11039,
+      "label": "Orienteering",
+      "level": 3
+    },
+    {
+      "id": 11040,
+      "label": "Logistics operations",
+      "level": 3
+    },
+    {
+      "id": 11041,
+      "label": "Manufacturing trades",
+      "level": 2
+    },
+    {
+      "id": 11042,
+      "label": "Sheet metal work",
+      "level": 3
+    },
+    {
+      "id": 11043,
+      "label": "Toolmaking",
+      "level": 3
+    },
+    {
+      "id": 11044,
+      "label": "Assembly",
+      "level": 3
+    },
+    {
+      "id": 11045,
+      "label": "Quality inspection",
+      "level": 3
+    },
+    {
+      "id": 11046,
+      "label": "Artistic practice",
+      "level": 2
+    },
+    {
+      "id": 11047,
+      "label": "Instrumental performance",
+      "level": 3
+    },
+    {
+      "id": 11048,
+      "label": "Vocal performance",
+      "level": 3
+    },
+    {
+      "id": 11049,
+      "label": "Visual art practice",
+      "level": 3
+    },
+    {
+      "id": 11050,
+      "label": "Acting",
+      "level": 3
+    },
+    {
+      "id": 11051,
+      "label": "Dance practice",
+      "level": 3
+    },
+    {
+      "id": 11052,
+      "label": "Craft making",
+      "level": 3
+    },
+    {
+      "id": 11053,
+      "label": "Photography practice",
+      "level": 3
+    },
+    {
+      "id": 11054,
+      "label": "Welfare skills",
+      "level": 2
+    },
+    {
+      "id": 11055,
+      "label": "Community support",
+      "level": 3
+    },
+    {
+      "id": 11056,
+      "label": "Disability support",
+      "level": 3
+    },
+    {
+      "id": 11057,
+      "label": "Counselling practice",
+      "level": 3
+    },
+    {
+      "id": 11058,
+      "label": "Social care practice",
+      "level": 3
+    },
+    {
+      "id": 11059,
+      "label": "Crisis intervention",
+      "level": 3
+    },
+    {
+      "id": 11060,
+      "label": "Interpersonal skills",
+      "level": 2
+    },
+    {
+      "id": 11061,
+      "label": "Communication",
+      "level": 3
+    },
+    {
+      "id": 11062,
+      "label": "Active listening",
+      "level": 3
+    },
+    {
+      "id": 11063,
+      "label": "Conflict resolution",
+      "level": 3
+    },
+    {
+      "id": 11064,
+      "label": "Public speaking",
+      "level": 3
+    },
+    {
+      "id": 11065,
+      "label": "Teamwork",
+      "level": 3
+    },
+    {
+      "id": 11066,
+      "label": "Life skills",
+      "level": 2
+    },
+    {
+      "id": 11067,
+      "label": "Financial management",
+      "level": 3
+    },
+    {
+      "id": 11068,
+      "label": "Time management",
+      "level": 3
+    },
+    {
+      "id": 11069,
+      "label": "Problem solving",
+      "level": 3
+    },
+    {
+      "id": 11070,
+      "label": "Digital literacy",
+      "level": 3
+    },
+    {
+      "id": 11071,
+      "label": "Critical thinking practice",
+      "level": 3
+    },
+    {
+      "id": 11072,
+      "label": "Adaptability",
+      "level": 3
+    },
+    {
+      "id": 11073,
+      "label": "Welding practice",
+      "level": 3
+    },
+    {
+      "id": 11074,
+      "label": "Machining practice",
+      "level": 3
+    },
+    {
+      "id": 11075,
+      "label": "Negotiation skills",
+      "level": 3
     }
   ],
   "edges": [
@@ -55952,58 +56307,6 @@
     {
       "source": 494,
       "target": 496
-    },
-    {
-      "source": 500,
-      "target": 501
-    },
-    {
-      "source": 500,
-      "target": 502
-    },
-    {
-      "source": 500,
-      "target": 503
-    },
-    {
-      "source": 500,
-      "target": 504
-    },
-    {
-      "source": 500,
-      "target": 505
-    },
-    {
-      "source": 500,
-      "target": 506
-    },
-    {
-      "source": 500,
-      "target": 507
-    },
-    {
-      "source": 507,
-      "target": 508
-    },
-    {
-      "source": 507,
-      "target": 509
-    },
-    {
-      "source": 507,
-      "target": 510
-    },
-    {
-      "source": 507,
-      "target": 511
-    },
-    {
-      "source": 500,
-      "target": 512
-    },
-    {
-      "source": 500,
-      "target": 513
     },
     {
       "source": 184,
@@ -97608,6 +97911,342 @@
     {
       "source": 1871,
       "target": 10991
+    },
+    {
+      "source": 500,
+      "target": 10992
+    },
+    {
+      "source": 10992,
+      "target": 10993
+    },
+    {
+      "source": 10992,
+      "target": 10994
+    },
+    {
+      "source": 10992,
+      "target": 10995
+    },
+    {
+      "source": 10992,
+      "target": 10996
+    },
+    {
+      "source": 10992,
+      "target": 10997
+    },
+    {
+      "source": 500,
+      "target": 10998
+    },
+    {
+      "source": 10998,
+      "target": 10999
+    },
+    {
+      "source": 10998,
+      "target": 11000
+    },
+    {
+      "source": 10998,
+      "target": 11001
+    },
+    {
+      "source": 10998,
+      "target": 11002
+    },
+    {
+      "source": 10998,
+      "target": 11003
+    },
+    {
+      "source": 10998,
+      "target": 11004
+    },
+    {
+      "source": 500,
+      "target": 11005
+    },
+    {
+      "source": 11005,
+      "target": 11006
+    },
+    {
+      "source": 11005,
+      "target": 11007
+    },
+    {
+      "source": 11005,
+      "target": 11008
+    },
+    {
+      "source": 11005,
+      "target": 11009
+    },
+    {
+      "source": 11005,
+      "target": 11010
+    },
+    {
+      "source": 11005,
+      "target": 11011
+    },
+    {
+      "source": 11005,
+      "target": 11012
+    },
+    {
+      "source": 500,
+      "target": 11013
+    },
+    {
+      "source": 11013,
+      "target": 11014
+    },
+    {
+      "source": 11013,
+      "target": 11015
+    },
+    {
+      "source": 11013,
+      "target": 11016
+    },
+    {
+      "source": 11013,
+      "target": 11017
+    },
+    {
+      "source": 11013,
+      "target": 11018
+    },
+    {
+      "source": 11013,
+      "target": 11019
+    },
+    {
+      "source": 500,
+      "target": 11020
+    },
+    {
+      "source": 11020,
+      "target": 11021
+    },
+    {
+      "source": 11020,
+      "target": 11022
+    },
+    {
+      "source": 11020,
+      "target": 11023
+    },
+    {
+      "source": 11020,
+      "target": 11024
+    },
+    {
+      "source": 11020,
+      "target": 11025
+    },
+    {
+      "source": 11020,
+      "target": 11026
+    },
+    {
+      "source": 11020,
+      "target": 11027
+    },
+    {
+      "source": 500,
+      "target": 11028
+    },
+    {
+      "source": 11028,
+      "target": 11029
+    },
+    {
+      "source": 11028,
+      "target": 11030
+    },
+    {
+      "source": 11028,
+      "target": 11031
+    },
+    {
+      "source": 11028,
+      "target": 11032
+    },
+    {
+      "source": 11028,
+      "target": 11033
+    },
+    {
+      "source": 11028,
+      "target": 11034
+    },
+    {
+      "source": 500,
+      "target": 11035
+    },
+    {
+      "source": 11035,
+      "target": 11036
+    },
+    {
+      "source": 11035,
+      "target": 11037
+    },
+    {
+      "source": 11035,
+      "target": 11038
+    },
+    {
+      "source": 11035,
+      "target": 11039
+    },
+    {
+      "source": 11035,
+      "target": 11040
+    },
+    {
+      "source": 500,
+      "target": 11041
+    },
+    {
+      "source": 11041,
+      "target": 11042
+    },
+    {
+      "source": 11041,
+      "target": 11043
+    },
+    {
+      "source": 11041,
+      "target": 11044
+    },
+    {
+      "source": 11041,
+      "target": 11045
+    },
+    {
+      "source": 500,
+      "target": 11046
+    },
+    {
+      "source": 11046,
+      "target": 11047
+    },
+    {
+      "source": 11046,
+      "target": 11048
+    },
+    {
+      "source": 11046,
+      "target": 11049
+    },
+    {
+      "source": 11046,
+      "target": 11050
+    },
+    {
+      "source": 11046,
+      "target": 11051
+    },
+    {
+      "source": 11046,
+      "target": 11052
+    },
+    {
+      "source": 11046,
+      "target": 11053
+    },
+    {
+      "source": 500,
+      "target": 11054
+    },
+    {
+      "source": 11054,
+      "target": 11055
+    },
+    {
+      "source": 11054,
+      "target": 11056
+    },
+    {
+      "source": 11054,
+      "target": 11057
+    },
+    {
+      "source": 11054,
+      "target": 11058
+    },
+    {
+      "source": 11054,
+      "target": 11059
+    },
+    {
+      "source": 500,
+      "target": 11060
+    },
+    {
+      "source": 11060,
+      "target": 11061
+    },
+    {
+      "source": 11060,
+      "target": 11062
+    },
+    {
+      "source": 11060,
+      "target": 11063
+    },
+    {
+      "source": 11060,
+      "target": 11064
+    },
+    {
+      "source": 11060,
+      "target": 11065
+    },
+    {
+      "source": 500,
+      "target": 11066
+    },
+    {
+      "source": 11066,
+      "target": 11067
+    },
+    {
+      "source": 11066,
+      "target": 11068
+    },
+    {
+      "source": 11066,
+      "target": 11069
+    },
+    {
+      "source": 11066,
+      "target": 11070
+    },
+    {
+      "source": 11066,
+      "target": 11071
+    },
+    {
+      "source": 11066,
+      "target": 11072
+    },
+    {
+      "source": 11041,
+      "target": 11073
+    },
+    {
+      "source": 11041,
+      "target": 11074
+    },
+    {
+      "source": 11060,
+      "target": 11075
     }
   ]
 }
