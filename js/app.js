@@ -53,14 +53,16 @@ function nodeGradient(hex) {
   });
 })();
 
-fetch('knowledge_map.json')
-  .then(r => r.json())
-  .then(init)
+Promise.all([
+  fetch('knowledge_map.json').then(r => r.json()),
+  fetch('knowledge_map_emergent.json').then(r => r.json())
+])
+  .then(([baseData, emergentData]) => init(baseData, emergentData))
   .catch(() => {
-    document.body.innerHTML = '<div style="color:white;padding:20px">Could not load knowledge_map.json — place it in the same folder.</div>';
+    document.body.innerHTML = '<div style="color:white;padding:20px">Could not load knowledge map files — place them in the same folder.</div>';
   });
 
-function init(data) {
+function init(data, emergentData) {
   // ── Build lookup structures ────────────────────────────────────────────────
   const allNodes = {};
   data.nodes.forEach(n => allNodes[n.id] = { ...n, children: [], parent: null, expanded: false });
@@ -89,6 +91,47 @@ function init(data) {
 
   const hasHiddenChildren = id => (childrenOf[id] || []).some(cid => allNodes[cid].level >= 5);
 
+  // ── Emergent layer constants & data ───────────────────────────────────────
+  const LAYER_Y_OFFSET  = 680;
+  const E_COLOR_L1      = '#C4A55A';
+  const E_COLOR_L2      = '#E8C97A';
+
+  const allEmergentNodes  = {};
+  const emergentChildrenOf = {};
+  const emergentParentOf   = {};
+  const drawsFromEdges     = [];
+
+  emergentData.nodes.forEach(n => {
+    allEmergentNodes[n.id] = {
+      ...n,
+      expanded: false,
+      color: n.level === 1 ? E_COLOR_L1 : E_COLOR_L2
+    };
+  });
+  emergentData.edges.forEach(e => {
+    if (e.edge_type === 'hierarchical') {
+      if (!emergentChildrenOf[e.source]) emergentChildrenOf[e.source] = [];
+      emergentChildrenOf[e.source].push(e.target);
+      emergentParentOf[e.target] = e.source;
+    } else if (e.edge_type === 'draws_from') {
+      drawsFromEdges.push({ source: e.source, target: e.target });
+    }
+  });
+
+  const visibleEmergentIds = new Set(
+    Object.values(allEmergentNodes).filter(n => n.level === 1).map(n => n.id)
+  );
+
+  function nearestVisibleBase(id) {
+    let cur = id;
+    while (cur !== undefined && !visibleIds.has(cur)) cur = parentOf[cur];
+    return cur !== undefined ? allNodes[cur] : null;
+  }
+
+  function diamondPoints(x, y, r) {
+    return `${x},${y - r} ${x + r},${y} ${x},${y + r} ${x - r},${y}`;
+  }
+
   // ── Visible set: starts as L1–L4 ──────────────────────────────────────────
   const visibleIds = new Set(Object.values(allNodes).filter(n => n.level <= 4).map(n => n.id));
 
@@ -97,9 +140,13 @@ function init(data) {
   const svg      = d3.select("#canvas").attr("width", w).attr("height", h);
   const labelSvg = d3.select("#label-layer").attr("width", w).attr("height", h);
   const g        = svg.append("g");
-  const gLinks   = g.append("g").attr("class", "links");
-  const gNodes   = g.append("g").attr("class", "nodes");
-  const gExpand  = g.append("g").attr("class", "expanders");
+  const gLinks          = g.append("g").attr("class", "links");
+  const gNodes          = g.append("g").attr("class", "nodes");
+  const gExpand         = g.append("g").attr("class", "expanders");
+  const gConnectors     = g.append("g").attr("class", "connectors");
+  const gEmergentLinks  = g.append("g").attr("class", "emergent-links");
+  const gEmergentNodes  = g.append("g").attr("class", "emergent-nodes");
+  const gEmergentExpand = g.append("g").attr("class", "emergent-expanders");
 
   let currentTransform = d3.zoomIdentity;
 
@@ -110,6 +157,7 @@ function init(data) {
       currentTransform = e.transform;
       updateLabels();
       repositionLabels();
+      repositionEmergentLabels();
       document.getElementById("zoom-level").textContent = `zoom: ${e.transform.k.toFixed(2)}`;
     });
   svg.call(zoomBehaviour);
@@ -140,6 +188,20 @@ function init(data) {
     }
   });
 
+  // ── Seed emergent node positions ──────────────────────────────────────────
+  const eY = h / 2 - LAYER_Y_OFFSET;
+  const eL1 = Object.values(allEmergentNodes).filter(n => n.level === 1);
+  eL1.forEach((n, i) => {
+    const angle = (i / eL1.length) * 2 * Math.PI;
+    n.x = w / 2 + Math.min(w, h) * 0.36 * Math.cos(angle);
+    n.y = eY  + Math.min(w, h) * 0.10 * Math.sin(angle);
+  });
+  Object.values(allEmergentNodes).filter(n => n.level === 2).forEach(n => {
+    const par = allEmergentNodes[emergentParentOf[n.id]];
+    n.x = (par ? par.x : w / 2) + (Math.random() - 0.5) * 80;
+    n.y = (par ? par.y : eY)    + (Math.random() - 0.5) * 80;
+  });
+
   // ── Force simulation ───────────────────────────────────────────────────────
   const nodeRadius = d => d.level === 1 ? 16 : d.level === 2 ? 9 : d.level === 3 ? 5.5 : d.level === 4 ? 4 : 3;
 
@@ -154,6 +216,21 @@ function init(data) {
     .force("y",       d3.forceY(d => continentSeeds[d.continent] ? continentSeeds[d.continent].y : h/2).strength(d => d.level === 1 ? 0.3 : 0.06))
     .alphaDecay(0.015)
     .on("tick", ticked);
+
+  // ── Emergent force simulation ──────────────────────────────────────────────
+  const emergentNodeRadius = d => d.level === 1 ? 15 : 9;
+  let simEmergentNodes = [], simEmergentEdges = [];
+  let connector, emergentLink, emergentNode, emergentExpander, emergentLabel;
+  let emergentLayerVisible = true;
+
+  const simEmergent = d3.forceSimulation([])
+    .force("link",    d3.forceLink([]).id(d => d.id).strength(0.5))
+    .force("charge",  d3.forceManyBody().strength(d => d.level === 1 ? -1200 : -180).distanceMax(500))
+    .force("collide", d3.forceCollide().radius(d => emergentNodeRadius(d) + 8).strength(0.9))
+    .force("x",       d3.forceX(w / 2).strength(0.03))
+    .force("y",       d3.forceY(eY).strength(0.18))
+    .alphaDecay(0.04)
+    .on("tick", tickedEmergent);
 
   let link, node, expander, label;
 
@@ -215,9 +292,10 @@ function init(data) {
       .style("user-select", "none")
       .merge(expander);
 
-    label = labelSvg.selectAll("text").data(simNodes, d => d.id);
+    label = labelSvg.selectAll(".base-label").data(simNodes, d => d.id);
     label.exit().remove();
     label = label.enter().append("text")
+      .attr("class", "base-label")
       .text(d => d.label)
       .attr("font-size",   d => FONT_SIZE[d.level]   || 9)
       .attr("font-weight", d => FONT_WEIGHT[d.level] || 400)
@@ -406,7 +484,17 @@ function init(data) {
       .attr("x", d => d.x)
       .attr("y", d => d.y)
       .text(d => d.expanded ? "−" : "+");
+    updateConnectorPositions();
     repositionLabels();
+  }
+
+  function updateConnectorPositions() {
+    if (!connector) return;
+    connector
+      .attr("x1", d => allEmergentNodes[d.source] ? allEmergentNodes[d.source].x : 0)
+      .attr("y1", d => allEmergentNodes[d.source] ? allEmergentNodes[d.source].y : 0)
+      .attr("x2", d => { const n = nearestVisibleBase(d.target); return n ? n.x : 0; })
+      .attr("y2", d => { const n = nearestVisibleBase(d.target); return n ? n.y : 0; });
   }
 
   function repositionLabels() {
@@ -526,6 +614,158 @@ function init(data) {
     refreshNodeColors();
   };
 
+  // ── Emergent tick ─────────────────────────────────────────────────────────
+  function tickedEmergent() {
+    if (emergentNode) {
+      emergentNode.attr("points", d => {
+        const r = emergentNodeRadius(d) * 1.25;
+        return diamondPoints(d.x, d.y, r);
+      });
+    }
+    if (emergentLink) {
+      emergentLink
+        .attr("x1", d => (typeof d.source === 'object' ? d.source : allEmergentNodes[d.source])?.x || 0)
+        .attr("y1", d => (typeof d.source === 'object' ? d.source : allEmergentNodes[d.source])?.y || 0)
+        .attr("x2", d => (typeof d.target === 'object' ? d.target : allEmergentNodes[d.target])?.x || 0)
+        .attr("y2", d => (typeof d.target === 'object' ? d.target : allEmergentNodes[d.target])?.y || 0);
+    }
+    if (emergentExpander) {
+      emergentExpander
+        .attr("x", d => d.x)
+        .attr("y", d => d.y)
+        .text(d => d.expanded ? "−" : "+");
+    }
+    updateConnectorPositions();
+    repositionEmergentLabels();
+  }
+
+  // ── Emergent rebuild ───────────────────────────────────────────────────────
+  function rebuildEmergent() {
+    simEmergentNodes = Array.from(visibleEmergentIds).map(id => allEmergentNodes[id]);
+    simEmergentEdges = emergentData.edges
+      .filter(e => e.edge_type === 'hierarchical' &&
+                   visibleEmergentIds.has(e.source) && visibleEmergentIds.has(e.target))
+      .map(e => ({ source: e.source, target: e.target }));
+
+    const connectorData = drawsFromEdges.filter(e => visibleEmergentIds.has(e.source));
+
+    connector = gConnectors.selectAll("line").data(connectorData, d => `${d.source}-${d.target}`);
+    connector.exit().remove();
+    connector = connector.enter().append("line")
+      .attr("class", "connector-line")
+      .attr("stroke", "#5ADCFF")
+      .attr("stroke-width", 0.9)
+      .attr("stroke-dasharray", "4 3")
+      .merge(connector);
+
+    emergentLink = gEmergentLinks.selectAll("line").data(simEmergentEdges, d => `${d.source}-${d.target}`);
+    emergentLink.exit().remove();
+    emergentLink = emergentLink.enter().append("line")
+      .attr("stroke", E_COLOR_L1)
+      .attr("stroke-opacity", 0.55)
+      .attr("stroke-width", 1.2)
+      .merge(emergentLink);
+
+    emergentNode = gEmergentNodes.selectAll("polygon").data(simEmergentNodes, d => d.id);
+    emergentNode.exit().remove();
+    emergentNode = emergentNode.enter().append("polygon")
+      .attr("fill", d => d.color)
+      .attr("fill-opacity", d => d.level === 1 ? 0.92 : 0.78)
+      .attr("stroke", "rgba(255,230,140,0.55)")
+      .attr("stroke-width", d => d.level === 1 ? 1.5 : 0.8)
+      .style("cursor", "pointer")
+      .call(d3.drag()
+        .on("start", (e, d) => { if (!e.active) simEmergent.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+        .on("drag",  (e, d) => { d.fx = e.x; d.fy = e.y; })
+        .on("end",   (e, d) => { if (!e.active) simEmergent.alphaTarget(0); d.fx = null; d.fy = null; }))
+      .on("mouseover", (e, d) => {
+        tt.style.display = "block";
+        tt.innerHTML = `<strong style="color:${d.color}">${d.label}</strong><br><span style="color:#888;font-size:11px">Emergent field · Layer 2</span>`;
+      })
+      .on("mousemove", e => { tt.style.left = (e.clientX + 14) + "px"; tt.style.top = (e.clientY - 10) + "px"; })
+      .on("mouseout",  () => { tt.style.display = "none"; })
+      .on("click", onEmergentNodeClick)
+      .merge(emergentNode);
+
+    const expandableE = simEmergentNodes.filter(n => n.level === 1 && (emergentChildrenOf[n.id] || []).length > 0);
+    emergentExpander = gEmergentExpand.selectAll("text").data(expandableE, d => d.id);
+    emergentExpander.exit().remove();
+    emergentExpander = emergentExpander.enter().append("text")
+      .attr("font-size", 6)
+      .attr("fill", "rgba(255,255,255,0.7)")
+      .attr("text-anchor", "middle")
+      .attr("dominant-baseline", "middle")
+      .style("pointer-events", "none")
+      .style("user-select", "none")
+      .merge(emergentExpander);
+
+    emergentLabel = labelSvg.selectAll(".emergent-label").data(simEmergentNodes, d => d.id);
+    emergentLabel.exit().remove();
+    emergentLabel = emergentLabel.enter().append("text")
+      .attr("class", "emergent-label")
+      .text(d => d.label)
+      .attr("font-size",   d => d.level === 1 ? 12 : 10)
+      .attr("font-weight", d => d.level === 1 ? 600 : 400)
+      .attr("fill", d => d.color)
+      .attr("text-anchor", "middle")
+      .attr("opacity", 1)
+      .style("pointer-events", "none")
+      .style("user-select", "none")
+      .merge(emergentLabel);
+
+    simEmergent.nodes(simEmergentNodes);
+    simEmergent.force("link").links(simEmergentEdges);
+    simEmergent.alpha(0.4).restart();
+    repositionEmergentLabels();
+  }
+
+  function repositionEmergentLabels() {
+    if (!emergentLabel) return;
+    emergentLabel
+      .attr("x", d => currentTransform.applyX(d.x))
+      .attr("y", d => currentTransform.applyY(d.y) - (d.level === 1 ? 24 : 16));
+  }
+
+  // ── Emergent expand / collapse ─────────────────────────────────────────────
+  function toggleExpandEmergent(d) {
+    const kids = emergentChildrenOf[d.id] || [];
+    if (!d.expanded) {
+      kids.forEach(cid => {
+        visibleEmergentIds.add(cid);
+        allEmergentNodes[cid].x = d.x + (Math.random() - 0.5) * 60;
+        allEmergentNodes[cid].y = d.y + (Math.random() - 0.5) * 60;
+      });
+      d.expanded = true;
+    } else {
+      kids.forEach(cid => {
+        visibleEmergentIds.delete(cid);
+        allEmergentNodes[cid].expanded = false;
+      });
+      d.expanded = false;
+    }
+    rebuildEmergent();
+  }
+
+  function onEmergentNodeClick(e, d) {
+    e.stopPropagation();
+    if (d.level === 1 && (emergentChildrenOf[d.id] || []).length > 0) {
+      toggleExpandEmergent(d);
+    }
+  }
+
+  // ── Emergent layer toggle ──────────────────────────────────────────────────
+  document.getElementById('emergent-toggle-btn').addEventListener('click', function () {
+    emergentLayerVisible = !emergentLayerVisible;
+    this.classList.toggle('active', emergentLayerVisible);
+    const vis = emergentLayerVisible ? null : "none";
+    gConnectors.style("display", vis);
+    gEmergentLinks.style("display", vis);
+    gEmergentNodes.style("display", vis);
+    gEmergentExpand.style("display", vis);
+    labelSvg.selectAll(".emergent-label").style("display", vis);
+  });
+
   // ── Initial build ──────────────────────────────────────────────────────────
   rebuild();
+  rebuildEmergent();
 }
