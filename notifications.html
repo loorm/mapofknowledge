@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notifications — Map of Knowledge</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+
+/* ── page overrides ── */
+body {
+  background: linear-gradient(160deg, #F5EAE3 0%, #EDE6F0 55%, #E4EBF5 100%);
+  overflow: auto;
+  min-height: 100vh;
+}
+
+/* ── page shell ── */
+.notif-page {
+  max-width: 580px;
+  margin: 0 auto;
+  padding: 72px 20px 60px;
+}
+
+/* ── page header ── */
+.notif-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px;
+}
+.notif-title {
+  font-size: 22px; font-weight: 720;
+  color: #2C2820; letter-spacing: -0.4px;
+}
+.notif-mark-all {
+  font-size: 12px; font-weight: 550; color: #C4826A;
+  background: none; border: none; cursor: pointer;
+  padding: 6px 10px; border-radius: 8px;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+.notif-mark-all:hover { background: rgba(196,130,106,0.10); }
+
+/* ── filter tabs ── */
+.notif-tabs {
+  display: flex; gap: 6px;
+  margin-bottom: 20px;
+}
+.notif-tab {
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 12px; font-weight: 550;
+  color: #8A7E72; border: 1px solid rgba(58,48,40,0.12);
+  background: rgba(255,255,255,0.45); cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.notif-tab:hover { background: rgba(255,255,255,0.7); color: #3A3028; }
+.notif-tab.active {
+  background: rgba(196,130,106,0.12);
+  border-color: rgba(196,130,106,0.30);
+  color: #C4826A;
+}
+
+/* ── section label ── */
+.notif-section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.9px;
+  text-transform: uppercase; color: #B0A496;
+  margin: 20px 0 8px;
+}
+
+/* ── notification card ── */
+.notif-card {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: rgba(255,255,255,0.65);
+  border: 1px solid rgba(58,48,40,0.08);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 10px rgba(58,48,40,0.06);
+  transition: background 0.15s;
+  position: relative;
+  cursor: default;
+}
+.notif-card:hover { background: rgba(255,255,255,0.85); }
+.notif-card.read { opacity: 0.65; }
+
+/* unread dot */
+.notif-unread-dot {
+  position: absolute; top: 16px; right: 16px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #C4826A;
+}
+
+/* icon blob */
+.notif-icon {
+  width: 38px; height: 38px; border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.notif-icon.amber  { background: rgba(196,165,90,0.18); }
+.notif-icon.sage   { background: rgba(139,173,126,0.18); }
+.notif-icon.lavender { background: rgba(155,143,181,0.18); }
+.notif-icon.terra  { background: rgba(196,130,106,0.18); }
+
+/* text block */
+.notif-body { flex: 1; min-width: 0; }
+.notif-name {
+  font-size: 13px; font-weight: 620; color: #2C2820;
+  margin-bottom: 3px; padding-right: 18px;
+}
+.notif-card.read .notif-name { font-weight: 500; color: #6E6358; }
+.notif-desc {
+  font-size: 12px; color: #8A7E72; line-height: 1.55;
+}
+.notif-time {
+  font-size: 11px; color: #B0A496;
+  margin-top: 6px;
+}
+
+/* ── empty state ── */
+.notif-empty {
+  text-align: center; padding: 60px 20px;
+  color: #B0A496; font-size: 13px; line-height: 1.6;
+}
+.notif-empty-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  background: rgba(58,48,40,0.06);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+  color: #C4B8B0;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     TOP BAR (mirrors index.html)
+     ════════════════════════════════════════ -->
+<header id="top-bar">
+
+  <a class="topbar-logo" href="index.html">
+    <div class="topbar-logo-icon">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="5.5" stroke="white" stroke-width="1.3"/>
+        <circle cx="8" cy="8" r="1.4" fill="white"/>
+        <line x1="8" y1="2.5" x2="8" y2="4.6" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="8" y1="11.4" x2="8" y2="13.5" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="2.5" y1="8" x2="4.6" y2="8" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="11.4" y1="8" x2="13.5" y2="8" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <span class="topbar-logo-text">Map of Knowledge</span>
+  </a>
+
+  <div class="topbar-right">
+    <div class="topbar-burger-wrap">
+      <button class="topbar-icon-btn topbar-burger" id="nav-menu" title="Menu">
+        <svg width="16" height="14" viewBox="0 0 16 14" fill="none">
+          <path d="M1 1h14M1 7h14M1 13h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <div id="nav-dropdown" class="nav-dropdown">
+        <button class="nav-dropdown-item" onclick="window.location='profile.html'">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <circle cx="7.5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M2 13c0-2.8 2.5-4.5 5.5-4.5s5.5 1.7 5.5 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          Account
+        </button>
+        <button class="nav-dropdown-item active-page">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <path d="M7.5 1.5a4 4 0 0 0-4 4v2.5L2.5 9.5h10l-1-1.5V5.5a4 4 0 0 0-4-4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+            <path d="M6 11.5a1.5 1.5 0 0 0 3 0" stroke="currentColor" stroke-width="1.2"/>
+          </svg>
+          Notifications
+        </button>
+        <div class="nav-dropdown-divider"></div>
+        <button class="nav-dropdown-item">
+          <img src="images/icon-settings.svg" width="15" height="15" alt="">
+          Settings
+        </button>
+      </div>
+    </div>
+  </div>
+
+</header>
+
+
+<!-- ════════════════════════════════════════
+     NOTIFICATIONS CONTENT
+     ════════════════════════════════════════ -->
+<main class="notif-page">
+
+  <div class="notif-header">
+    <h1 class="notif-title">Notifications</h1>
+    <button class="notif-mark-all" onclick="markAllRead()">Mark all as read</button>
+  </div>
+
+  <div class="notif-tabs">
+    <button class="notif-tab active" onclick="switchTab(this, 'all')">All</button>
+    <button class="notif-tab" onclick="switchTab(this, 'unread')">Unread</button>
+    <button class="notif-tab" onclick="switchTab(this, 'achievements')">Achievements</button>
+  </div>
+
+  <!-- NEW -->
+  <div class="notif-section-label" id="section-new">New</div>
+
+  <div class="notif-card" data-type="achievements">
+    <div class="notif-unread-dot"></div>
+    <div class="notif-icon amber">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 2l2 5h5l-4 3 1.5 5L9 12l-4.5 3L6 10 2 7h5z" stroke="#C4A55A" stroke-width="1.3" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="notif-body">
+      <div class="notif-name">7-day learning streak!</div>
+      <div class="notif-desc">You've opened the map every day this week. Keep the momentum going.</div>
+      <div class="notif-time">2 hours ago</div>
+    </div>
+  </div>
+
+  <div class="notif-card" data-type="achievements">
+    <div class="notif-unread-dot"></div>
+    <div class="notif-icon lavender">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 2.5a4.5 4.5 0 0 1 2.8 8V13a.5.5 0 0 1-.5.5H6.7a.5.5 0 0 1-.5-.5v-2.5A4.5 4.5 0 0 1 9 2.5z" stroke="#9B8FB5" stroke-width="1.2" stroke-linejoin="round"/>
+        <path d="M6.5 15.5h5M7 17h4" stroke="#9B8FB5" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="notif-body">
+      <div class="notif-name">3 knobits mastered in Algebra</div>
+      <div class="notif-desc">You completed Solving linear equations, Inequalities, and Systems of equations this week.</div>
+      <div class="notif-time">Yesterday</div>
+    </div>
+  </div>
+
+  <div class="notif-card" data-type="all">
+    <div class="notif-unread-dot"></div>
+    <div class="notif-icon sage">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="9" r="6.5" stroke="#8BAD7E" stroke-width="1.2"/>
+        <path d="M9 5.5v4l2.5 2" stroke="#8BAD7E" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="notif-body">
+      <div class="notif-name">New content: Quantum Computing</div>
+      <div class="notif-desc">12 new L5 nodes added under Computer Science › Quantum Computing. Explore the map to see them.</div>
+      <div class="notif-time">2 days ago</div>
+    </div>
+  </div>
+
+  <!-- EARLIER -->
+  <div class="notif-section-label" id="section-earlier">Earlier</div>
+
+  <div class="notif-card read" data-type="all">
+    <div class="notif-icon lavender">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M3 9.5 7 13.5 15 5.5" stroke="#9B8FB5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="notif-body">
+      <div class="notif-name">Ready to continue?</div>
+      <div class="notif-desc">You left off at Knobit 4 in Linear Equations. Pick up where you stopped.</div>
+      <div class="notif-time">4 days ago</div>
+    </div>
+  </div>
+
+  <div class="notif-card read" data-type="all">
+    <div class="notif-icon terra">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="9" r="6.5" stroke="#C4826A" stroke-width="1.2"/>
+        <path d="M9 6v4" stroke="#C4826A" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="9" cy="13" r="0.8" fill="#C4826A"/>
+      </svg>
+    </div>
+    <div class="notif-body">
+      <div class="notif-name">Estonian Main School filter updated</div>
+      <div class="notif-desc">The curriculum filter has been refined with more precise subject coverage for grades 1–9.</div>
+      <div class="notif-time">1 week ago</div>
+    </div>
+  </div>
+
+  <div class="notif-card read" data-type="achievements">
+    <div class="notif-icon amber">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 2l2 5h5l-4 3 1.5 5L9 12l-4.5 3L6 10 2 7h5z" stroke="#C4A55A" stroke-width="1.3" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="notif-body">
+      <div class="notif-name">First exploration milestone</div>
+      <div class="notif-desc">You've visited nodes in 5 different domains. The map is opening up.</div>
+      <div class="notif-time">2 weeks ago</div>
+    </div>
+  </div>
+
+</main>
+
+
+<script>
+  /* ── Burger dropdown ── */
+  document.getElementById('nav-menu').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('nav-dropdown').classList.toggle('open');
+  });
+  document.addEventListener('click', function() {
+    document.getElementById('nav-dropdown').classList.remove('open');
+  });
+
+  /* ── Tabs ── */
+  function switchTab(btn, type) {
+    document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.notif-card').forEach(function(card) {
+      if (type === 'all') {
+        card.style.display = 'flex';
+      } else if (type === 'unread') {
+        card.style.display = card.querySelector('.notif-unread-dot') ? 'flex' : 'none';
+      } else if (type === 'achievements') {
+        card.style.display = card.dataset.type === 'achievements' ? 'flex' : 'none';
+      }
+    });
+    updateSectionVisibility();
+  }
+
+  function updateSectionVisibility() {
+    ['new', 'earlier'].forEach(function(id) {
+      const label = document.getElementById('section-' + id);
+      if (!label) return;
+      let next = label.nextElementSibling;
+      let hasVisible = false;
+      while (next && !next.classList.contains('notif-section-label')) {
+        if (next.style.display !== 'none') hasVisible = true;
+        next = next.nextElementSibling;
+      }
+      label.style.display = hasVisible ? '' : 'none';
+    });
+  }
+
+  /* ── Mark all read ── */
+  function markAllRead() {
+    document.querySelectorAll('.notif-card').forEach(function(card) {
+      card.classList.add('read');
+      const dot = card.querySelector('.notif-unread-dot');
+      if (dot) dot.remove();
+    });
+  }
+</script>
+
+</body>
+</html>
