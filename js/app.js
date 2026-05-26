@@ -93,6 +93,7 @@ function init(data, emergentData) {
 
   // ── Emergent layer constants & data ───────────────────────────────────────
   const LAYER_Y_OFFSET  = 680;
+  const LAYER_Z         = LAYER_Y_OFFSET;
   const E_COLOR_L1      = '#C4A55A';
   const E_COLOR_L2      = '#E8C97A';
 
@@ -150,6 +151,12 @@ function init(data, emergentData) {
 
   let currentTransform = d3.zoomIdentity;
 
+  // ── 3-D tilt projection ────────────────────────────────────────────────────
+  let tiltAngle = 0;
+  function projectY(worldY, z) {
+    return (worldY - h / 2) * Math.cos(tiltAngle) - z * Math.sin(tiltAngle) + h / 2;
+  }
+
   const zoomBehaviour = d3.zoom()
     .scaleExtent([0.1, 5])
     .on("zoom", e => {
@@ -158,7 +165,9 @@ function init(data, emergentData) {
       updateLabels();
       repositionLabels();
       repositionEmergentLabels();
-      document.getElementById("zoom-level").textContent = `zoom: ${e.transform.k.toFixed(2)}`;
+      const tiltDeg = Math.round((window.currentTilt || 0) * 180 / Math.PI);
+      document.getElementById("zoom-level").textContent =
+        tiltDeg > 0 ? `zoom: ${e.transform.k.toFixed(2)}  tilt: ${tiltDeg}°` : `zoom: ${e.transform.k.toFixed(2)}`;
     });
   svg.call(zoomBehaviour);
 
@@ -189,7 +198,7 @@ function init(data, emergentData) {
   });
 
   // ── Seed emergent node positions ──────────────────────────────────────────
-  const eY = h / 2 - LAYER_Y_OFFSET;
+  const eY = h / 2;
   const eL1 = Object.values(allEmergentNodes).filter(n => n.level === 1);
   eL1.forEach((n, i) => {
     const angle = (i / eL1.length) * 2 * Math.PI;
@@ -477,12 +486,12 @@ function init(data, emergentData) {
 
   function ticked() {
     if (link) link
-      .attr("x1", d => d.source.x).attr("y1", d => d.source.y)
-      .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
-    if (node) node.attr("cx", d => d.x).attr("cy", d => d.y);
+      .attr("x1", d => d.source.x).attr("y1", d => projectY(d.source.y, 0))
+      .attr("x2", d => d.target.x).attr("y2", d => projectY(d.target.y, 0));
+    if (node) node.attr("cx", d => d.x).attr("cy", d => projectY(d.y, 0));
     if (expander) expander
       .attr("x", d => d.x)
-      .attr("y", d => d.y)
+      .attr("y", d => projectY(d.y, 0))
       .text(d => d.expanded ? "−" : "+");
     updateConnectorPositions();
     repositionLabels();
@@ -492,16 +501,16 @@ function init(data, emergentData) {
     if (!connector) return;
     connector
       .attr("x1", d => allEmergentNodes[d.source] ? allEmergentNodes[d.source].x : 0)
-      .attr("y1", d => allEmergentNodes[d.source] ? allEmergentNodes[d.source].y : 0)
+      .attr("y1", d => allEmergentNodes[d.source] ? projectY(allEmergentNodes[d.source].y, LAYER_Z) : 0)
       .attr("x2", d => { const n = nearestVisibleBase(d.target); return n ? n.x : 0; })
-      .attr("y2", d => { const n = nearestVisibleBase(d.target); return n ? n.y : 0; });
+      .attr("y2", d => { const n = nearestVisibleBase(d.target); return n ? projectY(n.y, 0) : 0; });
   }
 
   function repositionLabels() {
     if (!label) return;
     label
       .attr("x", d => currentTransform.applyX(d.x))
-      .attr("y", d => currentTransform.applyY(d.y) - (NODE_OFFSET[d.level] || 10));
+      .attr("y", d => currentTransform.applyY(projectY(d.y, 0)) - (NODE_OFFSET[d.level] || 10));
   }
 
   function updateLabels() {
@@ -621,20 +630,20 @@ function init(data, emergentData) {
     if (emergentNode) {
       emergentNode.attr("points", d => {
         const r = emergentNodeRadius(d) * 1.25;
-        return diamondPoints(d.x, d.y, r);
+        return diamondPoints(d.x, projectY(d.y, LAYER_Z), r);
       });
     }
     if (emergentLink) {
       emergentLink
         .attr("x1", d => (typeof d.source === 'object' ? d.source : allEmergentNodes[d.source])?.x || 0)
-        .attr("y1", d => (typeof d.source === 'object' ? d.source : allEmergentNodes[d.source])?.y || 0)
+        .attr("y1", d => { const n = typeof d.source === 'object' ? d.source : allEmergentNodes[d.source]; return n ? projectY(n.y, LAYER_Z) : 0; })
         .attr("x2", d => (typeof d.target === 'object' ? d.target : allEmergentNodes[d.target])?.x || 0)
-        .attr("y2", d => (typeof d.target === 'object' ? d.target : allEmergentNodes[d.target])?.y || 0);
+        .attr("y2", d => { const n = typeof d.target === 'object' ? d.target : allEmergentNodes[d.target]; return n ? projectY(n.y, LAYER_Z) : 0; });
     }
     if (emergentExpander) {
       emergentExpander
         .attr("x", d => d.x)
-        .attr("y", d => d.y)
+        .attr("y", d => projectY(d.y, LAYER_Z))
         .text(d => d.expanded ? "−" : "+");
     }
     updateConnectorPositions();
@@ -733,7 +742,7 @@ function init(data, emergentData) {
     if (!emergentLabel) return;
     emergentLabel
       .attr("x", d => currentTransform.applyX(d.x))
-      .attr("y", d => currentTransform.applyY(d.y) - (d.level === 1 ? 24 : 16));
+      .attr("y", d => currentTransform.applyY(projectY(d.y, LAYER_Z)) - (d.level === 1 ? 24 : 16));
   }
 
   // ── Emergent expand / collapse ─────────────────────────────────────────────
@@ -780,6 +789,15 @@ function init(data, emergentData) {
       labelSvg.selectAll(".base-label").style("display", vis);
     }
   };
+
+  // ── Tilt API (called by tilt.js) ──────────────────────────────────────────
+  window.setTilt = function (angle) {
+    tiltAngle = angle;
+    window.currentTilt = angle;
+    ticked();
+    tickedEmergent();
+  };
+  window.currentTilt = 0;
 
   // ── Initial build ──────────────────────────────────────────────────────────
   rebuild();
