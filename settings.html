@@ -77,6 +77,19 @@ body {
 }
 .st-toggle.on .st-toggle-thumb { transform: translateX(18px); }
 
+.settings-save-btn {
+  display: block; width: 100%;
+  margin-top: 12px;
+  padding: 13px 20px;
+  background: linear-gradient(135deg, #C4826A 0%, #B06850 100%);
+  color: #fff; border: none; border-radius: 14px;
+  font-size: 14px; font-weight: 600; font-family: inherit;
+  cursor: pointer; letter-spacing: 0.1px;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.settings-save-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.settings-save-btn:active { transform: translateY(0); }
+
 </style>
 </head>
 <body>
@@ -156,6 +169,10 @@ body {
       </button>
     </div>
   </div>
+
+  <button class="settings-save-btn" onclick="window.location='index.html'">
+    Save &amp; return to map
+  </button>
 
 </main>
 
