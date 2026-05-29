@@ -1,0 +1,22 @@
+Wonderful! It's working as I imagined. However, when I zoom in, the display starts blinking heavily. Is it because there's so much to redray that my     
+  oldish laptop without a dedicated graphics card isn't up to the task and the refresh rate drops so much, that I start to see the blinking? Don't change  
+  anything yet, just curious.
+
+● Your instinct about hardware is partially right, but the root cause is architectural, not raw GPU power. A few things are happening together:
+
+  The labels layer is the bottleneck. The base layer has ~10,000+ nodes, each with a label in labelSvg — a separate SVG element that sits outside the      
+  zoomed <g> group. Because of that, every single zoom frame the code manually recalculates and writes new x/y DOM attributes for every label via D3       
+  .attr(). With SVG, that's a synchronous DOM write per node per frame. At 60fps that's potentially millions of attribute writes per second, and SVG       
+  rendering is entirely CPU-bound — there's no GPU acceleration path for individual SVG attribute changes.
+
+  Zooming in makes it worse specifically because the label opacity thresholds kick in at higher zoom levels (L3 at zoom 0.7, L4 at 1.4, L5 at 2.4). As you 
+  zoom in, more labels cross their visibility threshold and need to be both shown and repositioned on every frame. At low zoom you might be updating 200   
+  visible labels; at high zoom you could be updating thousands.
+
+  The tilt change didn't meaningfully worsen this — when tiltAngle = 0, projectY(d.y, 0) mathematically reduces to d.y exactly, so there's no extra work.  
+  The blink was latent in the architecture before.
+
+  Actual fix directions (when you want to tackle it): the most impactful would be to skip repositioning labels that are currently invisible (opacity = 0), 
+  since they don't need updating until they become visible. A second option is to put labels inside the <g> group and let the SVG transform handle
+  repositioning automatically — but that breaks the current offset-from-node approach. A third is Canvas rendering, which is GPU-accelerated and handles   
+  100k+ items easily, but is a much larger rewrite.

@@ -385,6 +385,30 @@
   font-size: 12px; font-weight: 600;
 }
 
+/* ── Source attribution ───────────────────── */
+.p-source {
+  display: inline-block;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 2px 7px; border-radius: 20px;
+  margin-top: 5px;
+}
+.p-source.tested        { background: rgba(139,173,126,0.18); color: #3A7030; }
+.p-source.self-reported { background: rgba(58,48,40,0.08);    color: #7A7068; }
+.p-source.predicted     { background: rgba(91,168,216,0.16);  color: #1868A8; }
+
+/* ── Internal credential extras ──────────── */
+.p-cred-icon.internal { background: rgba(91,168,216,0.18); }
+.p-cred-hash {
+  font-size: 10px; color: #B0A496; margin-top: 3px;
+  font-family: 'Courier New', monospace; letter-spacing: 0.3px;
+}
+.p-cred-verify {
+  display: inline-block; margin-top: 3px;
+  font-size: 11px; color: #5088C0; text-decoration: none; font-weight: 500;
+}
+.p-cred-verify:hover { text-decoration: underline; }
+
 /* secondary label within a card */
 .p-card-sub-label {
   font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
