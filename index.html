@@ -143,9 +143,10 @@
     <span class="fp-title">Filter</span>
     <div style="display:flex;align-items:center;gap:2px">
       <a class="fp-settings-link" href="settings.html#filters" title="Manage filters">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <circle cx="6" cy="6" r="1.9" stroke="currentColor" stroke-width="1.2"/>
-          <path d="M6 1v1.3M6 9.7V11M1 6h1.3M9.7 6H11M2.7 2.7l.9.9M8.4 8.4l.9.9M9.3 2.7l-.9.9M3.6 8.4l-.9.9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        <svg width="12" height="12" viewBox="0 0 12 12">
+          <path fill="currentColor" fill-rule="evenodd"
+            d="M9.38 4.77 11.14 5.19 11.14 6.81 9.38 7.23 8.76 8.31 9.27 10.04 7.86 10.86 6.63 9.55 5.37 9.55 4.14 10.86 2.73 10.04 3.24 8.31 2.62 7.23 0.86 6.81 0.86 5.19 2.62 4.77 3.24 3.69 2.73 1.96 4.14 1.14 5.37 2.45 6.63 2.45 7.86 1.14 9.27 1.96 8.76 3.69Z
+             M7.9 6A1.9 1.9 0 0 0 4.1 6A1.9 1.9 0 0 0 7.9 6Z"/>
         </svg>
       </a>
       <button id="fp-clear" class="fp-clear hidden" title="Clear filter">✕</button>
@@ -319,21 +320,21 @@
     </div>
 
     <div class="lm-progress-track">
-      <div class="lm-progress-fill" id="lm-progress-fill" style="width:43%"></div>
+      <div class="lm-progress-fill" id="lm-progress-fill" style="width:0%"></div>
     </div>
-    <div class="lm-progress-label" id="lm-progress-label">43% complete — keep going!</div>
+    <div class="lm-progress-label" id="lm-progress-label"></div>
 
     <div class="lm-knobit-list" id="lm-knobit-list">
       <!-- populated by learning.js -->
     </div>
 
     <div class="lm-start-bar">
-      <button class="lm-start-btn" onclick="startKnobit()">
+      <button class="lm-start-btn" id="lm-start-btn" onclick="startKnobit()">
         <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
           <circle cx="7.5" cy="7.5" r="6" stroke="white" stroke-width="1.3"/>
           <path d="M6 5l4 2.5L6 10V5z" fill="white"/>
         </svg>
-        Continue — Knobit 4
+        <span id="lm-start-btn-label">Start learning</span>
       </button>
     </div>
   </div><!-- /lm-path -->
@@ -356,240 +357,29 @@
         </div>
       </div>
       <div class="kn-phase-chips">
-        <span class="kn-chip active" id="chip-kn-teach">Teach</span>
-        <span class="kn-chip" id="chip-kn-apply">Apply</span>
-        <span class="kn-chip" id="chip-kn-assess">Assess</span>
-        <span class="kn-chip" id="chip-kn-result">Result</span>
+        <span class="kn-chip" id="chip-explain">Explain</span>
+        <span class="kn-chip" id="chip-demonstrate">Demonstrate</span>
+        <span class="kn-chip" id="chip-practice">Practice</span>
+        <span class="kn-chip" id="chip-meaning">Meaning</span>
       </div>
     </div>
 
-    <!-- phase panels wrapper -->
-    <div class="kn-phases-wrap">
+    <!-- scrollable block stream -->
+    <div class="kn-stream" id="kn-stream"></div>
 
-      <!-- ─── TEACH ─────────────────────────── -->
-      <div id="kn-teach" class="kn-phase active">
-        <div class="kn-content">
-          <div class="kn-teach-label">Teach</div>
-          <div class="kn-teach-title">Solving one-step equations</div>
+    <!-- sticky action area -->
+    <div class="kn-action-area" id="kn-action-area">
+      <div class="kn-button-row" id="kn-button-row"></div>
+      <div class="ask-bar">
+        <input type="text" class="ask-input" id="ask-input" placeholder="Ask anything…" autocomplete="off">
+        <button class="ask-send" id="ask-send" title="Send">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <path d="M13 7.5L2 2l2.5 5.5L2 13l11-5.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
 
-          <div class="kn-concept-card">
-            <div class="kn-concept-label">The core idea</div>
-            <div class="kn-concept-body">
-              An equation is a statement that two expressions are equal.
-              To solve it, you need to find the value of the unknown variable
-              that makes both sides balance — like a set of scales.
-            </div>
-          </div>
-
-          <div class="kn-formula-card">
-            <div class="kn-formula">x + a = b &nbsp;⟹&nbsp; x = b − a</div>
-            <div class="kn-formula-sub">Whatever you do to one side, do to the other</div>
-          </div>
-
-          <div class="kn-example-card">
-            <div class="kn-example-label">Worked example — Solve 2x + 3 = 11</div>
-            <div class="kn-steps">
-              <div class="kn-step">
-                <div class="kn-step-num">1</div>
-                <div>Subtract 3 from both sides: &nbsp;<strong>2x = 8</strong></div>
-              </div>
-              <div class="kn-step">
-                <div class="kn-step-num">2</div>
-                <div>Divide both sides by 2: &nbsp;<strong>x = 4</strong></div>
-              </div>
-              <div class="kn-step">
-                <div class="kn-step-num">3</div>
-                <div>Check: 2(4) + 3 = 11 ✓</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="kn-concept-card">
-            <div class="kn-concept-label">Key principle</div>
-            <div class="kn-concept-body">
-              Use inverse operations: if the equation adds, you subtract;
-              if it multiplies, you divide. Always perform the same operation
-              on <em>both</em> sides to keep the equation balanced.
-            </div>
-          </div>
-        </div>
-        <div class="kn-action-bar">
-          <button class="kn-action-btn" onclick="goPhase('kn-apply', 34, 'Apply: choose a context')">
-            Got it — let me try
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M5 2l5 5-5 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </div>
-      </div><!-- /kn-teach -->
-
-      <!-- ─── APPLY ─────────────────────────── -->
-      <div id="kn-apply" class="kn-phase">
-        <div class="kn-content">
-          <div class="kn-teach-label">Apply</div>
-          <div class="kn-teach-title">Pick a real-world context</div>
-          <div class="kn-apply-prompt">
-            The same equation can describe many situations.
-            Choose one and practise applying what you just learned.
-          </div>
-
-          <div class="kn-context-strip">
-            <button class="kn-context-pill selected" onclick="pickContext(this)">
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                <circle cx="9" cy="4" r="2.5" stroke="currentColor" stroke-width="1.2"/>
-                <path d="M1 12c0-3 2-4.5 5-4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-                <path d="M7 12h5M9.5 9.5v5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-              </svg>
-              Football
-            </button>
-            <button class="kn-context-pill" onclick="pickContext(this)">
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                <path d="M2 10l3-6 3 4 2-3 2 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              Finance
-            </button>
-            <button class="kn-context-pill" onclick="pickContext(this)">
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                <path d="M6.5 1.5a5 5 0 1 1 0 10 5 5 0 0 1 0-10z" stroke="currentColor" stroke-width="1.2"/>
-                <path d="M6.5 4v3l2 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-              </svg>
-              Science
-            </button>
-            <button class="kn-context-pill" onclick="pickContext(this)">
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                <rect x="1.5" y="2.5" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
-                <path d="M4.5 6h4M4.5 8h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-              </svg>
-              Recipe
-            </button>
-          </div>
-
-          <div class="kn-scenario-card">
-            <strong>The football scenario</strong>
-            A team scored some goals in the first half. In the second half
-            they scored 3 more, finishing with 11 goals in total.
-            How many goals did they score in the first half?
-          </div>
-
-          <div class="kn-scenario-card" style="background:linear-gradient(135deg,#fff 0%,#F0EDF8 100%);border-color:rgba(155,143,181,0.22)">
-            <strong>Set up the equation</strong>
-            Let <em>x</em> = first-half goals.<br>
-            <br>
-            x + 3 = 11
-            <div class="kn-input-row">
-              <input class="kn-answer-input" type="number" placeholder="x = ?" id="apply-answer"/>
-              <span class="kn-answer-unit">goals</span>
-            </div>
-          </div>
-        </div>
-        <div class="kn-action-bar">
-          <button class="kn-action-btn" onclick="goPhase('kn-assess', 67, 'Assess yourself')">
-            Check my answer
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M5 2l5 5-5 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </div>
-      </div><!-- /kn-apply -->
-
-      <!-- ─── ASSESS ────────────────────────── -->
-      <div id="kn-assess" class="kn-phase">
-        <div class="kn-content">
-          <div class="kn-teach-label">Assess</div>
-          <div class="kn-teach-title">Test your understanding</div>
-          <div class="kn-assess-prompt">
-            Answer without looking back. Trust what you learned.
-          </div>
-
-          <div class="kn-question-card">
-            <div class="kn-question-text">Solve for x:&nbsp;&nbsp; 3x − 5 = 16</div>
-            <div class="kn-answer-grid">
-              <button class="kn-answer-tile" onclick="pickAnswer(this)">x = 6</button>
-              <button class="kn-answer-tile" onclick="pickAnswer(this)" data-correct>x = 7</button>
-              <button class="kn-answer-tile" onclick="pickAnswer(this)">x = 11</button>
-              <button class="kn-answer-tile" onclick="pickAnswer(this)">x = 4</button>
-            </div>
-          </div>
-
-          <div class="kn-question-card">
-            <div class="kn-question-text">Which operation "undoes" multiplication?</div>
-            <div class="kn-answer-grid">
-              <button class="kn-answer-tile" onclick="pickAnswer(this)">Addition</button>
-              <button class="kn-answer-tile" onclick="pickAnswer(this)">Subtraction</button>
-              <button class="kn-answer-tile" onclick="pickAnswer(this)" data-correct>Division</button>
-              <button class="kn-answer-tile" onclick="pickAnswer(this)">Squaring</button>
-            </div>
-          </div>
-        </div>
-        <div class="kn-action-bar">
-          <button class="kn-action-btn secondary" onclick="goPhase('kn-result', 100, 'Knobit complete!')">
-            Submit answers
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M2 7l4 4 6-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </div>
-      </div><!-- /kn-assess -->
-
-      <!-- ─── RESULT ────────────────────────── -->
-      <div id="kn-result" class="kn-phase">
-        <div class="kn-content">
-          <div class="kn-result-hero">
-            <div class="kn-result-badge">
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <path d="M6 16l7 7 13-13" stroke="#5E9052" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <div class="kn-result-title">Knobit complete!</div>
-            <div class="kn-result-sub">
-              You answered correctly and showed you can apply
-              one-step equations in context. Well done.
-            </div>
-          </div>
-
-          <div class="kn-result-stats">
-            <div class="kn-stat-card">
-              <div class="kn-stat-num">2/2</div>
-              <div class="kn-stat-label">Questions correct</div>
-            </div>
-            <div class="kn-stat-card">
-              <div class="kn-stat-num">1st</div>
-              <div class="kn-stat-label">Try</div>
-            </div>
-            <div class="kn-stat-card">
-              <div class="kn-stat-num">+12</div>
-              <div class="kn-stat-label">XP earned</div>
-            </div>
-          </div>
-
-          <div class="kn-next-strip">Up next in this unit</div>
-          <div class="kn-next-preview" onclick="startKnobit()">
-            <div class="kn-next-preview-icon">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/>
-                <path d="M6.5 5.5l4 2.5-4 2.5V5.5z" fill="currentColor"/>
-              </svg>
-            </div>
-            <div>
-              <div class="kn-next-name">Solving two-step equations</div>
-              <div class="kn-next-meta">Knobit 5 · ~4 min</div>
-            </div>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:#C4B8B0">
-              <path d="M5 2l5 5-5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-        </div>
-        <div class="kn-action-bar">
-          <button class="kn-action-btn" onclick="showUnitComplete()">
-            Continue to next knobit
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M5 2l5 5-5 5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </div>
-      </div><!-- /kn-result -->
-
-    </div><!-- /kn-phases-wrap -->
   </div><!-- /lm-knobit -->
 
 
