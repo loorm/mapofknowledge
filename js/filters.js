@@ -12,7 +12,7 @@
    The ancestry-chain walk in app.js means matching any ancestor
    also colours all its descendants.
    ──────────────────────────────────────────────────────────────────── */
-  const FILTERS = {
+  var FILTERS = {
 
     'my-knowledge': {
       label: 'My Knowledge',
@@ -35,8 +35,8 @@
       ])
     },
 
-    'estonian-main-school': {
-      label: 'Estonian Main School 2023',
+    'estonian-basic-school': {
+      label: 'Estonian Basic School 2023',
       color: '#8BAD7E',
       // Estonian National Curriculum for Basic School (grades 1–9, ages 7–15).
       // Source: https://oppekava.ee/pohikool-2023/
@@ -162,24 +162,124 @@
         'Manufacturing & engineering trades',
 
       ])
+    },
+
+    'aws-solutions-architect': {
+      label: 'AWS Solutions Architect',
+      color: '#6BA8C4',
+      // AWS Solutions Architect – Associate (SAA-C03) exam domain coverage.
+      // Maps to the computer science and systems knowledge the credential tests.
+      labels: new Set([
+        /* Core CS foundations */
+        'Algorithms', 'Data structures',
+        'Operating systems',
+        /* Networking */
+        'Computer networks', 'Network protocols',
+        /* Databases & storage */
+        'Databases', 'Relational databases', 'Non-relational databases',
+        /* Security */
+        'Information security', 'Cryptography', 'Identity & access management',
+        /* Systems & software engineering */
+        'Distributed systems', 'Software architecture', 'Software engineering',
+        'Cloud computing', 'Virtualisation',
+        /* Economics of cloud */
+        'Cost optimisation', 'Microeconomics',
+      ])
+    },
+
+    'b-driving-licence': {
+      label: 'B-Category Driving Licence',
+      color: '#D4A85A',
+      // Estonian B-category (car) driving licence — theory and practical exam.
+      // Physics of motion, human factors, traffic law, and vehicle mechanics.
+      labels: new Set([
+        /* Physics */
+        'Classical mechanics',  // braking distance, kinetic energy, friction
+        'Geometric optics',     // visibility, mirrors, headlights
+        'Thermodynamics',       // engine basics, tyre pressure
+        /* Psychology / human factors */
+        'Attention', 'Perception', 'Reaction time',
+        'Risk assessment',
+        /* Biology / health */
+        'Pharmacology',         // alcohol, medication effects on driving
+        /* Law */
+        'Law',                  // traffic regulations sit within the legal domain
+        /* Ethics */
+        'Technology ethics',    // road-user responsibility
+        /* Environment */
+        'Environmental ethics', // emissions, fuel efficiency awareness
+      ])
+    },
+
+    'abrsm-grade5-music': {
+      label: 'ABRSM Grade 5 Music Theory',
+      color: '#C48FA0',
+      // ABRSM Grade 5 Music Theory syllabus — prerequisite for practical grades 6–8.
+      // Covers notation, harmony, counterpoint, form, and music history up to the 20th century.
+      labels: new Set([
+        /* Music */
+        'Music theory',         // harmony, rhythm, intervals, scales, modes
+        'Performance practice', // articulation, dynamics, stylistic conventions
+        /* Acoustics (physics of sound) */
+        'Acoustics',
+        /* History */
+        'World historical periods', // Baroque → 20th c. contextualised in music
+        /* Mathematics — rhythm as ratio */
+        'Arithmetic',
+        /* Language & notation */
+        'Semantics',            // musical terminology (Italian, German, French markings)
+      ])
     }
 
   };
 
+  /* ─── Custom filters from localStorage ──────────────────────────── */
+  (function loadCustomFilters() {
+    var customs;
+    try { customs = JSON.parse(localStorage.getItem('kq_filter_custom') || '[]'); }
+    catch(e) { customs = []; }
+
+    var list = document.querySelector('#filter-panel .fp-list');
+    customs.forEach(function(cf) {
+      FILTERS[cf.id] = { label: cf.label, color: cf.color, labels: new Set(cf.labels) };
+      var div = document.createElement('div');
+      div.className = 'fp-item';
+      div.dataset.filterId = cf.id;
+      div.style.setProperty('--fi-color', cf.color);
+      div.innerHTML = '<div class="fp-radio"></div><div class="fp-dot"></div>'
+                    + '<span class="fp-label">' + cf.label + '</span>';
+      list.appendChild(div);
+    });
+  })();
+
+  /* ─── Apply visibility from localStorage ────────────────────────── */
+  (function applyVisibility() {
+    var hidden;
+    try { hidden = JSON.parse(localStorage.getItem('kq_filter_hidden') || '[]'); }
+    catch(e) { hidden = []; }
+    if (!hidden.length) return;
+    document.querySelectorAll('.fp-item').forEach(function(item) {
+      if (hidden.indexOf(item.dataset.filterId) !== -1) {
+        item.style.display = 'none';
+      }
+    });
+  })();
+
   /* ─── State ──────────────────────────────────────────────────────── */
-  let activeFilterId = null;
+  var activeFilterId = null;
 
   /* ─── DOM refs ───────────────────────────────────────────────────── */
-  const panel    = document.getElementById('filter-panel');
-  const filterBtn= document.getElementById('filter-btn');
-  const clearBtn = document.getElementById('fp-clear');
+  var panel     = document.getElementById('filter-panel');
+  var filterBtn = document.getElementById('filter-btn');
+  var clearBtn  = document.getElementById('fp-clear');
+  var list      = document.querySelector('#filter-panel .fp-list');
 
   /* ─── Filter panel toggle ────────────────────────────────────────── */
   filterBtn.addEventListener('click', function (e) {
     e.stopPropagation();
     // close Layer Panel if open
-    const lp = document.getElementById('layer-panel');
-    const lb = document.getElementById('layers-btn');
+    var lp = document.getElementById('layer-panel');
+    var lb = document.getElementById('layers-btn');
     if (lp) lp.classList.remove('open');
     if (lb) lb.classList.remove('active');
     panel.classList.toggle('open');
@@ -193,25 +293,23 @@
     }
   });
 
-  /* ─── Filter item clicks ─────────────────────────────────────────── */
-  document.querySelectorAll('.fp-item').forEach(function (item) {
-    item.addEventListener('click', function (e) {
-      e.stopPropagation();
-      const fid = this.dataset.filterId;
+  /* ─── Filter item clicks (delegated) ────────────────────────────── */
+  list.addEventListener('click', function (e) {
+    var item = e.target.closest('.fp-item');
+    if (!item) return;
+    e.stopPropagation();
+    var fid = item.dataset.filterId;
 
-      if (activeFilterId === fid) {
-        /* clicking the active filter → deactivate */
-        deactivate();
-      } else {
-        /* activate this filter */
-        activeFilterId = fid;
-        document.querySelectorAll('.fp-item').forEach(function (el) {
-          el.classList.toggle('active', el.dataset.filterId === fid);
-        });
-        if (clearBtn) clearBtn.classList.remove('hidden');
-        applyToMap(FILTERS[fid].labels);
-      }
-    });
+    if (activeFilterId === fid) {
+      deactivate();
+    } else {
+      activeFilterId = fid;
+      document.querySelectorAll('.fp-item').forEach(function (el) {
+        el.classList.toggle('active', el.dataset.filterId === fid);
+      });
+      if (clearBtn) clearBtn.classList.remove('hidden');
+      applyToMap(FILTERS[fid] ? FILTERS[fid].labels : null);
+    }
   });
 
   /* ─── Clear button ───────────────────────────────────────────────── */
