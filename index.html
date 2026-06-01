@@ -141,7 +141,15 @@
 
   <div class="fp-header">
     <span class="fp-title">Filter</span>
-    <button id="fp-clear" class="fp-clear hidden" title="Clear filter">✕</button>
+    <div style="display:flex;align-items:center;gap:2px">
+      <a class="fp-settings-link" href="settings.html#filters" title="Manage filters">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <circle cx="6" cy="6" r="1.9" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M6 1v1.3M6 9.7V11M1 6h1.3M9.7 6H11M2.7 2.7l.9.9M8.4 8.4l.9.9M9.3 2.7l-.9.9M3.6 8.4l-.9.9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+      </a>
+      <button id="fp-clear" class="fp-clear hidden" title="Clear filter">✕</button>
+    </div>
   </div>
 
   <div class="fp-list">
@@ -153,11 +161,32 @@
       <span class="fp-label">My Knowledge</span>
     </div>
 
-    <div class="fp-item" data-filter-id="estonian-main-school"
+    <div class="fp-item" data-filter-id="estonian-basic-school"
          style="--fi-color:#8BAD7E">
       <div class="fp-radio"></div>
       <div class="fp-dot"></div>
-      <span class="fp-label">Estonian Main School 2023</span>
+      <span class="fp-label">Estonian Basic School 2023</span>
+    </div>
+
+    <div class="fp-item" data-filter-id="aws-solutions-architect"
+         style="--fi-color:#6BA8C4">
+      <div class="fp-radio"></div>
+      <div class="fp-dot"></div>
+      <span class="fp-label">AWS Solutions Architect</span>
+    </div>
+
+    <div class="fp-item" data-filter-id="b-driving-licence"
+         style="--fi-color:#D4A85A">
+      <div class="fp-radio"></div>
+      <div class="fp-dot"></div>
+      <span class="fp-label">B-Category Driving Licence</span>
+    </div>
+
+    <div class="fp-item" data-filter-id="abrsm-grade5-music"
+         style="--fi-color:#C48FA0">
+      <div class="fp-radio"></div>
+      <div class="fp-dot"></div>
+      <span class="fp-label">ABRSM Grade 5 Music Theory</span>
     </div>
 
   </div>

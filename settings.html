@@ -90,6 +90,83 @@ body {
 .settings-save-btn:hover { opacity: 0.88; transform: translateY(-1px); }
 .settings-save-btn:active { transform: translateY(0); }
 
+/* ── map filter rows ── */
+.sf-filter-row {
+  background: rgba(255,255,255,0.65);
+  border: 1px solid rgba(58,48,40,0.08);
+  border-radius: 14px;
+  padding: 12px 18px;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 2px 10px rgba(58,48,40,0.05);
+}
+.sf-filter-row + .sf-filter-row { margin-top: 6px; }
+.sf-color-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+}
+.sf-filter-label { font-size: 13px; font-weight: 600; color: #2C2820; flex: 1; }
+.sf-delete-btn {
+  font-size: 11px; font-weight: 600; color: #B0A496;
+  cursor: pointer; border-radius: 6px;
+  background: none; border: none; padding: 4px 8px;
+  transition: color 0.12s, background 0.12s;
+}
+.sf-delete-btn:hover { color: #C4826A; background: rgba(196,130,106,0.08); }
+.sf-add-btn {
+  width: 100%; margin-top: 8px;
+  padding: 11px 18px;
+  background: rgba(255,255,255,0.45);
+  border: 1.5px dashed rgba(58,48,40,0.18);
+  border-radius: 14px; color: #8A7E72;
+  font-size: 13px; font-weight: 500; font-family: inherit;
+  cursor: pointer; text-align: center;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.sf-add-btn:hover { background: rgba(255,255,255,0.70); border-color: rgba(58,48,40,0.28); color: #3A3028; }
+.sf-add-form {
+  background: rgba(255,255,255,0.65);
+  border: 1px solid rgba(58,48,40,0.08);
+  border-radius: 14px; padding: 16px 18px;
+  box-shadow: 0 2px 10px rgba(58,48,40,0.05);
+  margin-top: 8px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.sf-add-form.hidden { display: none; }
+.sf-input {
+  width: 100%; padding: 9px 12px;
+  border: 1.5px solid rgba(58,48,40,0.12);
+  border-radius: 9px; font-size: 13px;
+  font-family: inherit; color: #2C2820;
+  background: rgba(255,255,255,0.80);
+  outline: none; box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.sf-input:focus { border-color: #C4826A; }
+.sf-input::placeholder { color: #B0A496; }
+.sf-form-actions {
+  display: flex; gap: 8px; justify-content: flex-end;
+}
+.sf-cancel-btn {
+  padding: 8px 16px; border-radius: 9px;
+  font-size: 13px; font-weight: 500; font-family: inherit;
+  cursor: pointer; background: none;
+  border: 1.5px solid rgba(58,48,40,0.14); color: #8A7E72;
+  transition: background 0.12s;
+}
+.sf-cancel-btn:hover { background: rgba(58,48,40,0.04); }
+.sf-save-filter-btn {
+  padding: 8px 16px; border-radius: 9px;
+  font-size: 13px; font-weight: 600; font-family: inherit;
+  cursor: pointer; border: none;
+  background: linear-gradient(135deg, #C4826A 0%, #B06850 100%);
+  color: #fff; transition: opacity 0.15s;
+}
+.sf-save-filter-btn:hover { opacity: 0.88; }
+.sf-custom-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.9px;
+  text-transform: uppercase; color: #B0A496;
+  padding: 0 4px; margin-top: 16px; margin-bottom: 8px;
+}
+
 </style>
 </head>
 <body>
@@ -170,6 +247,31 @@ body {
     </div>
   </div>
 
+  <!-- MAP FILTERS -->
+  <div class="settings-section" id="filters">
+    <div class="settings-section-label">Map filters</div>
+
+    <div id="sf-preset-list"></div>
+
+    <div id="sf-custom-section" style="display:none">
+      <div class="sf-custom-label">Custom</div>
+      <div id="sf-custom-list"></div>
+    </div>
+
+    <button class="sf-add-btn" id="sf-add-open">+ Add custom filter</button>
+
+    <div class="sf-add-form hidden" id="sf-add-form">
+      <input type="text" class="sf-input" id="sf-filter-name"
+             placeholder="Filter name (e.g. ABRSM Grade 6)">
+      <input type="text" class="sf-input" id="sf-filter-labels"
+             placeholder="Knowledge areas, comma-separated (e.g. Music theory, Acoustics)">
+      <div class="sf-form-actions">
+        <button class="sf-cancel-btn" id="sf-cancel">Cancel</button>
+        <button class="sf-save-filter-btn" id="sf-save">Add filter</button>
+      </div>
+    </div>
+  </div>
+
   <button class="settings-save-btn" onclick="window.location='index.html'">
     Save &amp; return to map
   </button>
@@ -185,6 +287,111 @@ body {
   });
   document.addEventListener('click', function () {
     document.getElementById('nav-dropdown').classList.remove('open');
+  });
+
+  /* ── Filter settings ── */
+  var PRESET_FILTERS = [
+    { id: 'my-knowledge',            label: 'My Knowledge',               color: '#9B8FB5' },
+    { id: 'estonian-basic-school',   label: 'Estonian Basic School 2023', color: '#8BAD7E' },
+    { id: 'aws-solutions-architect', label: 'AWS Solutions Architect',    color: '#6BA8C4' },
+    { id: 'b-driving-licence',       label: 'B-Category Driving Licence', color: '#D4A85A' },
+    { id: 'abrsm-grade5-music',      label: 'ABRSM Grade 5 Music Theory', color: '#C48FA0' },
+  ];
+  var CUSTOM_COLORS = ['#A0C4B0', '#C4A0B0', '#A0B0C4', '#C4B4A0', '#B0A0C4'];
+
+  function sfGetHidden() {
+    try { return JSON.parse(localStorage.getItem('kq_filter_hidden') || '[]'); }
+    catch(e) { return []; }
+  }
+  function sfSetHidden(arr) { localStorage.setItem('kq_filter_hidden', JSON.stringify(arr)); }
+  function sfGetCustom() {
+    try { return JSON.parse(localStorage.getItem('kq_filter_custom') || '[]'); }
+    catch(e) { return []; }
+  }
+  function sfSetCustom(arr) { localStorage.setItem('kq_filter_custom', JSON.stringify(arr)); }
+
+  /* Render preset filter rows */
+  var sfPresetList = document.getElementById('sf-preset-list');
+  var sfHidden = sfGetHidden();
+  PRESET_FILTERS.forEach(function(f, i) {
+    var isOn = sfHidden.indexOf(f.id) === -1;
+    var row = document.createElement('div');
+    row.className = 'sf-filter-row';
+    if (i > 0) row.style.marginTop = '6px';
+    row.innerHTML =
+      '<span class="sf-color-dot" style="background:' + f.color + '"></span>' +
+      '<span class="sf-filter-label">' + f.label + '</span>' +
+      '<button class="st-toggle' + (isOn ? ' on' : '') + '" data-filter-id="' + f.id + '" aria-label="Toggle ' + f.label + '">' +
+      '<div class="st-toggle-thumb"></div></button>';
+    sfPresetList.appendChild(row);
+  });
+  sfPresetList.addEventListener('click', function(e) {
+    var btn = e.target.closest('.st-toggle');
+    if (!btn) return;
+    var fid = btn.dataset.filterId;
+    var isOn = btn.classList.toggle('on');
+    var h = sfGetHidden();
+    if (isOn) { var idx = h.indexOf(fid); if (idx !== -1) h.splice(idx, 1); }
+    else { if (h.indexOf(fid) === -1) h.push(fid); }
+    sfSetHidden(h);
+  });
+
+  /* Render custom filter rows */
+  function sfRenderCustom() {
+    var customs = sfGetCustom();
+    var section = document.getElementById('sf-custom-section');
+    var customList = document.getElementById('sf-custom-list');
+    customList.innerHTML = '';
+    section.style.display = customs.length ? '' : 'none';
+    customs.forEach(function(cf, i) {
+      var row = document.createElement('div');
+      row.className = 'sf-filter-row';
+      if (i > 0) row.style.marginTop = '6px';
+      row.innerHTML =
+        '<span class="sf-color-dot" style="background:' + cf.color + '"></span>' +
+        '<span class="sf-filter-label">' + cf.label + '</span>' +
+        '<button class="sf-delete-btn" data-filter-id="' + cf.id + '" title="Remove filter">✕</button>';
+      customList.appendChild(row);
+    });
+  }
+  sfRenderCustom();
+
+  document.getElementById('sf-custom-list').addEventListener('click', function(e) {
+    var btn = e.target.closest('.sf-delete-btn');
+    if (!btn) return;
+    var fid = btn.dataset.filterId;
+    sfSetCustom(sfGetCustom().filter(function(cf) { return cf.id !== fid; }));
+    sfSetHidden(sfGetHidden().filter(function(id) { return id !== fid; }));
+    sfRenderCustom();
+  });
+
+  /* Add form */
+  var sfAddOpen = document.getElementById('sf-add-open');
+  var sfAddForm = document.getElementById('sf-add-form');
+  sfAddOpen.addEventListener('click', function() {
+    sfAddForm.classList.remove('hidden');
+    sfAddOpen.style.display = 'none';
+  });
+  document.getElementById('sf-cancel').addEventListener('click', function() {
+    sfAddForm.classList.add('hidden');
+    sfAddOpen.style.display = '';
+    document.getElementById('sf-filter-name').value = '';
+    document.getElementById('sf-filter-labels').value = '';
+  });
+  document.getElementById('sf-save').addEventListener('click', function() {
+    var name = document.getElementById('sf-filter-name').value.trim();
+    if (!name) { document.getElementById('sf-filter-name').focus(); return; }
+    var labels = document.getElementById('sf-filter-labels').value
+                   .split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+    var customs = sfGetCustom();
+    var color = CUSTOM_COLORS[customs.length % CUSTOM_COLORS.length];
+    customs.push({ id: 'custom-' + Date.now(), label: name, color: color, labels: labels });
+    sfSetCustom(customs);
+    sfRenderCustom();
+    sfAddForm.classList.add('hidden');
+    sfAddOpen.style.display = '';
+    document.getElementById('sf-filter-name').value = '';
+    document.getElementById('sf-filter-labels').value = '';
   });
 
   /* ── Screensaver toggle ── */
