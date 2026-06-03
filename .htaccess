@@ -1,7 +1,7 @@
 Options -Indexes
 RewriteEngine On
 
-# Proxy all requests to Node.js Express (fork mode, all interfaces).
-# Using the actual server IP since 127.0.0.1 is namespace-isolated on this host.
+# Proxy all requests to Node.js Express via Unix domain socket.
+# Unix sockets bypass TCP firewalling on this host.
 RewriteCond %{REQUEST_URI} !^/\.well-known
-RewriteRule ^(.*)$ http://217.146.69.48:3000/$1 [P,L]
+RewriteRule ^(.*)$ unix:/data01/virt147958/mok.sock|http://mok/$1 [P,L]
