@@ -1,0 +1,13 @@
+# Proxy all requests to Node.js Express server on port 3000
+# Apache handles TLS; Express handles auth, API, and static serving.
+
+Options -Indexes
+RewriteEngine On
+
+# Health check passthrough (optional direct response)
+# Everything else → Node.js
+RewriteCond %{REQUEST_URI} !^/\.well-known
+RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]
+
+# Allow ProxyPassReverse to fix redirect URLs
+ProxyPassReverse / http://127.0.0.1:3000/
