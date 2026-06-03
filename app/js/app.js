@@ -53,13 +53,11 @@ function nodeGradient(hex) {
   });
 })();
 
-Promise.all([
-  fetch('knowledge_map.json').then(r => r.json()),
-  fetch('knowledge_map_emergent.json').then(r => r.json())
-])
-  .then(([baseData, emergentData]) => init(baseData, emergentData))
+fetch('/api/map')
+  .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(({ base, emergent }) => init(base, emergent))
   .catch(() => {
-    document.body.innerHTML = '<div style="color:white;padding:20px">Could not load knowledge map files — place them in the same folder.</div>';
+    document.body.innerHTML = '<div style="color:white;padding:20px">Could not load map — please refresh or log in again.</div>';
   });
 
 function init(data, emergentData) {
@@ -390,13 +388,86 @@ function init(data, emergentData) {
     if (learnBtn) {
       const crumb = (domainNode ? domainNode.label : "") +
         (crumbParts.length ? " › " + crumbParts.join(" › ") : "");
-      learnBtn.onclick = function () {
-        closeSidebar();
-        openLearningMode(d, crumb);
+      learnBtn.onclick = async function () {
+        if (d.level !== 5) return;
+        try {
+          const r = await fetch(`/api/nodes/${d.id}/learn`, { method: 'POST' });
+          const { knobits } = await r.json();
+          closeSidebar();
+          openLearningMode(d, crumb, knobits);
+        } catch (err) {
+          closeSidebar();
+          openLearningMode(d, crumb, null);
+        }
       };
     }
 
     sidebar.classList.add("open");
+
+    // Load overview and knowledge asynchronously
+    const sbOverview = document.querySelector('.sb-overview-text');
+    const sbPct      = document.querySelector('.sb-pct');
+    const sbBadge    = document.querySelector('.sb-knowledge-badge');
+    const sbToggle   = document.querySelector('.sb-toggle');
+    const learnBtnEl = document.querySelector('.sb-learn-btn');
+    const nodeExtId  = d.id;
+
+    // Learn this — only active for L5 nodes
+    if (learnBtnEl) {
+      if (d.level === 5) {
+        learnBtnEl.disabled = false;
+        learnBtnEl.style.opacity = '';
+        learnBtnEl.style.cursor = '';
+      } else {
+        learnBtnEl.disabled = true;
+        learnBtnEl.style.opacity = '0.4';
+        learnBtnEl.style.cursor = 'not-allowed';
+      }
+    }
+
+    // Overview
+    if (sbOverview) {
+      sbOverview.textContent = 'Loading…';
+      fetch(`/api/nodes/${nodeExtId}/overview`)
+        .then(r => r.json())
+        .then(({ overview }) => { if (sbOverview) sbOverview.textContent = overview || ''; })
+        .catch(() => { if (sbOverview) sbOverview.textContent = ''; });
+    }
+
+    // Knowledge %
+    if (sbPct) {
+      fetch(`/api/nodes/${nodeExtId}/knowledge`)
+        .then(r => r.json())
+        .then(({ percentage, source }) => {
+          if (!sbPct) return;
+          sbPct.textContent = `${percentage}%`;
+          if (sbBadge) {
+            sbBadge.textContent = source === 'tested' ? 'Tested' : source === 'self_reported' ? 'Self-reported' : '';
+          }
+          if (sbToggle) {
+            sbToggle.classList.toggle('on', percentage >= 100 && source === 'self_reported');
+          }
+        })
+        .catch(() => {});
+    }
+
+    // I know this toggle
+    if (sbToggle && !sbToggle._wired) {
+      sbToggle._wired = true;
+      sbToggle.style.cursor = 'pointer';
+      sbToggle.addEventListener('click', function () {
+        const isOn = sbToggle.classList.toggle('on');
+        const pct  = isOn ? 100 : 0;
+        fetch(`/api/nodes/${nodeExtId}/knowledge`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ percentage: pct, source: 'self_reported' }),
+        }).then(r => r.json()).then(({ percentage }) => {
+          if (sbPct) sbPct.textContent = `${percentage}%`;
+          if (sbBadge) sbBadge.textContent = percentage >= 100 ? 'Self-reported' : '';
+        }).catch(() => {});
+      });
+    }
   }
 
   function closeSidebar() {

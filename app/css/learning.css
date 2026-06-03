@@ -659,3 +659,73 @@
   transition: background 0.14s;
 }
 .lm-complete-btn-ghost:hover { background: rgba(58,48,40,0.05); }
+
+/* ── API-driven additions ── */
+
+/* Option buttons (4-button rows in explain / meaning) */
+.kn-option-btn {
+  padding: 9px 16px;
+  background: rgba(255,255,255,0.85);
+  border: 1px solid rgba(58,48,40,0.14);
+  border-radius: 10px;
+  font-size: 13px; font-weight: 550;
+  font-family: inherit; color: #3A3028;
+  cursor: pointer;
+  transition: background 0.13s, border-color 0.13s;
+  flex-shrink: 0;
+}
+.kn-option-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,1);
+  border-color: var(--lm-accent);
+}
+.kn-option-btn.choice-locked,
+.kn-option-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Answer textarea (practice phase) */
+.kn-answer-input {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 14px;
+  border: 1.5px solid rgba(58,48,40,0.14);
+  border-radius: 10px;
+  font-size: 14px; font-family: inherit; color: #2C2820;
+  background: #fff; resize: vertical; min-height: 56px;
+  outline: none;
+  transition: border-color 0.14s, box-shadow 0.14s;
+}
+.kn-answer-input:focus {
+  border-color: var(--lm-accent);
+  box-shadow: 0 0 0 3px var(--lm-accent-soft);
+}
+
+/* Loading dots block */
+.block-loading {
+  display: flex; align-items: center; gap: 5px;
+  padding: 14px 18px;
+  background: rgba(255,255,255,0.5);
+  border: 1px solid rgba(58,48,40,0.07);
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+.loading-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #B0A496;
+  animation: dot-pulse 1.2s ease-in-out infinite both;
+}
+.loading-dot:nth-child(1) { animation-delay: 0s;    }
+.loading-dot:nth-child(2) { animation-delay: 0.2s;  }
+.loading-dot:nth-child(3) { animation-delay: 0.4s;  }
+@keyframes dot-pulse {
+  0%, 100% { transform: scale(0.7); opacity: 0.3; }
+  40%       { transform: scale(1);   opacity: 1;   }
+}
+
+/* Button row container */
+#kn-button-row {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 10px 0 4px;
+}
