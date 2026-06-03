@@ -10,6 +10,7 @@ module.exports = {
     env: {
       NODE_ENV: 'production',
       PORT:     3000,
+      SOCKET:   '/data01/virt147958/mok.sock',
     },
     error_file:  '/data01/virt147958/logs/mok-error.log',
     out_file:    '/data01/virt147958/logs/mok-out.log',
