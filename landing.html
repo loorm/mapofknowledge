@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Map of Knowledge — Every concept. One map.</title>
+<style>
+
+/* ── Reset & base ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #080810;
+  --bg2:       #0d0d1a;
+  --cream:     #F2EDE6;
+  --terra:     #C4826A;
+  --terra-dim: rgba(196,130,106,0.15);
+  --lavender:  #9B8FB5;
+  --sage:      #8BAD7E;
+  --amber:     #C4A55A;
+  --blue:      #378ADD;
+  --muted:     rgba(242,237,230,0.45);
+  --border:    rgba(255,255,255,0.07);
+  --card-bg:   rgba(255,255,255,0.04);
+  --glass:     rgba(8,8,16,0.88);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--cream);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* ── Topbar ────────────────────────────────────────────────────────────────── */
+#topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+  height: 60px;
+  background: rgba(8,8,16,0.82);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 40px;
+  gap: 0;
+}
+
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 15px; font-weight: 620; letter-spacing: -0.2px;
+  color: var(--cream);
+  flex-shrink: 0;
+}
+.nav-logo-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--terra-dim);
+  border: 1px solid rgba(196,130,106,0.3);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.nav-links {
+  display: flex; align-items: center; gap: 32px;
+  margin-left: 48px;
+}
+.nav-links a {
+  font-size: 13px; font-weight: 500;
+  color: var(--muted);
+  transition: color 0.15s;
+}
+.nav-links a:hover { color: var(--cream); }
+
+.nav-right {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 10px;
+}
+.btn-ghost {
+  padding: 7px 18px;
+  border: 1px solid rgba(242,237,230,0.18);
+  border-radius: 8px;
+  font-size: 13px; font-weight: 500;
+  color: var(--cream);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  font-family: inherit;
+}
+.btn-ghost:hover { border-color: rgba(242,237,230,0.4); background: rgba(255,255,255,0.04); }
+
+.btn-primary {
+  padding: 7px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #C4826A 0%, #A86852 100%);
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  font-family: inherit;
+}
+.btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+/* ── Hero ──────────────────────────────────────────────────────────────────── */
+#hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 120px 24px 80px;
+  overflow: hidden;
+}
+
+#hero-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  opacity: 0.55;
+}
+
+.hero-inner {
+  position: relative; z-index: 2;
+  max-width: 760px;
+}
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 14px;
+  border: 1px solid rgba(196,130,106,0.35);
+  border-radius: 20px;
+  background: rgba(196,130,106,0.08);
+  font-size: 11px; font-weight: 600; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--terra);
+  margin-bottom: 28px;
+}
+.hero-eyebrow-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--terra);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+.hero-h1 {
+  font-size: clamp(36px, 6vw, 72px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -2px;
+  color: var(--cream);
+  margin-bottom: 24px;
+}
+.hero-h1 em {
+  font-style: normal;
+  background: linear-gradient(135deg, var(--terra) 0%, var(--amber) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: clamp(15px, 2vw, 19px);
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 560px;
+  margin: 0 auto 44px;
+}
+
+.hero-ctas {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px; flex-wrap: wrap;
+}
+.btn-hero-primary {
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #C4826A 0%, #A86852 100%);
+  border: none; border-radius: 12px;
+  font-size: 15px; font-weight: 600; color: #fff;
+  cursor: pointer; font-family: inherit;
+  transition: opacity 0.15s, transform 0.12s;
+  box-shadow: 0 8px 32px rgba(196,130,106,0.3);
+}
+.btn-hero-primary:hover { opacity: 0.88; transform: translateY(-2px); }
+
+.btn-hero-ghost {
+  padding: 14px 32px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(242,237,230,0.15);
+  border-radius: 12px;
+  font-size: 15px; font-weight: 500; color: var(--cream);
+  cursor: pointer; font-family: inherit;
+  transition: background 0.15s, border-color 0.15s;
+  display: flex; align-items: center; gap: 8px;
+}
+.btn-hero-ghost:hover { background: rgba(255,255,255,0.08); border-color: rgba(242,237,230,0.3); }
+
+.hero-stat-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 40px; margin-top: 64px; flex-wrap: wrap;
+}
+.hero-stat { text-align: center; }
+.hero-stat-num {
+  font-size: 28px; font-weight: 700; letter-spacing: -1px;
+  color: var(--cream);
+}
+.hero-stat-label {
+  font-size: 12px; color: var(--muted); margin-top: 2px;
+}
+.hero-stat-divider {
+  width: 1px; height: 36px;
+  background: var(--border);
+}
+
+/* ── Section shell ─────────────────────────────────────────────────────────── */
+.section {
+  padding: 100px 24px;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+.section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--terra);
+  margin-bottom: 14px;
+}
+.section-h2 {
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 700; letter-spacing: -1.2px;
+  color: var(--cream); line-height: 1.12;
+  margin-bottom: 16px;
+}
+.section-sub {
+  font-size: 16px; color: var(--muted); line-height: 1.7;
+  max-width: 560px;
+}
+
+/* ── Features ──────────────────────────────────────────────────────────────── */
+#features { border-top: 1px solid var(--border); }
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 56px;
+}
+
+.feat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 32px;
+  transition: border-color 0.2s, transform 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.feat-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 20px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.feat-card:hover { border-color: rgba(242,237,230,0.14); transform: translateY(-3px); }
+.feat-card:hover::before { opacity: 1; }
+
+.feat-card.c-map::before  { background: radial-gradient(ellipse at top left, rgba(55,138,221,0.08) 0%, transparent 65%); }
+.feat-card.c-learn::before { background: radial-gradient(ellipse at top left, rgba(155,143,181,0.08) 0%, transparent 65%); }
+.feat-card.c-pass::before  { background: radial-gradient(ellipse at top left, rgba(139,173,126,0.08) 0%, transparent 65%); }
+
+.feat-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 24px;
+}
+.feat-icon.i-map    { background: rgba(55,138,221,0.15);   color: var(--blue); }
+.feat-icon.i-learn  { background: rgba(155,143,181,0.15);  color: var(--lavender); }
+.feat-icon.i-pass   { background: rgba(139,173,126,0.15);  color: var(--sage); }
+
+.feat-title {
+  font-size: 18px; font-weight: 660; letter-spacing: -0.3px;
+  color: var(--cream); margin-bottom: 10px;
+}
+.feat-body {
+  font-size: 14px; color: var(--muted); line-height: 1.7;
+}
+.feat-tag {
+  display: inline-block;
+  margin-top: 18px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11px; font-weight: 600;
+  background: rgba(242,237,230,0.06);
+  color: rgba(242,237,230,0.5);
+}
+
+/* ── How it works ──────────────────────────────────────────────────────────── */
+#how {
+  border-top: 1px solid var(--border);
+  padding: 100px 24px;
+}
+#how .inner { max-width: 1120px; margin: 0 auto; }
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  margin-top: 64px;
+  position: relative;
+}
+.steps::before {
+  content: '';
+  position: absolute;
+  top: 28px; left: calc(16.66% + 24px); right: calc(16.66% + 24px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--terra), var(--amber), var(--terra), transparent);
+  opacity: 0.4;
+}
+
+.step {
+  text-align: center;
+  padding: 0 32px;
+}
+.step-num {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  border: 1px solid rgba(196,130,106,0.4);
+  background: rgba(196,130,106,0.08);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 24px;
+  font-size: 18px; font-weight: 700; color: var(--terra);
+  position: relative; z-index: 1;
+}
+.step-title {
+  font-size: 16px; font-weight: 650; color: var(--cream);
+  margin-bottom: 10px; letter-spacing: -0.2px;
+}
+.step-body { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+/* ── Map visualization ─────────────────────────────────────────────────────── */
+#mapviz {
+  border-top: 1px solid var(--border);
+  padding: 100px 24px;
+  overflow: hidden;
+}
+#mapviz .inner { max-width: 1120px; margin: 0 auto; }
+
+.mapviz-wrap {
+  margin-top: 56px;
+  position: relative;
+  height: 480px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  overflow: hidden;
+}
+#viz-canvas {
+  width: 100%; height: 100%;
+  display: block;
+}
+.mapviz-overlay {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, var(--bg) 100%);
+  pointer-events: none;
+}
+.mapviz-legend {
+  position: absolute; bottom: 24px; left: 24px;
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.legend-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: rgba(242,237,230,0.55);
+  background: rgba(8,8,16,0.7);
+  padding: 4px 8px; border-radius: 6px;
+  border: 1px solid var(--border);
+}
+.legend-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Pricing ───────────────────────────────────────────────────────────────── */
+#pricing { border-top: 1px solid var(--border); }
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 56px;
+  align-items: start;
+}
+
+.price-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 32px;
+  transition: border-color 0.2s;
+}
+.price-card.featured {
+  border-color: rgba(196,130,106,0.5);
+  background: rgba(196,130,106,0.06);
+  position: relative;
+}
+.price-badge {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  padding: 4px 16px;
+  background: linear-gradient(135deg, #C4826A, #A86852);
+  border-radius: 20px;
+  font-size: 11px; font-weight: 700; color: #fff;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.price-tier {
+  font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 12px;
+}
+.price-amount {
+  display: flex; align-items: baseline; gap: 4px;
+  margin-bottom: 6px;
+}
+.price-cur { font-size: 18px; font-weight: 600; color: var(--cream); margin-top: 4px; }
+.price-num { font-size: 48px; font-weight: 700; letter-spacing: -2px; color: var(--cream); line-height: 1; }
+.price-per { font-size: 13px; color: var(--muted); }
+.price-desc { font-size: 13px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+
+.price-divider { height: 1px; background: var(--border); margin-bottom: 24px; }
+
+.price-features { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.price-features li {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13px; color: var(--muted); line-height: 1.5;
+}
+.price-features li .check {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: rgba(139,173,126,0.15);
+  color: var(--sage);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.price-features li .check.terra {
+  background: rgba(196,130,106,0.15); color: var(--terra);
+}
+
+.price-cta {
+  width: 100%; margin-top: 28px;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.price-cta.primary {
+  background: linear-gradient(135deg, #C4826A 0%, #A86852 100%);
+  border: none; color: #fff;
+  box-shadow: 0 4px 20px rgba(196,130,106,0.25);
+}
+.price-cta.secondary {
+  background: transparent;
+  border: 1px solid rgba(242,237,230,0.15);
+  color: var(--cream);
+}
+.price-cta:hover { opacity: 0.85; transform: translateY(-1px); }
+
+/* ── Footer ────────────────────────────────────────────────────────────────── */
+#footer {
+  border-top: 1px solid var(--border);
+  padding: 56px 40px;
+}
+#footer .inner {
+  max-width: 1120px; margin: 0 auto;
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 40px;
+  flex-wrap: wrap;
+}
+.footer-brand .nav-logo { margin-bottom: 12px; }
+.footer-tagline { font-size: 13px; color: var(--muted); max-width: 240px; line-height: 1.6; }
+
+.footer-links {
+  display: flex; gap: 48px; flex-wrap: wrap;
+}
+.footer-col h4 {
+  font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: rgba(242,237,230,0.35);
+  margin-bottom: 14px;
+}
+.footer-col a {
+  display: block;
+  font-size: 13px; color: var(--muted);
+  margin-bottom: 8px;
+  transition: color 0.15s;
+}
+.footer-col a:hover { color: var(--cream); }
+
+.footer-bottom {
+  max-width: 1120px; margin: 40px auto 0;
+  padding-top: 24px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 12px; color: rgba(242,237,230,0.25);
+  flex-wrap: wrap; gap: 8px;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  #topbar { padding: 0 20px; }
+  .nav-links { display: none; }
+  .features-grid, .pricing-grid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; gap: 40px; }
+  .steps::before { display: none; }
+  .price-card.featured { margin-top: 0; }
+  .footer-links { gap: 28px; }
+  .section { padding: 72px 20px; }
+}
+
+@media (max-width: 520px) {
+  .hero-stat-row { gap: 20px; }
+  .hero-stat-divider { display: none; }
+}
+
+/* ── Scroll reveal ─────────────────────────────────────────────────────────── */
+.reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+
+</style>
+</head>
+<body>
+
+<!-- ════ NAV ════ -->
+<header id="topbar">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="5.5" stroke="#C4826A" stroke-width="1.3"/>
+        <circle cx="8" cy="8" r="1.4" fill="#C4826A"/>
+        <line x1="8" y1="2.5" x2="8" y2="4.6" stroke="#C4826A" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="8" y1="11.4" x2="8" y2="13.5" stroke="#C4826A" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="2.5" y1="8" x2="4.6" y2="8" stroke="#C4826A" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="11.4" y1="8" x2="13.5" y2="8" stroke="#C4826A" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </div>
+    Map of Knowledge
+  </a>
+
+  <nav class="nav-links">
+    <a href="#features">About</a>
+    <a href="#how">How it works</a>
+    <a href="#pricing">Pricing</a>
+  </nav>
+
+  <div class="nav-right">
+    <button class="btn-ghost">Log in</button>
+    <button class="btn-primary">Sign up free</button>
+  </div>
+</header>
+
+
+<!-- ════ HERO ════ -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+
+  <div class="hero-inner">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-dot"></div>
+      Now in early access
+    </div>
+
+    <h1 class="hero-h1">
+      Every concept<br>humanity has ever named.<br>
+      <em>One map.</em>
+    </h1>
+
+    <p class="hero-sub">
+      Navigate 10,000+ nodes of structured human knowledge. Learn any concept with an adaptive AI tutor. Watch your understanding accumulate in a portable Learner Passport that is yours — forever.
+    </p>
+
+    <div class="hero-ctas">
+      <button class="btn-hero-primary">Explore the map free</button>
+      <button class="btn-hero-ghost">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M5.5 4.5l4 2.5-4 2.5V4.5z" fill="currentColor"/>
+        </svg>
+        See how it works
+      </button>
+    </div>
+
+    <div class="hero-stat-row">
+      <div class="hero-stat">
+        <div class="hero-stat-num">10,847</div>
+        <div class="hero-stat-label">Knowledge nodes</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">9</div>
+        <div class="hero-stat-label">Domains mapped</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">2</div>
+        <div class="hero-stat-label">Knowledge layers</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">∞</div>
+        <div class="hero-stat-label">Things to learn</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════ FEATURES ════ -->
+<section id="features">
+  <div class="section">
+    <div class="section-label reveal">What it is</div>
+    <h2 class="section-h2 reveal reveal-delay-1">A new kind of<br>learning instrument.</h2>
+    <p class="section-sub reveal reveal-delay-2">Three interlocking parts, built from the ground up to work together.</p>
+
+    <div class="features-grid">
+
+      <div class="feat-card c-map reveal reveal-delay-1">
+        <div class="feat-icon i-map">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.4"/>
+            <circle cx="11" cy="11" r="2" fill="currentColor"/>
+            <circle cx="5" cy="6" r="1.2" fill="currentColor" opacity=".5"/>
+            <circle cx="17" cy="8" r="1.2" fill="currentColor" opacity=".5"/>
+            <circle cx="7" cy="17" r="1.2" fill="currentColor" opacity=".5"/>
+            <circle cx="16" cy="16" r="1.2" fill="currentColor" opacity=".5"/>
+            <line x1="11" y1="11" x2="5" y2="6" stroke="currentColor" stroke-width="0.8" opacity=".4"/>
+            <line x1="11" y1="11" x2="17" y2="8" stroke="currentColor" stroke-width="0.8" opacity=".4"/>
+            <line x1="11" y1="11" x2="7" y2="17" stroke="currentColor" stroke-width="0.8" opacity=".4"/>
+            <line x1="11" y1="11" x2="16" y2="16" stroke="currentColor" stroke-width="0.8" opacity=".4"/>
+          </svg>
+        </div>
+        <div class="feat-title">The Map</div>
+        <div class="feat-body">An interactive force-directed graph of over 10,000 knowledge nodes spanning mathematics, science, humanities, arts, and more — organised into two layers: Foundational Knowledge and Emergent interdisciplinary fields.</div>
+        <div class="feat-tag">Free to explore</div>
+      </div>
+
+      <div class="feat-card c-learn reveal reveal-delay-2">
+        <div class="feat-icon i-learn">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M4 16V8l7-4 7 4v8" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+            <path d="M8 22v-6h6v6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+            <circle cx="11" cy="10" r="1.5" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="feat-title">Learn Mode</div>
+        <div class="feat-body">Click any concept and enter a focused learning session. An adaptive AI tutor walks you through it in four phases — Explain, Demonstrate, Practice, Meaning — adjusting to your responses in real time.</div>
+        <div class="feat-tag">Learner plan</div>
+      </div>
+
+      <div class="feat-card c-pass reveal reveal-delay-3">
+        <div class="feat-icon i-pass">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="3" y="2" width="16" height="18" rx="3" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M7 7h8M7 11h8M7 15h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <circle cx="16" cy="16" r="3.5" fill="#080810" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M14.5 16l1 1 2-2" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="feat-title">Learner Passport</div>
+        <div class="feat-body">Every concept you learn, every credential you earn, every reflection you write — collected in a structured, portable record. Cryptographically verifiable. Yours to export. Yours forever, regardless of platform.</div>
+        <div class="feat-tag">Learner plan</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ════ HOW IT WORKS ════ -->
+<section id="how">
+  <div class="inner">
+    <div class="section" style="padding-bottom: 0;">
+      <div class="section-label reveal">How it works</div>
+      <h2 class="section-h2 reveal reveal-delay-1">Three steps.<br>A lifetime of learning.</h2>
+    </div>
+
+    <div class="section" style="padding-top: 0;">
+      <div class="steps">
+        <div class="step reveal reveal-delay-1">
+          <div class="step-num">1</div>
+          <div class="step-title">Find a concept</div>
+          <div class="step-body">Navigate the knowledge graph by zooming, panning, and filtering. Use curriculum filters — Estonian Main School, your own knowledge profile — or simply explore until something catches your eye.</div>
+        </div>
+        <div class="step reveal reveal-delay-2">
+          <div class="step-num">2</div>
+          <div class="step-title">Learn it deeply</div>
+          <div class="step-body">Click "Learn this" and the adaptive tutor takes over. It explains the concept in short bytes, demonstrates with worked examples, then gives you practice problems — adjusting in real time to how you respond.</div>
+        </div>
+        <div class="step reveal reveal-delay-3">
+          <div class="step-num">3</div>
+          <div class="step-title">It lands in your Passport</div>
+          <div class="step-body">Completed units are recorded in your Learner Passport — with your score, the date, and a cryptographic credential you can share. The map node changes colour. Your knowledge becomes visible.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════ MAP VISUALIZATION ════ -->
+<section id="mapviz">
+  <div class="inner">
+    <div class="section-label reveal">The knowledge graph</div>
+    <h2 class="section-h2 reveal reveal-delay-1">Every domain. All at once.</h2>
+    <p class="section-sub reveal reveal-delay-2">Nine domains of human knowledge, hundreds of subfields, thousands of leaf concepts — connected into a single navigable space.</p>
+
+    <div class="mapviz-wrap reveal">
+      <canvas id="viz-canvas"></canvas>
+      <div class="mapviz-overlay"></div>
+      <div class="mapviz-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#378ADD"></div>Mathematics</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#9F8FE8"></div>Philosophy</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#EF9F27"></div>Social Sciences</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#E2614A"></div>Medicine</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2BBFA0"></div>Humanities</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#D4537E"></div>Arts</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#7ABF3C"></div>Applied Sciences</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#5BC8D8"></div>Natural Sciences</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#C4A55A"></div>Skills & Crafts</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════ PRICING ════ -->
+<section id="pricing">
+  <div class="section">
+    <div class="section-label reveal">Pricing</div>
+    <h2 class="section-h2 reveal reveal-delay-1">Start exploring free.<br>Learn when you're ready.</h2>
+    <p class="section-sub reveal reveal-delay-2">No ads. No selling your data. A simple subscription when you want the full experience.</p>
+
+    <div class="pricing-grid">
+
+      <!-- Free -->
+      <div class="price-card reveal reveal-delay-1">
+        <div class="price-tier">Free</div>
+        <div class="price-amount">
+          <span class="price-cur">€</span>
+          <span class="price-num">0</span>
+          <span class="price-per">/ forever</span>
+        </div>
+        <p class="price-desc">The full map, always free. Explore human knowledge without a clock running.</p>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li><span class="check"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span> Full knowledge map — all 10,000+ nodes</li>
+          <li><span class="check"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span> Both knowledge layers (Foundational + Emergent)</li>
+          <li><span class="check"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span> Curriculum filters (Estonian Main School, etc.)</li>
+          <li><span class="check"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span> 3D tilt view, layers panel</li>
+        </ul>
+        <button class="price-cta secondary">Start exploring</button>
+      </div>
+
+      <!-- Learner — featured -->
+      <div class="price-card featured reveal reveal-delay-2">
+        <div class="price-badge">Most popular</div>
+        <div class="price-tier">Learner</div>
+        <div class="price-amount">
+          <span class="price-cur">€</span>
+          <span class="price-num">9</span>
+          <span class="price-per">/ month</span>
+        </div>
+        <p class="price-desc">The complete learning experience. Map, tutor, and passport — everything working together.</p>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li><span class="check terra"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span> Everything in Free</li>
+          <li><span class="check terra"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span> Adaptive AI tutor — all concepts</li>
+          <li><span class="check terra"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span> Full Learner Passport</li>
+          <li><span class="check terra"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span> Progress tracking across all nodes</li>
+          <li><span class="check terra"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span> Personal knowledge filter ("My Knowledge")</li>
+          <li><span class="check terra"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span> Verifiable credentials</li>
+        </ul>
+        <button class="price-cta primary">Start free trial</button>
+      </div>
+
+      <!-- Scholar -->
+      <div class="price-card reveal reveal-delay-3">
+        <div class="price-tier">Scholar</div>
+        <div class="price-amount">
+          <span class="price-cur">€</span>
+          <span class="price-num">19</span>
+          <span class="price-per">/ month</span>
+        </div>
+        <p class="price-desc">For serious learners who want every capability and the deepest analysis of their learning.</p>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li><span class="check"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span> Everything in Learner</li>
+          <li><span class="check"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span> Priority LLM — faster, more detailed responses</li>
+          <li><span class="check"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span> Passport export (JSON-LD, PDF)</li>
+          <li><span class="check"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span> Advanced learning analytics</li>
+          <li><span class="check"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span> Custom knowledge subsets</li>
+          <li><span class="check"><svg width="9" height="9" viewBox="0 0 9 9"><path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span> Early access to new features</li>
+        </ul>
+        <button class="price-cta secondary">Get Scholar</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ════ FOOTER ════ -->
+<footer id="footer">
+  <div class="inner">
+    <div class="footer-brand">
+      <a href="#" class="nav-logo">
+        <div class="nav-logo-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="5.5" stroke="#C4826A" stroke-width="1.3"/>
+            <circle cx="8" cy="8" r="1.4" fill="#C4826A"/>
+            <line x1="8" y1="2.5" x2="8" y2="4.6" stroke="#C4826A" stroke-width="1.3" stroke-linecap="round"/>
+            <line x1="8" y1="11.4" x2="8" y2="13.5" stroke="#C4826A" stroke-width="1.3" stroke-linecap="round"/>
+            <line x1="2.5" y1="8" x2="4.6" y2="8" stroke="#C4826A" stroke-width="1.3" stroke-linecap="round"/>
+            <line x1="11.4" y1="8" x2="13.5" y2="8" stroke="#C4826A" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        Map of Knowledge
+      </a>
+      <p class="footer-tagline">Every concept humanity has ever named. One map. Built for serious learners.</p>
+    </div>
+
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Product</h4>
+        <a href="#features">About</a>
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#">Changelog</a>
+      </div>
+      <div class="footer-col">
+        <h4>Learn</h4>
+        <a href="#">Knowledge Map</a>
+        <a href="#">Learner Passport</a>
+        <a href="#">Adaptive Tutor</a>
+        <a href="#">Curriculum Filters</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About KaiQ</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom" style="padding: 0 40px;">
+    <span>© 2026 KaiQ. All rights reserved.</span>
+    <span>Built in Estonia 🇪🇪</span>
+  </div>
+</footer>
+
+
+<script>
+/* ── Hero canvas — animated knowledge graph ──────────────────────────── */
+(function() {
+  const canvas = document.getElementById('hero-canvas');
+  const ctx = canvas.getContext('2d');
+
+  const COLORS = [
+    '#378ADD','#9F8FE8','#EF9F27','#E2614A',
+    '#2BBFA0','#D4537E','#7ABF3C','#5BC8D8','#C4A55A'
+  ];
+
+  let W, H, nodes, edges;
+
+  function resize() {
+    W = canvas.width  = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+
+  function init() {
+    resize();
+    // Create cluster centers (one per domain)
+    const clusters = COLORS.map((c, i) => {
+      const angle = (i / COLORS.length) * Math.PI * 2;
+      const r = Math.min(W, H) * 0.32;
+      return { x: W/2 + r * Math.cos(angle), y: H/2 + r * Math.sin(angle), color: c };
+    });
+
+    nodes = [];
+    // L1 nodes (domain centers)
+    clusters.forEach((cl, ci) => {
+      nodes.push({ x: cl.x, y: cl.y, vx: (Math.random()-.5)*0.3, vy: (Math.random()-.5)*0.3, r: 6, color: cl.color, cluster: ci, alpha: 0.9 });
+      // L2 nodes around each cluster
+      for (let j = 0; j < 12; j++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist  = 30 + Math.random() * 80;
+        nodes.push({
+          x: cl.x + Math.cos(angle) * dist,
+          y: cl.y + Math.sin(angle) * dist,
+          vx: (Math.random()-.5)*0.25, vy: (Math.random()-.5)*0.25,
+          r: 1.5 + Math.random() * 2.5,
+          color: cl.color, cluster: ci, alpha: 0.5 + Math.random() * 0.4
+        });
+      }
+      // L3/4 deeper nodes
+      for (let j = 0; j < 20; j++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist  = 20 + Math.random() * 140;
+        nodes.push({
+          x: cl.x + Math.cos(angle) * dist,
+          y: cl.y + Math.sin(angle) * dist,
+          vx: (Math.random()-.5)*0.2, vy: (Math.random()-.5)*0.2,
+          r: 0.8 + Math.random() * 1.5,
+          color: cl.color, cluster: ci, alpha: 0.2 + Math.random() * 0.35
+        });
+      }
+    });
+
+    // Edges: connect nearby same-cluster nodes
+    edges = [];
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i+1; j < nodes.length; j++) {
+        const a = nodes[i], b = nodes[j];
+        if (a.cluster !== b.cluster) continue;
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 90 && Math.random() < 0.18) {
+          edges.push({ a: i, b: j, alpha: 0.08 + Math.random() * 0.12 });
+        }
+      }
+    }
+    // A few cross-cluster edges (emergent connections)
+    for (let k = 0; k < 18; k++) {
+      const i = Math.floor(Math.random() * nodes.length);
+      const j = Math.floor(Math.random() * nodes.length);
+      if (nodes[i].cluster !== nodes[j].cluster && nodes[i].r > 3) {
+        const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+        if (Math.sqrt(dx*dx+dy*dy) < 250) {
+          edges.push({ a: i, b: j, alpha: 0.05, cross: true });
+        }
+      }
+    }
+  }
+
+  function tick() {
+    nodes.forEach(n => {
+      n.x += n.vx; n.y += n.vy;
+      // Gentle pull toward cluster
+      const cl = clusters_ref[n.cluster];
+      n.vx += (cl.x - n.x) * 0.0002;
+      n.vy += (cl.y - n.y) * 0.0002;
+      // Damping
+      n.vx *= 0.998; n.vy *= 0.998;
+      // Boundary
+      if (n.x < 0 || n.x > W) n.vx *= -1;
+      if (n.y < 0 || n.y > H) n.vy *= -1;
+    });
+  }
+
+  let clusters_ref;
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Edges
+    edges.forEach(e => {
+      const a = nodes[e.a], b = nodes[e.b];
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.strokeStyle = e.cross
+        ? `rgba(242,237,230,${e.alpha * 0.6})`
+        : a.color + Math.round(e.alpha * 255).toString(16).padStart(2,'0');
+      ctx.lineWidth = e.cross ? 0.5 : 0.7;
+      ctx.stroke();
+    });
+
+    // Nodes
+    nodes.forEach(n => {
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      // Parse color and apply alpha
+      const hex = n.color;
+      const r = parseInt(hex.slice(1,3),16);
+      const g = parseInt(hex.slice(3,5),16);
+      const b2 = parseInt(hex.slice(5,7),16);
+      ctx.fillStyle = `rgba(${r},${g},${b2},${n.alpha})`;
+      ctx.fill();
+      // Glow for larger nodes
+      if (n.r > 4) {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r * 2.5, 0, Math.PI * 2);
+        const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * 2.5);
+        grad.addColorStop(0, `rgba(${r},${g},${b2},0.18)`);
+        grad.addColorStop(1, `rgba(${r},${g},${b2},0)`);
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }
+    });
+  }
+
+  function loop() {
+    tick();
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  const COLORS2 = COLORS;
+  function buildClusters() {
+    return COLORS2.map((c, i) => {
+      const angle = (i / COLORS2.length) * Math.PI * 2;
+      const r = Math.min(W, H) * 0.32;
+      return { x: W/2 + r * Math.cos(angle), y: H/2 + r * Math.sin(angle), color: c };
+    });
+  }
+
+  resize();
+  clusters_ref = buildClusters();
+  init();
+  // fix init to use clusters_ref
+  nodes.forEach((n, idx) => {});
+  window.addEventListener('resize', () => {
+    resize();
+    clusters_ref = buildClusters();
+  });
+  loop();
+})();
+
+
+/* ── Viz canvas — static knowledge map ──────────────────────────────── */
+(function() {
+  const canvas = document.getElementById('viz-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const DOMAINS = [
+    { name: 'Mathematics',      color: '#378ADD', x: 0.18, y: 0.42 },
+    { name: 'Philosophy',       color: '#9F8FE8', x: 0.28, y: 0.22 },
+    { name: 'Social Sciences',  color: '#EF9F27', x: 0.50, y: 0.18 },
+    { name: 'Medicine',         color: '#E2614A', x: 0.72, y: 0.28 },
+    { name: 'Humanities',       color: '#2BBFA0', x: 0.82, y: 0.50 },
+    { name: 'Arts',             color: '#D4537E', x: 0.72, y: 0.72 },
+    { name: 'Applied Sciences', color: '#7ABF3C', x: 0.50, y: 0.80 },
+    { name: 'Natural Sciences', color: '#5BC8D8', x: 0.28, y: 0.72 },
+    { name: 'Skills & Crafts',  color: '#C4A55A', x: 0.50, y: 0.50 },
+  ];
+
+  let W, H, allNodes = [], allEdges = [], animFrame = 0;
+
+  function resize() {
+    W = canvas.width  = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+    buildScene();
+  }
+
+  function buildScene() {
+    allNodes = []; allEdges = [];
+
+    DOMAINS.forEach((d, di) => {
+      const cx = d.x * W, cy = d.y * H;
+      // L1 node
+      allNodes.push({ x: cx, y: cy, r: 9, color: d.color, domain: di, level: 1 });
+      // Children
+      const count = 8 + Math.floor(Math.random() * 10);
+      for (let i = 0; i < count; i++) {
+        const angle = (i / count) * Math.PI * 2 + Math.random() * 0.5;
+        const dist  = 40 + Math.random() * 55;
+        const nx = cx + Math.cos(angle) * dist;
+        const ny = cy + Math.sin(angle) * dist;
+        const idx = allNodes.length;
+        allNodes.push({ x: nx, y: ny, r: 2 + Math.random() * 3, color: d.color, domain: di, level: 2 });
+        allEdges.push({ a: di * 1000, b: idx, color: d.color, alpha: 0.25 });
+        // Grandchildren
+        const gc = 3 + Math.floor(Math.random() * 5);
+        for (let j = 0; j < gc; j++) {
+          const ga = angle + (j - gc/2) * 0.35;
+          const gd = dist + 25 + Math.random() * 35;
+          allNodes.push({ x: cx + Math.cos(ga)*gd, y: cy + Math.sin(ga)*gd, r: 0.8 + Math.random(), color: d.color, domain: di, level: 3 });
+          allEdges.push({ a: idx, b: allNodes.length - 1, color: d.color, alpha: 0.12 });
+        }
+      }
+      // remap L1 index
+      allNodes[di] = { x: cx, y: cy, r: 9, color: d.color, domain: di, level: 1 };
+      allEdges.forEach(e => { if(e.a === di * 1000) e.a = di; });
+    });
+
+    // Cross-domain edges (emergent fields)
+    for (let k = 0; k < 14; k++) {
+      const a = Math.floor(Math.random() * DOMAINS.length);
+      const b = (a + 2 + Math.floor(Math.random() * 5)) % DOMAINS.length;
+      allEdges.push({ a, b, color: '#C4A55A', alpha: 0.18, dashed: true });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    animFrame++;
+
+    allEdges.forEach(e => {
+      if (e.a >= allNodes.length || e.b >= allNodes.length) return;
+      const na = allNodes[e.a], nb = allNodes[e.b];
+      ctx.beginPath();
+      if (e.dashed) ctx.setLineDash([4, 4]);
+      else ctx.setLineDash([]);
+      ctx.moveTo(na.x, na.y);
+      ctx.lineTo(nb.x, nb.y);
+      const hex = e.color;
+      const r = parseInt(hex.slice(1,3),16);
+      const g = parseInt(hex.slice(3,5),16);
+      const b2 = parseInt(hex.slice(5,7),16);
+      ctx.strokeStyle = `rgba(${r},${g},${b2},${e.alpha})`;
+      ctx.lineWidth = e.dashed ? 0.8 : 0.6;
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+
+    allNodes.forEach(n => {
+      const hex = n.color;
+      const r = parseInt(hex.slice(1,3),16);
+      const g = parseInt(hex.slice(3,5),16);
+      const b2 = parseInt(hex.slice(5,7),16);
+      const alpha = n.level === 1 ? 0.85 : n.level === 2 ? 0.6 : 0.35;
+
+      if (n.level === 1) {
+        // Glow
+        const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * 4);
+        grad.addColorStop(0, `rgba(${r},${g},${b2},0.22)`);
+        grad.addColorStop(1, `rgba(${r},${g},${b2},0)`);
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r * 4, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }
+
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${r},${g},${b2},${alpha})`;
+      ctx.fill();
+    });
+  }
+
+  function loop() { draw(); requestAnimationFrame(loop); }
+
+  resize();
+  window.addEventListener('resize', resize);
+  loop();
+})();
+
+
+/* ── Scroll reveal ───────────────────────────────────────────────────── */
+(function() {
+  const els = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  els.forEach(el => io.observe(el));
+})();
+</script>
+
+</body>
+</html>

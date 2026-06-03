@@ -1,0 +1,8 @@
+node_modules/
+package-lock.json
+*.pub
+*.pub.pub
+.env
+.env.*
+*.pem
+*.key
