@@ -1,9 +1,7 @@
 Options -Indexes
 RewriteEngine On
 
-# Forward everything to the Node.js Express server on port 3000.
-# ProxyPassReverse is not permitted in .htaccess on this host, so
-# BASE_URL in .env is set to the public https:// URL to ensure
-# any Location redirects from Express are already correct.
+# Proxy all requests to Node.js Express (fork mode, all interfaces).
+# Using the actual server IP since 127.0.0.1 is namespace-isolated on this host.
 RewriteCond %{REQUEST_URI} !^/\.well-known
-RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]
+RewriteRule ^(.*)$ http://217.146.69.48:3000/$1 [P,L]
