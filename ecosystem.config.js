@@ -10,8 +10,8 @@ module.exports = {
       NODE_ENV: 'production',
       PORT:     3000,
     },
-    error_file:  '/home/virt147958/logs/mok-error.log',
-    out_file:    '/home/virt147958/logs/mok-out.log',
+    error_file:  '/data01/virt147958/logs/mok-error.log',
+    out_file:    '/data01/virt147958/logs/mok-out.log',
     log_date_format: 'YYYY-MM-DD HH:mm:ss',
   }],
 };
