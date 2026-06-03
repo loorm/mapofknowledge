@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Map of Human Knowledge</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/learning.css">
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     TOP BAR
+     ════════════════════════════════════════ -->
+<header id="top-bar">
+
+  <a class="topbar-logo" href="#" onclick="if(typeof closeLearningMode==='function'){closeLearningMode();} return false;">
+    <div class="topbar-logo-icon">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="5.5" stroke="white" stroke-width="1.3"/>
+        <circle cx="8" cy="8" r="1.4" fill="white"/>
+        <line x1="8" y1="2.5" x2="8" y2="4.6" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="8" y1="11.4" x2="8" y2="13.5" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="2.5" y1="8" x2="4.6" y2="8" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="11.4" y1="8" x2="13.5" y2="8" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <span class="topbar-logo-text">Map of Knowledge</span>
+  </a>
+
+  <div class="topbar-right">
+    <div class="topbar-search-wrap">
+      <svg class="search-icon" width="13" height="13" viewBox="0 0 13 13" fill="none">
+        <circle cx="5.5" cy="5.5" r="3.8" stroke="currentColor" stroke-width="1.3"/>
+        <line x1="8.5" y1="8.5" x2="11.5" y2="11.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      <input id="search-box" type="text" placeholder="Search knowledge…" />
+      <button id="search-clear" class="search-clear" title="Clear" style="display:none">✕</button>
+    </div>
+
+    <div class="topbar-burger-wrap">
+      <button class="topbar-icon-btn topbar-burger" id="nav-menu" title="Menu">
+        <svg width="16" height="14" viewBox="0 0 16 14" fill="none">
+          <path d="M1 1h14M1 7h14M1 13h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <div id="nav-dropdown" class="nav-dropdown">
+        <button class="nav-dropdown-item" onclick="window.location='profile.html'">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <circle cx="7.5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M2 13c0-2.8 2.5-4.5 5.5-4.5s5.5 1.7 5.5 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          Account
+        </button>
+        <button class="nav-dropdown-item" onclick="window.location='notifications.html'">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <path d="M7.5 1.5a4 4 0 0 0-4 4v2.5L2.5 9.5h10l-1-1.5V5.5a4 4 0 0 0-4-4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+            <path d="M6 11.5a1.5 1.5 0 0 0 3 0" stroke="currentColor" stroke-width="1.2"/>
+          </svg>
+          Notifications
+        </button>
+        <div class="nav-dropdown-divider"></div>
+        <button class="nav-dropdown-item" onclick="window.location='settings.html'">
+          <img src="images/icon-settings.svg" width="15" height="15" alt="">
+          Settings
+        </button>
+      </div>
+    </div>
+
+  </div>
+</header>
+
+
+<!-- ════════════════════════════════════════
+     MAP CANVAS
+     ════════════════════════════════════════ -->
+<svg id="canvas"></svg>
+<svg id="label-layer"></svg>
+<div id="tooltip"></div>
+<div id="node-count"></div>
+<div id="zoom-level"></div>
+
+
+<!-- ════════════════════════════════════════
+     BOTTOM-LEFT CONTROLS
+     ════════════════════════════════════════ -->
+<div id="ctrl-left" class="ctrl-card">
+
+  <button class="ctrl-btn active" title="Map view">
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+      <circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.3"/>
+      <path d="M1.5 7.5h12M7.5 1.5c-2 2-2 8 0 12M7.5 1.5c2 2 2 8 0 12" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <div class="ctrl-divider"></div>
+
+  <button class="ctrl-btn" id="layers-btn" title="Layers">
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+      <path d="M7.5 2 L13 5.5 L7.5 9 L2 5.5 Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+      <path d="M2 9L7.5 12.5L13 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <button class="ctrl-btn" id="filter-btn" title="Filter">
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+      <path d="M2 4.5h11M4 7.5h7M6 10.5h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+
+</div>
+
+
+<!-- ════════════════════════════════════════
+     LAYER PANEL
+     ════════════════════════════════════════ -->
+<div id="layer-panel" class="ctrl-card">
+  <div class="fp-header">
+    <span class="fp-title">Layers</span>
+  </div>
+  <div class="fp-list">
+    <div class="layer-item" data-layer="base">
+      <div class="layer-checkbox checked" style="--lc-color:#6E9EDD"></div>
+      <span class="fp-label">Foundational Knowledge</span>
+    </div>
+    <div class="layer-item" data-layer="emergent">
+      <div class="layer-checkbox" style="--lc-color:#C4A55A"></div>
+      <span class="fp-label">Emergent Knowledge</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     FILTER PANEL
+     ════════════════════════════════════════ -->
+<div id="filter-panel" class="ctrl-card">
+
+  <div class="fp-header">
+    <span class="fp-title">Filter</span>
+    <div style="display:flex;align-items:center;gap:2px">
+      <a class="fp-settings-link" href="settings.html#filters" title="Manage filters">
+        <svg width="12" height="12" viewBox="0 0 12 12">
+          <path fill="currentColor" fill-rule="evenodd"
+            d="M9.38 4.77 11.14 5.19 11.14 6.81 9.38 7.23 8.76 8.31 9.27 10.04 7.86 10.86 6.63 9.55 5.37 9.55 4.14 10.86 2.73 10.04 3.24 8.31 2.62 7.23 0.86 6.81 0.86 5.19 2.62 4.77 3.24 3.69 2.73 1.96 4.14 1.14 5.37 2.45 6.63 2.45 7.86 1.14 9.27 1.96 8.76 3.69Z
+             M7.9 6A1.9 1.9 0 0 0 4.1 6A1.9 1.9 0 0 0 7.9 6Z"/>
+        </svg>
+      </a>
+      <button id="fp-clear" class="fp-clear hidden" title="Clear filter">✕</button>
+    </div>
+  </div>
+
+  <div class="fp-list">
+
+    <div class="fp-item" data-filter-id="my-knowledge"
+         style="--fi-color:#9B8FB5">
+      <div class="fp-radio"></div>
+      <div class="fp-dot"></div>
+      <span class="fp-label">My Knowledge</span>
+    </div>
+
+    <div class="fp-item" data-filter-id="estonian-basic-school"
+         style="--fi-color:#8BAD7E">
+      <div class="fp-radio"></div>
+      <div class="fp-dot"></div>
+      <span class="fp-label">Estonian Basic School 2023</span>
+    </div>
+
+    <div class="fp-item" data-filter-id="aws-solutions-architect"
+         style="--fi-color:#6BA8C4">
+      <div class="fp-radio"></div>
+      <div class="fp-dot"></div>
+      <span class="fp-label">AWS Solutions Architect</span>
+    </div>
+
+    <div class="fp-item" data-filter-id="b-driving-licence"
+         style="--fi-color:#D4A85A">
+      <div class="fp-radio"></div>
+      <div class="fp-dot"></div>
+      <span class="fp-label">B-Category Driving Licence</span>
+    </div>
+
+    <div class="fp-item" data-filter-id="abrsm-grade5-music"
+         style="--fi-color:#C48FA0">
+      <div class="fp-radio"></div>
+      <div class="fp-dot"></div>
+      <span class="fp-label">ABRSM Grade 5 Music Theory</span>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     BOTTOM-RIGHT ZOOM
+     ════════════════════════════════════════ -->
+<div id="ctrl-zoom" class="ctrl-card">
+  <button class="ctrl-btn" id="zoom-in" title="Zoom in">+</button>
+  <div class="ctrl-divider"></div>
+  <button class="ctrl-btn" id="zoom-out" title="Zoom out">−</button>
+  <div class="ctrl-divider"></div>
+  <button class="ctrl-btn" id="tilt-more" title="Tilt toward edge-on">
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+      <ellipse cx="7.5" cy="10" rx="5.5" ry="2" stroke="currentColor" stroke-width="1.2"/>
+      <ellipse cx="7.5" cy="7"  rx="5.5" ry="2" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 2"/>
+      <path d="M7.5 4V1M6 2.5l1.5-1.5 1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <button class="ctrl-btn" id="tilt-less" title="Tilt back toward top-down">
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+      <ellipse cx="7.5" cy="5"  rx="5.5" ry="2" stroke="currentColor" stroke-width="1.2"/>
+      <ellipse cx="7.5" cy="8"  rx="5.5" ry="2" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 2"/>
+      <path d="M7.5 11v3M6 12.5l1.5 1.5 1.5-1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     SIDEBAR
+     ════════════════════════════════════════ -->
+<aside id="sidebar">
+
+  <button id="sb-close" title="Close panel">
+    <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+      <path d="M1 1l9 9M10 1L1 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <div class="sb-header">
+    <div class="sb-breadcrumb" id="sb-breadcrumb-text">Natural Sciences › Physics</div>
+    <div class="sb-domain-tag" id="sb-domain-tag">Natural Sciences</div>
+    <div class="sb-title" id="sb-title">Quantum Mechanics</div>
+  </div>
+
+  <div class="sb-divider"></div>
+
+  <div class="sb-body">
+
+    <!-- Your Knowledge card -->
+    <div class="sb-knowledge-card">
+      <div class="sb-knowledge-header">
+        <span class="sb-knowledge-label">Your Knowledge</span>
+        <span class="sb-knowledge-badge">Finished</span>
+      </div>
+      <div class="sb-pct">72%</div>
+      <div class="sb-pct-sub">Based on your interactions with related<br>topics in Physics and Mathematics.</div>
+    </div>
+
+    <!-- I know this -->
+    <div class="sb-toggle-row">
+      <div class="sb-toggle-label">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+          <path d="M7.5 1.5a4 4 0 0 1 2.8 6.8V11a.5.5 0 0 1-.5.5h-4.6A.5.5 0 0 1 4.7 11V8.3A4 4 0 0 1 7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+          <path d="M5 13h5M5.5 14.5h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        I know this
+      </div>
+      <div class="sb-toggle">
+        <div class="sb-toggle-thumb"></div>
+      </div>
+    </div>
+
+    <!-- Test me -->
+    <button class="sb-test-btn">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+        <rect x="1.5" y="1.5" width="12" height="12" rx="2.5" stroke="white" stroke-width="1.2"/>
+        <path d="M5 7.5h5M7.5 5v5" stroke="white" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      Test me
+    </button>
+
+    <!-- Learn this -->
+    <button class="sb-learn-btn">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+        <path d="M2 4.5L7.5 2l5.5 2.5v4c0 2.5-2.3 4.5-5.5 5.5C4.3 13 2 11 2 8.5v-4z" stroke="white" stroke-width="1.2" stroke-linejoin="round"/>
+        <path d="M5.5 7.5l1.5 1.5 2.5-2.5" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Learn this
+    </button>
+
+    <!-- Overview -->
+    <div>
+      <div class="sb-section-title">Overview</div>
+      <div class="sb-overview-text">
+        A fundamental theory in physics describing the physical properties of matter at the scale of atoms and subatomic particles. It is the foundation of all quantum physics including quantum chemistry, quantum field theory, and quantum information science.
+      </div>
+    </div>
+
+  </div>
+</aside>
+
+
+<!-- ════════════════════════════════════════
+     LEARNING MODE  (z-index 320, above map)
+     Three views: lm-path | lm-knobit | lm-complete
+     ════════════════════════════════════════ -->
+<div id="learning-mode">
+
+  <!-- ── VIEW 1: LEARNING PATH ─────────────────── -->
+  <div id="lm-path" class="lm-view">
+    <div class="lm-path-header">
+      <button class="lm-back-btn" onclick="closeLearningMode()" title="Back to map">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="3.5" r="1.8" stroke="currentColor" stroke-width="1.2"/>
+          <circle cx="2.5" cy="12" r="1.8" stroke="currentColor" stroke-width="1.2"/>
+          <circle cx="13.5" cy="12" r="1.8" stroke="currentColor" stroke-width="1.2"/>
+          <line x1="6.5" y1="5" x2="3.8" y2="10.3" stroke="currentColor" stroke-width="1.1"/>
+          <line x1="9.5" y1="5" x2="12.2" y2="10.3" stroke="currentColor" stroke-width="1.1"/>
+          <line x1="4.3" y1="12" x2="11.7" y2="12" stroke="currentColor" stroke-width="1.1"/>
+        </svg>
+      </button>
+      <div class="lm-path-meta">
+        <div class="lm-path-crumb" id="lm-path-crumb">Mathematics › Algebra</div>
+        <div class="lm-path-title" id="lm-path-title">Linear Equations</div>
+      </div>
+    </div>
+
+    <div class="lm-progress-track">
+      <div class="lm-progress-fill" id="lm-progress-fill" style="width:0%"></div>
+    </div>
+    <div class="lm-progress-label" id="lm-progress-label"></div>
+
+    <div class="lm-knobit-list" id="lm-knobit-list">
+      <!-- populated by learning.js -->
+    </div>
+
+    <div class="lm-start-bar">
+      <button class="lm-start-btn" id="lm-start-btn" onclick="startKnobit()">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+          <circle cx="7.5" cy="7.5" r="6" stroke="white" stroke-width="1.3"/>
+          <path d="M6 5l4 2.5L6 10V5z" fill="white"/>
+        </svg>
+        <span id="lm-start-btn-label">Start learning</span>
+      </button>
+    </div>
+  </div><!-- /lm-path -->
+
+
+  <!-- ── VIEW 2: KNOBIT LESSON ──────────────────── -->
+  <div id="lm-knobit" class="lm-view">
+
+    <!-- sub-nav bar -->
+    <div class="kn-nav">
+      <button class="kn-nav-back" onclick="showLmView('lm-path')" title="Back to path">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M8 2L3 6.5 8 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="kn-progress-wrap">
+        <div class="kn-nav-label" id="lm-knobit-nav-label">Solving one-step equations</div>
+        <div class="kn-progress-track">
+          <div class="kn-progress-fill" id="kn-progress-fill-bar" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="kn-phase-chips">
+        <span class="kn-chip" id="chip-explain">Explain</span>
+        <span class="kn-chip" id="chip-demonstrate">Demonstrate</span>
+        <span class="kn-chip" id="chip-practice">Practice</span>
+        <span class="kn-chip" id="chip-meaning">Meaning</span>
+      </div>
+    </div>
+
+    <!-- scrollable block stream -->
+    <div class="kn-stream" id="kn-stream"></div>
+
+    <!-- sticky action area -->
+    <div class="kn-action-area" id="kn-action-area">
+      <div class="kn-button-row" id="kn-button-row"></div>
+      <div class="ask-bar">
+        <input type="text" class="ask-input" id="ask-input" placeholder="Ask anything…" autocomplete="off">
+        <button class="ask-send" id="ask-send" title="Send">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <path d="M13 7.5L2 2l2.5 5.5L2 13l11-5.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /lm-knobit -->
+
+
+  <!-- ── VIEW 3: UNIT COMPLETE ──────────────────── -->
+  <div id="lm-complete" class="lm-view">
+    <div class="lm-complete-badge">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <path d="M20 6l3.5 8.5L32 16l-6 6 1.5 9L20 27l-7.5 4 1.5-9-6-6 8.5-1.5L20 6z"
+          stroke="#C4826A" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="lm-complete-title">Unit complete!</div>
+    <div class="lm-complete-sub">
+      You've finished all 7 knobits in <strong>Linear Equations</strong>.
+      You're building real fluency — keep the momentum going.
+    </div>
+
+    <div class="lm-complete-stats">
+      <div class="lm-complete-stat">
+        <div class="lm-cstat-num">7</div>
+        <div class="lm-cstat-label">Knobits<br>mastered</div>
+      </div>
+      <div class="lm-complete-stat">
+        <div class="lm-cstat-num">94%</div>
+        <div class="lm-cstat-label">Accuracy<br>rate</div>
+      </div>
+      <div class="lm-complete-stat">
+        <div class="lm-cstat-num">+84</div>
+        <div class="lm-cstat-label">XP<br>earned</div>
+      </div>
+    </div>
+
+    <div class="lm-complete-actions">
+      <button class="lm-complete-btn-primary" onclick="closeLearningMode()">
+        Back to the map
+      </button>
+      <button class="lm-complete-btn-ghost" onclick="showLmView('lm-path')">
+        Review this unit
+      </button>
+    </div>
+  </div><!-- /lm-complete -->
+
+</div><!-- /learning-mode -->
+
+
+<script src="js/learning.js"></script>
+<script src="js/layers.js"></script>
+<script src="js/filters.js"></script>
+<script src="js/app.js"></script>
+<script src="js/tilt.js"></script>
+</body>
+</html>
