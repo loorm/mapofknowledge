@@ -458,8 +458,27 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
   letter-spacing: 0.1px;
   transition: background 0.15s, transform 0.1s;
 }
-.sb-learn-btn:hover { background: linear-gradient(135deg, #1A82A8 0%, #0D6290 100%); transform: translateY(-1px); }
+.sb-learn-btn:hover:not(:disabled) { background: linear-gradient(135deg, #1A82A8 0%, #0D6290 100%); transform: translateY(-1px); }
 .sb-learn-btn:active { transform: translateY(0); }
+.sb-learn-btn:disabled { cursor: default; opacity: 1; transform: none; }
+
+/* Loading dots inside the Learn button */
+.sb-learn-dots {
+  display: inline-flex; align-items: center; gap: 4px; margin-left: 8px;
+  vertical-align: middle;
+}
+.sb-learn-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(255,255,255,0.85);
+  animation: sb-dot-fade 1.4s ease-in-out infinite both;
+}
+.sb-learn-dot:nth-child(1) { animation-delay: 0s;    }
+.sb-learn-dot:nth-child(2) { animation-delay: 0.22s; }
+.sb-learn-dot:nth-child(3) { animation-delay: 0.44s; }
+@keyframes sb-dot-fade {
+  0%, 100% { transform: scale(0.55); opacity: 0.25; }
+  45%       { transform: scale(1);   opacity: 1;    }
+}
 
 /* Overview */
 .sb-section-title {
