@@ -2,8 +2,8 @@
    FILTERS  —  filters.js  (Map View sub-module)
    ───────────────────────────────────────────────────────────────
    Owns  : filter panel UI, filter set definitions
-   Calls : window.Map.setFilter(), window.Map.setKnowledgeFilter(),
-           window.Map.clearKnowledgeFilter()
+   Calls : window.MapView.setFilter(), window.MapView.setKnowledgeFilter(),
+           window.MapView.clearKnowledgeFilter()
    Never : touch D3 internals, learning.js, test.js
    ═══════════════════════════════════════════════════════════════ */
 

@@ -6,7 +6,7 @@
    Exposes: window.Learn.open(node, crumb, knobits)
             window.Learn.close()
             window.Learn.showView(id)
-   Calls  : window.Map.refreshProgress()
+   Calls  : window.MapView.refreshProgress()
    Never  : touch app.js map rendering, test.js, or #lm-test
    ═══════════════════════════════════════════════════════════════ */
 

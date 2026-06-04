@@ -4,7 +4,7 @@
    Owns  : #lm-test view, 4-tier question flow, evaluate, result
    Exposes: window.Test.open(node, crumb)
             window.Test.close()
-   Calls  : window.Learn.showView(), window.Map.refreshProgress()
+   Calls  : window.Learn.showView(), window.MapView.refreshProgress()
    Never  : touch app.js internals, learning.js internals,
             or any element outside #lm-test / #learning-mode
    ═══════════════════════════════════════════════════════════════ */
@@ -214,7 +214,7 @@ window.Test = (function () {
     }
     if (bdEl) bdEl.textContent = breakdown || '';
 
-    if (window.Map && window.Map.refreshProgress) window.Map.refreshProgress();
+    if (window.MapView && window.MapView.refreshProgress) window.MapView.refreshProgress();
   }
 
   /* ─── public namespace ──────────────────────────────────────── */

@@ -3,12 +3,12 @@
    ───────────────────────────────────────────────────────────────
    Owns  : D3 force simulation, zoom/pan, node rendering, sidebar,
            progress overlay, filter state, knowledge toggle
-   Exposes: window.Map.setFilter(labelSet)
-            window.Map.setKnowledgeFilter(progressMap)
-            window.Map.clearKnowledgeFilter()
-            window.Map.resetZoom()
-            window.Map.refreshProgress()
-            window.Map.setTilt(angle)        [called by tilt.js]
+   Exposes: window.MapView.setFilter(labelSet)
+            window.MapView.setKnowledgeFilter(progressMap)
+            window.MapView.clearKnowledgeFilter()
+            window.MapView.resetZoom()
+            window.MapView.refreshProgress()
+            window.MapView.setTilt(angle)    [called by tilt.js]
    Calls  : window.Learn.open/close, window.Test.open/close
    Never  : implement learning or test flow — delegate to those modules
    ═══════════════════════════════════════════════════════════════ */
@@ -1067,8 +1067,8 @@ function init(data, emergentData) {
   };
   window.currentTilt = 0;
 
-  // ── Public Map namespace ───────────────────────────────────────────────────
-  window.Map = {
+  // ── Public MapView namespace (avoid 'Map' — that's a JS built-in) ────────────
+  window.MapView = {
     setFilter:            function(labelSet) { window.setMapFilter(labelSet); },
     setKnowledgeFilter:   function(pm, t)   { window.setKnowledgeFilter(pm, t); },
     clearKnowledgeFilter: function()         { window.clearKnowledgeFilter(); },
@@ -1077,7 +1077,7 @@ function init(data, emergentData) {
     setTilt:              function(angle)    { window.setTilt(angle); },
   };
   // Keep legacy aliases so filters.js / tilt.js / HTML inline calls still work
-  window.refreshProgress = window.Map.refreshProgress;
+  window.refreshProgress = window.MapView.refreshProgress;
 
   // ── Initial build ──────────────────────────────────────────────────────────
   rebuild();
