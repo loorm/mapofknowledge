@@ -1,271 +1,223 @@
-/* ══════════════════════════════════════════════
-   TEST MODE  —  js/test.js
-   4-Tier Knowledge Diagnostic
-   #lm-test lives inside #learning-mode (shown by app.js onclick).
-   Exposes: window.initTest(node, crumb)   — set up state + load Q1
-            window.closeTestMode()         — called by back buttons
-   ══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   TEST MODE  —  test.js
+   ───────────────────────────────────────────────────────────────
+   Owns  : #lm-test view, 4-tier question flow, evaluate, result
+   Exposes: window.Test.open(node, crumb)
+            window.Test.close()
+   Calls  : window.Learn.showView(), window.Map.refreshProgress()
+   Never  : touch app.js internals, learning.js internals,
+            or any element outside #lm-test / #learning-mode
+   ═══════════════════════════════════════════════════════════════ */
 
-(function () {
+window.Test = (function () {
 
-  /* ─── State ──────────────────────────────────────────────────── */
-  var _node        = null;
-  var _crumb       = '';
-  var _questionNum = 1;
-  var _history     = [];
-  var _currentQ    = null;
-  var _submitting  = false;
-
-  function el(id) { return document.getElementById(id); }
-
-  /* ─── Entry / exit ────────────────────────────────────────────── */
-  window.initTest = function (node, crumb) {
-    _node        = node;
-    _crumb       = crumb || '';
-    _questionNum = 1;
-    _history     = [];
-    _currentQ    = null;
-    _submitting  = false;
-
-    var stream      = el('tm-stream');
-    var resultDiv   = el('tm-result');
-    var inputArea   = el('tm-input-area');
-    var answerInput = el('tm-answer-input');
-    var nodeLabelEl = el('tm-node-label');
-
-    if (stream)      stream.innerHTML = '';
-    if (resultDiv)   resultDiv.style.display = 'none';
-    if (inputArea)   inputArea.style.display = '';
-    if (answerInput) { answerInput.value = ''; answerInput.disabled = false; }
-    if (nodeLabelEl) nodeLabelEl.textContent = node.label || '';
-
-    _updateProgress();
-    _loadQuestion();
-  };
-
-  window.closeTestMode = function () {
-    if (typeof window.closeLearningMode === 'function') window.closeLearningMode();
-    _node = null;
-  };
-
-  /* ─── Load next question ─────────────────────────────────────── */
-  function _loadQuestion() {
-    _setInputLoading(true, 'Generating question ' + _questionNum + ' of 4');
-    // Show loading state in stream so we can confirm the fetch is running
-    var stream = el('tm-stream');
-    var loadingDiv = null;
-    if (stream) {
-      loadingDiv = document.createElement('div');
-      loadingDiv.className = 'tm-block tm-question';
-      loadingDiv.style.opacity = '0.5';
-      loadingDiv.textContent = 'Generating question ' + _questionNum + '…';
-      stream.appendChild(loadingDiv);
-    }
-    fetch('/api/test/question', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ nodeId: _node.id, questionNum: _questionNum, history: _history }),
-    })
-      .then(function (r) { return r.json(); })
-      .then(function (q) {
-        if (loadingDiv && loadingDiv.parentNode) loadingDiv.parentNode.removeChild(loadingDiv);
-        _currentQ = q;
-        _setInputLoading(false);
-        if (q && q.question) {
-          _appendQuestion(q);
-        } else {
-          _appendError('Server returned: ' + JSON.stringify(q));
-        }
-        _updateProgress();
-        var inp = el('tm-answer-input');
-        if (inp) inp.focus();
-      })
-      .catch(function (err) {
-        if (loadingDiv && loadingDiv.parentNode) loadingDiv.parentNode.removeChild(loadingDiv);
-        _setInputLoading(false);
-        _appendError('Could not generate question: ' + (err && err.message ? err.message : 'network error'));
-      });
+  /* ─── overlay helpers ───────────────────────────────────────── */
+  function _showOverlay() {
+    var lm = document.getElementById('learning-mode');
+    if (lm) lm.classList.add('active');
+    if (window.Learn && window.Learn.showView) window.Learn.showView('lm-test');
+    var sw = document.querySelector('.topbar-search-wrap');
+    if (sw) sw.style.display = 'none';
   }
 
-  /* ─── Submit answer ──────────────────────────────────────────── */
-  function _submitAnswer() {
-    if (_submitting || !_currentQ) return;
-    var answerInput = el('tm-answer-input');
-    var answer = answerInput ? answerInput.value.trim() : '';
-    if (!answer) return;
+  function _hideOverlay() {
+    var lm = document.getElementById('learning-mode');
+    if (lm) lm.classList.remove('active');
+    var sw = document.querySelector('.topbar-search-wrap');
+    if (sw) sw.style.display = '';
+  }
 
-    _submitting = true;
-    if (answerInput) answerInput.disabled = true;
-    _setInputLoading(true, 'Evaluating your answer');
-    _appendAnswer(answer);
-    if (answerInput) answerInput.value = '';
+  /* ─── public API ────────────────────────────────────────────── */
+  function open(node, crumb) {
+    _showOverlay();
+    _start(node, crumb);
+  }
 
-    fetch('/api/test/evaluate', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({
-        nodeId: _node.id, questionNum: _questionNum,
-        question: _currentQ.question, options: _currentQ.options || null,
-        userAnswer: answer, history: _history,
-      }),
-    })
-      .then(function (r) { return r.json(); })
-      .then(function (ev) {
-        _history.push({ question: _currentQ.question, answer: answer, correct: ev.correct });
-        _appendFeedback(ev.feedback, ev.correct);
-        _setInputLoading(false);
-        _submitting = false;
+  function close() {
+    _hideOverlay();
+  }
 
-        if (_questionNum === 4 && ev.finalScore !== undefined) {
-          setTimeout(function () { _showResult(ev.finalScore, ev.scoreBreakdown); }, 900);
-        } else {
-          _questionNum++;
-          _updateProgress();
+  /* ─── test flow ─────────────────────────────────────────────── */
+  function _start(node, crumb) {
+    var g = function(id) { return document.getElementById(id); };
+    var tmLabel   = g('tm-node-label');
+    var stream    = g('tm-stream');
+    var result    = g('tm-result');
+    var inputArea = g('tm-input-area');
+    var answerInput = g('tm-answer-input');
+    var submitBtn   = g('tm-submit-btn');
+    var progress    = g('tm-progress');
+
+    if (tmLabel)    tmLabel.textContent   = node.label || '';
+    if (result)     result.style.display  = 'none';
+    if (inputArea)  inputArea.style.display = '';
+    if (stream)     stream.innerHTML      = '';
+    if (progress)   progress.textContent  = 'Q 1 / 4';
+
+    var state = {
+      node:       node,
+      crumb:      crumb,
+      questionNum: 1,
+      history:    [],
+      currentQ:   null,
+      submitting: false,
+    };
+
+    /* append a block to the stream and scroll */
+    function block(cls, text) {
+      var div = document.createElement('div');
+      div.className  = cls;
+      div.textContent = text;
+      if (stream) {
+        stream.appendChild(div);
+        if (stream.scrollHeight - stream.scrollTop - stream.clientHeight < 200)
+          stream.scrollTop = stream.scrollHeight;
+      }
+      return div;
+    }
+
+    /* fetch + render the next question */
+    function loadQ() {
+      if (progress)  progress.textContent  = 'Q ' + state.questionNum + ' / 4';
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Generating question…'; }
+
+      var ld = block('tm-block tm-question', 'Generating question ' + state.questionNum + ' of 4…');
+      ld.style.opacity = '0.45';
+
+      fetch('/api/test/question', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          nodeId:      state.node.id,
+          questionNum: state.questionNum,
+          history:     state.history,
+        }),
+      })
+        .then(function(r) { return r.json(); })
+        .then(function(q) {
+          if (ld.parentNode) ld.parentNode.removeChild(ld);
+          if (!q || !q.question) {
+            block('tm-block tm-error', 'Server error: ' + JSON.stringify(q));
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit answer'; }
+            return;
+          }
+          state.currentQ = q;
+
+          var wrap = document.createElement('div');
+          wrap.className = 'tm-block tm-question';
+
+          var tierNames = ['', 'Factual', 'Conceptual', 'Procedural', 'Analytical'];
+          var lbl = document.createElement('div');
+          lbl.className   = 'tm-block-tier';
+          lbl.textContent = 'Q' + state.questionNum + ' — ' + (tierNames[state.questionNum] || '');
+          wrap.appendChild(lbl);
+
+          var txt = document.createElement('div');
+          txt.className   = 'tm-block-text';
+          txt.textContent = q.question;
+          wrap.appendChild(txt);
+
+          if (q.type === 'mcq' && q.options && q.options.length) {
+            var opts = document.createElement('div');
+            opts.className = 'tm-options';
+            q.options.forEach(function(opt, i) {
+              var row = document.createElement('div');
+              row.className   = 'tm-option';
+              row.textContent = (i + 1) + '.  ' + opt;
+              opts.appendChild(row);
+            });
+            wrap.appendChild(opts);
+            if (answerInput) answerInput.placeholder = 'Enter number (1–' + q.options.length + ')';
+          } else {
+            if (answerInput) answerInput.placeholder = 'Your answer…';
+          }
+
+          if (stream) { stream.appendChild(wrap); stream.scrollTop = stream.scrollHeight; }
+          if (answerInput) { answerInput.disabled = false; answerInput.value = ''; answerInput.focus(); }
+          if (submitBtn)   { submitBtn.disabled = false; submitBtn.textContent = 'Submit answer'; }
+        })
+        .catch(function(err) {
+          if (ld.parentNode) ld.parentNode.removeChild(ld);
+          block('tm-block tm-error', 'Could not load question: ' + (err && err.message ? err.message : 'network error'));
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit answer'; }
+        });
+    }
+
+    /* submit the typed answer */
+    function submitAnswer() {
+      if (state.submitting || !state.currentQ) return;
+      var answer = answerInput ? answerInput.value.trim() : '';
+      if (!answer) return;
+
+      state.submitting = true;
+      if (answerInput) answerInput.disabled = true;
+      if (submitBtn)   { submitBtn.disabled = true; submitBtn.textContent = 'Evaluating…'; }
+
+      block('tm-block tm-user-answer', answer);
+      if (answerInput) answerInput.value = '';
+
+      fetch('/api/test/evaluate', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          nodeId:      state.node.id,
+          questionNum: state.questionNum,
+          question:    state.currentQ.question,
+          options:     state.currentQ.options || null,
+          userAnswer:  answer,
+          history:     state.history,
+        }),
+      })
+        .then(function(r) { return r.json(); })
+        .then(function(ev) {
+          state.history.push({ question: state.currentQ.question, answer: answer, correct: ev.correct });
+          block('tm-block tm-feedback ' + (ev.correct ? 'tm-correct' : 'tm-wrong'),
+                (ev.correct ? '✓ ' : '✗ ') + ev.feedback);
+          state.submitting = false;
+
+          if (state.questionNum === 4 && ev.finalScore !== undefined) {
+            setTimeout(function() { _showResult(ev.finalScore, ev.scoreBreakdown, inputArea, result); }, 900);
+          } else {
+            state.questionNum++;
+            state.currentQ = null;
+            if (answerInput) answerInput.disabled = false;
+            setTimeout(loadQ, 600);
+          }
+        })
+        .catch(function() {
+          block('tm-block tm-error', 'Evaluation failed — please try again.');
+          state.submitting = false;
           if (answerInput) answerInput.disabled = false;
-          var sb = el('tm-submit-btn');
-          if (sb) sb.disabled = false;
-          setTimeout(_loadQuestion, 600);
-        }
-      })
-      .catch(function () {
-        _appendError('Evaluation failed — please try again.');
-        _setInputLoading(false);
-        _submitting = false;
-        var ai = el('tm-answer-input'), sb = el('tm-submit-btn');
-        if (ai) ai.disabled = false;
-        if (sb) sb.disabled = false;
-      });
+          if (submitBtn)   { submitBtn.disabled = false; submitBtn.textContent = 'Submit answer'; }
+        });
+    }
+
+    /* wire input events */
+    if (submitBtn)   submitBtn.onclick   = submitAnswer;
+    if (answerInput) answerInput.onkeydown = function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitAnswer(); }
+    };
+
+    loadQ();
   }
 
-  /* ─── Result screen ──────────────────────────────────────────── */
-  function _showResult(score, breakdown) {
-    var inputArea = el('tm-input-area');
-    var resultDiv = el('tm-result');
-    var scoreEl   = el('tm-result-score');
-    var bdEl      = el('tm-result-breakdown');
-
+  /* ─── result screen ─────────────────────────────────────────── */
+  function _showResult(score, breakdown, inputArea, result) {
     if (inputArea) inputArea.style.display = 'none';
-    if (resultDiv) resultDiv.style.display = '';
-    if (scoreEl)   scoreEl.textContent = score + '%';
-    if (bdEl)      bdEl.textContent    = breakdown || '';
-    if (scoreEl)   scoreEl.style.color = score >= 80 ? '#8BAD7E' : score >= 50 ? '#C4A55A' : '#C4826A';
+    if (result)    result.style.display    = '';
 
-    if (typeof window.refreshProgress === 'function') window.refreshProgress();
-  }
-
-  /* ─── Helpers ────────────────────────────────────────────────── */
-  function _updateProgress() {
-    var p = el('tm-progress');
-    if (p) p.textContent = 'Q ' + _questionNum + ' / 4';
-  }
-
-  function _appendQuestion(q) {
-    var stream = el('tm-stream');
-    if (!stream) return;
-    var wrap = document.createElement('div');
-    wrap.className = 'tm-block tm-question';
-
-    var tierNames = ['', 'Factual', 'Conceptual', 'Procedural', 'Analytical'];
-    var lbl = document.createElement('div');
-    lbl.className = 'tm-block-tier';
-    lbl.textContent = 'Q' + _questionNum + ' — ' + (tierNames[_questionNum] || '');
-    wrap.appendChild(lbl);
-
-    var text = document.createElement('div');
-    text.className = 'tm-block-text';
-    text.textContent = q.question;
-    wrap.appendChild(text);
-
-    var inp = el('tm-answer-input');
-    if (q.type === 'mcq' && q.options && q.options.length) {
-      var opts = document.createElement('div');
-      opts.className = 'tm-options';
-      q.options.forEach(function (opt, i) {
-        var row = document.createElement('div');
-        row.className = 'tm-option';
-        row.textContent = (i + 1) + '.  ' + opt;
-        opts.appendChild(row);
-      });
-      wrap.appendChild(opts);
-      if (inp) inp.placeholder = 'Enter the number of your answer (1–' + q.options.length + ')';
-    } else {
-      if (inp) inp.placeholder = 'Your answer…';
+    var scoreEl = document.getElementById('tm-result-score');
+    var bdEl    = document.getElementById('tm-result-breakdown');
+    if (scoreEl) {
+      scoreEl.textContent  = score + '%';
+      scoreEl.style.color  = score >= 80 ? '#8BAD7E' : score >= 50 ? '#C4A55A' : '#C4826A';
     }
+    if (bdEl) bdEl.textContent = breakdown || '';
 
-    _fadeIn(wrap, stream);
-    _scrollStream(stream);
+    if (window.Map && window.Map.refreshProgress) window.Map.refreshProgress();
   }
 
-  function _appendAnswer(text) {
-    var stream = el('tm-stream');
-    if (!stream) return;
-    var div = document.createElement('div');
-    div.className = 'tm-block tm-user-answer';
-    div.textContent = text;
-    _fadeIn(div, stream);
-    _scrollStream(stream);
-  }
-
-  function _appendFeedback(text, correct) {
-    var stream = el('tm-stream');
-    if (!stream) return;
-    var div = document.createElement('div');
-    div.className = 'tm-block tm-feedback ' + (correct ? 'tm-correct' : 'tm-wrong');
-    div.textContent = (correct ? '✓ ' : '✗ ') + text;
-    _fadeIn(div, stream);
-    _scrollStream(stream);
-  }
-
-  function _appendError(text) {
-    var stream = el('tm-stream');
-    if (!stream) return;
-    var div = document.createElement('div');
-    div.className = 'tm-block tm-error';
-    div.textContent = text;
-    _fadeIn(div, stream);
-    _scrollStream(stream);
-  }
-
-  function _setInputLoading(on, label) {
-    var sb = el('tm-submit-btn');
-    if (!sb) return;
-    sb.disabled = on;
-    if (on) {
-      sb.innerHTML =
-        '<span style="opacity:0.75;font-size:12px">' + (label || 'Loading') + '</span>' +
-        '<span class="sb-learn-dots"><span class="sb-learn-dot"></span>' +
-        '<span class="sb-learn-dot"></span><span class="sb-learn-dot"></span></span>';
-    } else {
-      sb.textContent = 'Submit answer';
-    }
-  }
-
-  function _fadeIn(div, stream) {
-    div.style.opacity = '0';
-    div.style.transform = 'translateY(8px)';
-    stream.appendChild(div);
-    requestAnimationFrame(function () {
-      div.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
-      div.style.opacity = '1';
-      div.style.transform = 'translateY(0)';
-    });
-  }
-
-  function _scrollStream(stream) {
-    if (stream.scrollHeight - stream.scrollTop - stream.clientHeight < 180) {
-      stream.scrollTop = stream.scrollHeight;
-    }
-  }
-
-  /* ─── Event wiring ────────────────────────────────────────────── */
-  document.addEventListener('click', function (e) {
-    if (e.target === el('tm-submit-btn')) _submitAnswer();
-  });
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && !e.shiftKey && document.activeElement === el('tm-answer-input')) {
-      e.preventDefault();
-      _submitAnswer();
-    }
-  });
+  /* ─── public namespace ──────────────────────────────────────── */
+  return { open: open, close: close };
 
 })();

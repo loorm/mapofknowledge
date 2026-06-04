@@ -1,3 +1,18 @@
+/* ═══════════════════════════════════════════════════════════════
+   MAP VIEW  —  app.js
+   ───────────────────────────────────────────────────────────────
+   Owns  : D3 force simulation, zoom/pan, node rendering, sidebar,
+           progress overlay, filter state, knowledge toggle
+   Exposes: window.Map.setFilter(labelSet)
+            window.Map.setKnowledgeFilter(progressMap)
+            window.Map.clearKnowledgeFilter()
+            window.Map.resetZoom()
+            window.Map.refreshProgress()
+            window.Map.setTilt(angle)        [called by tilt.js]
+   Calls  : window.Learn.open/close, window.Test.open/close
+   Never  : implement learning or test flow — delegate to those modules
+   ═══════════════════════════════════════════════════════════════ */
+
 const CONTINENTS = {
   "Mathematics":      "#378ADD",
   "Philosophy":       "#9F8FE8",
@@ -426,11 +441,11 @@ function init(data, emergentData) {
           const { knobits } = await r.json();
           restore();
           closeSidebar();
-          openLearningMode(d, crumb, knobits);
+          window.Learn.open(d, crumb, knobits);
         } catch (err) {
           restore();
           closeSidebar();
-          openLearningMode(d, crumb, null);
+          window.Learn.open(d, crumb, null);
         }
       };
     }
@@ -467,12 +482,7 @@ function init(data, emergentData) {
         testBtnEl.style.cursor = '';
         testBtnEl.onclick = function () {
           closeSidebar();
-          const lmOverlay = document.getElementById('learning-mode');
-          if (lmOverlay) lmOverlay.classList.add('active');
-          if (typeof window.showLmView === 'function') window.showLmView('lm-test');
-          const sw = document.querySelector('.topbar-search-wrap');
-          if (sw) sw.style.display = 'none';
-          startTest(d, crumb);
+          window.Test.open(d, crumb);
         };
       } else {
         testBtnEl.disabled = true;
@@ -565,143 +575,6 @@ function init(data, emergentData) {
   function closeSidebar() {
     sidebar.classList.remove("open");
     sidebar.style.background = "";
-  }
-
-  // ── Test mode (fully self-contained, no test.js dependency) ──────────────────
-  function startTest(node, crumb) {
-    const elId = id => document.getElementById(id);
-    const tmLabel = elId('tm-node-label');
-    const stream  = elId('tm-stream');
-    const result  = elId('tm-result');
-    const inputArea  = elId('tm-input-area');
-    const answerInput= elId('tm-answer-input');
-    const submitBtn  = elId('tm-submit-btn');
-    const progress   = elId('tm-progress');
-
-    if (tmLabel) tmLabel.textContent = node.label || '';
-    if (result)  result.style.display = 'none';
-    if (inputArea) inputArea.style.display = '';
-    if (stream)  stream.innerHTML = '';
-    if (progress) progress.textContent = 'Q 1 / 4';
-
-    const state = { node, crumb, questionNum: 1, history: [], currentQ: null, submitting: false };
-
-    function tmBlock(cls, text) {
-      const div = document.createElement('div');
-      div.className = cls;
-      div.textContent = text;
-      if (stream) {
-        stream.appendChild(div);
-        if (stream.scrollHeight - stream.scrollTop - stream.clientHeight < 200) stream.scrollTop = stream.scrollHeight;
-      }
-      return div;
-    }
-
-    function loadQ() {
-      if (progress) progress.textContent = 'Q ' + state.questionNum + ' / 4';
-      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Generating question…'; }
-      const ld = tmBlock('tm-block tm-question', 'Generating question ' + state.questionNum + ' of 4…');
-      ld.style.opacity = '0.45';
-
-      fetch('/api/test/question', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nodeId: state.node.id, questionNum: state.questionNum, history: state.history }),
-      })
-        .then(r => r.json())
-        .then(q => {
-          if (ld.parentNode) ld.parentNode.removeChild(ld);
-          if (!q || !q.question) { tmBlock('tm-block tm-error', 'Server error: ' + JSON.stringify(q)); return; }
-          state.currentQ = q;
-
-          const wrap = document.createElement('div');
-          wrap.className = 'tm-block tm-question';
-          const tierNames = ['', 'Factual', 'Conceptual', 'Procedural', 'Analytical'];
-          const lbl = document.createElement('div');
-          lbl.className = 'tm-block-tier';
-          lbl.textContent = 'Q' + state.questionNum + ' — ' + (tierNames[state.questionNum] || '');
-          wrap.appendChild(lbl);
-          const txt = document.createElement('div');
-          txt.className = 'tm-block-text';
-          txt.textContent = q.question;
-          wrap.appendChild(txt);
-          if (q.type === 'mcq' && q.options && q.options.length) {
-            const opts = document.createElement('div');
-            opts.className = 'tm-options';
-            q.options.forEach((opt, i) => {
-              const row = document.createElement('div');
-              row.className = 'tm-option';
-              row.textContent = (i + 1) + '.  ' + opt;
-              opts.appendChild(row);
-            });
-            wrap.appendChild(opts);
-            if (answerInput) answerInput.placeholder = 'Enter number (1–' + q.options.length + ')';
-          } else {
-            if (answerInput) answerInput.placeholder = 'Your answer…';
-          }
-          if (stream) { stream.appendChild(wrap); stream.scrollTop = stream.scrollHeight; }
-          if (answerInput) { answerInput.disabled = false; answerInput.value = ''; answerInput.focus(); }
-          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit answer'; }
-        })
-        .catch(err => {
-          if (ld.parentNode) ld.parentNode.removeChild(ld);
-          tmBlock('tm-block tm-error', 'Could not load question: ' + (err && err.message || 'network error'));
-          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit answer'; }
-        });
-    }
-
-    function submitAnswer() {
-      if (state.submitting || !state.currentQ) return;
-      const answer = answerInput ? answerInput.value.trim() : '';
-      if (!answer) return;
-      state.submitting = true;
-      if (answerInput) answerInput.disabled = true;
-      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Evaluating…'; }
-      tmBlock('tm-block tm-user-answer', answer);
-      if (answerInput) answerInput.value = '';
-
-      fetch('/api/test/evaluate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nodeId: state.node.id, questionNum: state.questionNum,
-          question: state.currentQ.question, options: state.currentQ.options || null,
-          userAnswer: answer, history: state.history,
-        }),
-      })
-        .then(r => r.json())
-        .then(ev => {
-          state.history.push({ question: state.currentQ.question, answer, correct: ev.correct });
-          tmBlock('tm-block tm-feedback ' + (ev.correct ? 'tm-correct' : 'tm-wrong'), (ev.correct ? '✓ ' : '✗ ') + ev.feedback);
-          state.submitting = false;
-          if (state.questionNum === 4 && ev.finalScore !== undefined) {
-            setTimeout(() => {
-              if (inputArea) inputArea.style.display = 'none';
-              if (result) result.style.display = '';
-              const scoreEl = document.getElementById('tm-result-score');
-              const bdEl    = document.getElementById('tm-result-breakdown');
-              if (scoreEl) { scoreEl.textContent = ev.finalScore + '%'; scoreEl.style.color = ev.finalScore >= 80 ? '#8BAD7E' : ev.finalScore >= 50 ? '#C4A55A' : '#C4826A'; }
-              if (bdEl) bdEl.textContent = ev.scoreBreakdown || '';
-              if (typeof window.refreshProgress === 'function') window.refreshProgress();
-            }, 900);
-          } else {
-            state.questionNum++;
-            state.currentQ = null;
-            if (answerInput) answerInput.disabled = false;
-            setTimeout(loadQ, 600);
-          }
-        })
-        .catch(() => {
-          tmBlock('tm-block tm-error', 'Evaluation failed — please try again.');
-          state.submitting = false;
-          if (answerInput) answerInput.disabled = false;
-          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit answer'; }
-        });
-    }
-
-    if (submitBtn) submitBtn.onclick = submitAnswer;
-    if (answerInput) answerInput.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitAnswer(); } };
-    loadQ();
   }
 
   // ── Click to highlight ─────────────────────────────────────────────────────
@@ -1193,6 +1066,18 @@ function init(data, emergentData) {
     tickedEmergent();
   };
   window.currentTilt = 0;
+
+  // ── Public Map namespace ───────────────────────────────────────────────────
+  window.Map = {
+    setFilter:            function(labelSet) { window.setMapFilter(labelSet); },
+    setKnowledgeFilter:   function(pm, t)   { window.setKnowledgeFilter(pm, t); },
+    clearKnowledgeFilter: function()         { window.clearKnowledgeFilter(); },
+    resetZoom:            function()         { window.resetMapZoom(); },
+    refreshProgress:      function()         { loadProgress(); },
+    setTilt:              function(angle)    { window.setTilt(angle); },
+  };
+  // Keep legacy aliases so filters.js / tilt.js / HTML inline calls still work
+  window.refreshProgress = window.Map.refreshProgress;
 
   // ── Initial build ──────────────────────────────────────────────────────────
   rebuild();

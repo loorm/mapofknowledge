@@ -1,9 +1,14 @@
-/* ══════════════════════════════════════════════
-   LEARNING MODE  —  js/learning.js
-   API-driven adaptive tutor.
-   Exposes: openLearningMode(node, crumb, knobits)
-            closeLearningMode()
-   ══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   LEARNING MODE  —  learning.js
+   ───────────────────────────────────────────────────────────────
+   Owns  : #learning-mode overlay, lm-path / lm-knobit / lm-complete
+           views, knobit flow (explain → demonstrate → practice → meaning)
+   Exposes: window.Learn.open(node, crumb, knobits)
+            window.Learn.close()
+            window.Learn.showView(id)
+   Calls  : window.Map.refreshProgress()
+   Never  : touch app.js map rendering, test.js, or #lm-test
+   ═══════════════════════════════════════════════════════════════ */
 
 (function () {
 
@@ -576,3 +581,11 @@
   });
 
 })();
+
+/* ─── public namespace ──────────────────────────────────────────
+   Other modules call window.Learn.*  — never openLearningMode directly */
+window.Learn = {
+  open:     window.openLearningMode,
+  close:    window.closeLearningMode,
+  showView: window.showLmView,
+};
