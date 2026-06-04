@@ -11,24 +11,16 @@
 
 window.Test = (function () {
 
-  /* ─── public API — copied directly from openLearningMode/closeLearningMode ── */
+  /* ─── public API ────────────────────────────────────────────────────────────
+     open() is called AFTER app.js has already created the overlay div and
+     appended it to body — so we just set up state and start the question flow. */
   function open(node, crumb) {
-    // Step 1: hide search (identical to openLearningMode line 1)
-    var sw = document.querySelector('.topbar-search-wrap');
-    if (sw) sw.style.display = 'none';
-    // Step 2: switch to test view (replaces _buildPathView + showLmView('lm-path'))
-    if (window.showLmView) window.showLmView('lm-test');
-    // Step 3: show overlay (identical to openLearningMode last 2 lines)
-    var overlay = document.getElementById('learning-mode');
-    if (overlay) overlay.classList.add('active');
-    // Step 4: start test flow
     _start(node, crumb);
   }
 
   function close() {
-    // Identical to closeLearningMode
-    var overlay = document.getElementById('learning-mode');
-    if (overlay) overlay.classList.remove('active');
+    var div = document.getElementById('_test_live');
+    if (div) div.parentNode.removeChild(div);
     var sw = document.querySelector('.topbar-search-wrap');
     if (sw) sw.style.display = '';
   }
