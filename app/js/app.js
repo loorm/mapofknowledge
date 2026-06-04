@@ -473,7 +473,7 @@ function init(data, emergentData) {
       }
     }
 
-    // Test me — active for L5 nodes (mirrors Learn this)
+    // Test me — active for L5 nodes
     const testBtnEl = document.querySelector('.sb-test-btn');
     if (testBtnEl) {
       if (d.level === 5) {
@@ -482,28 +482,9 @@ function init(data, emergentData) {
         testBtnEl.style.cursor = '';
         const testCrumb = (domainNode ? domainNode.label : '') +
           (crumbParts.length ? ' › ' + crumbParts.join(' › ') : '');
-        testBtnEl.onclick = async function () {
-          const originalHTML = testBtnEl.innerHTML;
-          testBtnEl.disabled = true;
-          testBtnEl.innerHTML =
-            '<span style="opacity:0.75;font-size:12px">Creating your learning path</span>' +
-            '<span class="sb-learn-dots">' +
-            '<span class="sb-learn-dot"></span>' +
-            '<span class="sb-learn-dot"></span>' +
-            '<span class="sb-learn-dot"></span>' +
-            '</span>';
-          const restore = () => { testBtnEl.innerHTML = originalHTML; testBtnEl.disabled = false; };
-          try {
-            const r = await fetch(`/api/nodes/${d.id}/learn`, { method: 'POST' });
-            const { knobits } = await r.json();
-            restore();
-            closeSidebar();
-            window.Test.open(d, testCrumb, knobits);
-          } catch (err) {
-            restore();
-            closeSidebar();
-            window.Test.open(d, testCrumb, null);
-          }
+        testBtnEl.onclick = function () {
+          closeSidebar();
+          window.Test.open(d, testCrumb);
         };
       } else {
         testBtnEl.disabled = true;

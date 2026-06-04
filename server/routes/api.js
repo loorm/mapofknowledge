@@ -458,136 +458,63 @@ async function getNodeBreadcrumb(nodeDbId) {
   return rows.map(r => r.label).join(' › ');
 }
 
-// ── LLM testing interactions ─────────────────────────────────────────────────
-router.post('/test/interact', async (req, res) => {
-  const {
-    knobitId, phase, action,
-    byteIndex = 0, answer, priorChoices = [],
-    original = '', question = '', expected = '', userAnswer = '',
-    context = '',
-  } = req.body;
-
+// ── 4-tier diagnostic: generate question ─────────────────────────────────────
+router.post('/test/question', async (req, res) => {
+  const { nodeId, questionNum, history = [] } = req.body;
   try {
-    const [rows] = await db.execute(
-      `SELECT k.title, n.label AS nodeLabel
-       FROM knobits k JOIN nodes n ON k.node_id = n.id
-       WHERE k.id = ?`,
-      [knobitId]
+    const [nodes] = await db.execute(
+      'SELECT id AS db_id, label, level FROM nodes WHERE external_id = ?', [nodeId]
     );
-    if (!rows.length) return res.status(404).json({ error: 'Knobit not found' });
-    const { title, nodeLabel } = rows[0];
-
-    let result;
-
-    if (phase === 'explain') {
-      if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
-        result = { text: await llm.generateRephrase(nodeLabel, title, original, action) };
-      } else {
-        result = { text: await llm.generateExplainByte(nodeLabel, title, byteIndex, original) };
-      }
-    } else if (phase === 'demonstrate') {
-      result = { demonstrate: await llm.generateDemonstrate(nodeLabel, title, byteIndex) };
-    } else if (phase === 'practice') {
-      if (action === 'grade') {
-        result = { grade: await llm.gradePractice(nodeLabel, title, question, expected, userAnswer) };
-      } else {
-        result = { practice: await llm.generatePractice(nodeLabel, title, byteIndex) };
-      }
-    } else if (phase === 'meaning') {
-      if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
-        result = { text: await llm.generateRephrase(nodeLabel, title, original, action) };
-      } else {
-        result = { text: await llm.generateMeaning(nodeLabel, title) };
-      }
-    } else if (phase === 'ask') {
-      result = { text: await llm.answerQuestion(nodeLabel, title, action || 'general', question, context) };
-    } else {
-      return res.status(400).json({ error: `Unknown phase: ${phase}` });
-    }
-
+    if (!nodes.length) return res.status(404).json({ error: 'Node not found' });
+    const { db_id, label, level } = nodes[0];
+    if (level < 4) return res.status(400).json({ error: 'Test only available for L4 and L5 nodes' });
+    const breadcrumb = await getNodeBreadcrumb(db_id);
+    const result = await llm.generateTestQuestion(label, breadcrumb, questionNum, history);
     res.json(result);
   } catch (err) {
-    console.error('[api/test/interact]', err.message);
-    res.status(500).json({ error: 'LLM interaction failed: ' + err.message });
+    console.error('[api/test/question]', err.message);
+    res.status(500).json({ error: 'Failed to generate question' });
   }
 });
 
-// ── Mark knobit complete (testing) ───────────────────────────────────────────
-router.post('/test/knobit/:id/complete', async (req, res) => {
-  const knobitId   = req.params.id;
+// ── 4-tier diagnostic: evaluate answer ───────────────────────────────────────
+router.post('/test/evaluate', async (req, res) => {
+  const { nodeId, questionNum, question, options, userAnswer, history = [] } = req.body;
   const passportId = req.user?.passport_id;
-  if (!passportId) return res.status(400).json({ error: 'No passport' });
 
   try {
-    await db.execute(
-      `INSERT INTO knobit_progress (passport_id, knobit_id, phase_reached, completed_at)
-       VALUES (?, ?, 'done', NOW())
-       ON DUPLICATE KEY UPDATE phase_reached = 'done', completed_at = NOW()`,
-      [passportId, knobitId]
+    const [nodes] = await db.execute(
+      'SELECT id AS db_id, label, level FROM nodes WHERE external_id = ?', [nodeId]
+    );
+    if (!nodes.length) return res.status(404).json({ error: 'Node not found' });
+    const { db_id, label } = nodes[0];
+    const breadcrumb = await getNodeBreadcrumb(db_id);
+
+    const evaluation = await llm.evaluateTestAnswer(
+      label, breadcrumb, questionNum, question, options, userAnswer, history
     );
 
-    const [krow] = await db.execute(
-      `SELECT k.node_id, n.external_id AS nodeExtId, n.label AS nodeLabel, k.locale
-       FROM knobits k JOIN nodes n ON k.node_id = n.id
-       WHERE k.id = ?`,
-      [knobitId]
-    );
-    if (krow.length) {
-      const { node_id, nodeExtId, nodeLabel, locale } = krow[0];
-      const [[{ total }]] = await db.execute(
-        'SELECT COUNT(*) AS total FROM knobits WHERE node_id = ? AND locale = ?',
-        [node_id, locale]
-      );
-      const [[{ done }]] = await db.execute(
-        `SELECT COUNT(*) AS done
-         FROM knobit_progress kp JOIN knobits k ON kp.knobit_id = k.id
-         WHERE kp.passport_id = ? AND k.node_id = ? AND kp.phase_reached = 'done'`,
-        [passportId, node_id]
-      );
-      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+    if (questionNum === 4 && evaluation.finalScore !== undefined && passportId) {
       await db.execute(
         `INSERT INTO user_node_knowledge
            (passport_id, node_external_id, percentage, source, updated_at)
          VALUES (?, ?, ?, 'tested', NOW())
          ON DUPLICATE KEY UPDATE
            percentage = VALUES(percentage), source = 'tested', updated_at = NOW()`,
-        [passportId, nodeExtId, pct]
+        [passportId, nodeId, evaluation.finalScore]
       );
-
-      if (pct === 100) {
-        const credTitle = `${nodeLabel} — Completed`;
-        const [[existing]] = await db.execute(
-          `SELECT id FROM passport_credentials
-           WHERE passport_id = ? AND type = 'platform' AND title = ?`,
-          [passportId, credTitle]
-        );
-        if (!existing) {
-          const crypto = require('crypto');
-          const hash = crypto.createHash('sha256')
-            .update(`${passportId}-${nodeExtId}-${Date.now()}`)
-            .digest('hex')
-            .substring(0, 16);
-          await db.execute(
-            `INSERT INTO passport_credentials
-               (passport_id, type, title, issuer, awarded_date, score_pct, threshold_pct,
-                blockchain_hash, sort_order)
-             VALUES (?, 'platform', ?, 'Map of Knowledge · KaiQ Platform', CURDATE(), 100, 80, ?, 0)`,
-            [passportId, credTitle, '0x' + hash]
-          );
-          await db.execute(
-            `INSERT INTO passport_events
-               (passport_id, event_date, title, institution, result, type, sort_order)
-             VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', 'Score: 100%', 'assessment', 0)`,
-            [passportId, `Completed: ${nodeLabel}`]
-          );
-        }
-      }
+      await db.execute(
+        `INSERT INTO passport_events
+           (passport_id, event_date, title, institution, result, type, sort_order)
+         VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', ?, 'assessment', 0)`,
+        [passportId, `Knowledge test: ${label}`, `Score: ${evaluation.finalScore}%`]
+      );
     }
 
-    res.json({ ok: true });
+    res.json(evaluation);
   } catch (err) {
-    console.error('[api/test/knobit/complete]', err.message);
-    res.status(500).json({ error: 'Failed to save knobit completion' });
+    console.error('[api/test/evaluate]', err.message);
+    res.status(500).json({ error: 'Evaluation failed' });
   }
 });
 
