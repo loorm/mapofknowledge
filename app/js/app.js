@@ -512,7 +512,16 @@ function init(data, emergentData) {
               '<button id="tm-result-back" onclick="window.Test.close()">Back to map</button>' +
             '</div>';
           document.body.appendChild(div);
-          window.Test.open(d, crumb);
+          // Set label inline — independent of test.js
+          var tmLbl = document.getElementById('tm-node-label');
+          if (tmLbl) tmLbl.textContent = d.label || '';
+          // Start test flow
+          if (window.Test && typeof window.Test.open === 'function') {
+            window.Test.open(d, crumb);
+          } else {
+            var tmStr = document.getElementById('tm-stream');
+            if (tmStr) tmStr.innerHTML = '<div style="padding:20px;color:#c44">test.js not loaded — please hard-refresh (Ctrl+Shift+R)</div>';
+          }
         };
       } else {
         testBtnEl.disabled = true;
