@@ -467,22 +467,30 @@ function init(data, emergentData) {
         testBtnEl.style.cursor = '';
         testBtnEl.onclick = function () {
           closeSidebar();
-          // Show overlay — exact same pattern as the Learn this button / openLearningMode
           const lmOverlay = document.getElementById('learning-mode');
           if (lmOverlay) lmOverlay.classList.add('active');
           if (typeof window.showLmView === 'function') window.showLmView('lm-test');
           const sw = document.querySelector('.topbar-search-wrap');
           if (sw) sw.style.display = 'none';
-          // Set node label directly so it always shows
           const tmLabel = document.getElementById('tm-node-label');
           if (tmLabel) tmLabel.textContent = d.label || '';
-          // Hand off to test.js for state + question loading
-          if (typeof window.initTest === 'function') {
-            window.initTest(d, crumb);
-          } else {
-            const tmStream = document.getElementById('tm-stream');
-            if (tmStream) tmStream.innerHTML = '<div style="padding:20px;color:#c44;font-size:14px">Please reload the page and try again.</div>';
+
+          // Reset and show loading directly — no test.js dependency
+          const tmResult = document.getElementById('tm-result');
+          const tmInputArea = document.getElementById('tm-input-area');
+          const tmStream = document.getElementById('tm-stream');
+          if (tmResult) tmResult.style.display = 'none';
+          if (tmInputArea) tmInputArea.style.display = '';
+          if (tmStream) {
+            tmStream.innerHTML = '';
+            const ld = document.createElement('div');
+            ld.className = 'tm-block tm-question';
+            ld.style.opacity = '0.6';
+            ld.textContent = 'Generating question 1…';
+            tmStream.appendChild(ld);
           }
+
+          if (typeof window.initTest === 'function') window.initTest(d, crumb);
         };
       } else {
         testBtnEl.disabled = true;
