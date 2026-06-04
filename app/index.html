@@ -7,6 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/learning.css">
+<link rel="stylesheet" href="css/testing.css">
 </head>
 <body>
 
@@ -436,7 +437,141 @@
 </div><!-- /learning-mode -->
 
 
+<!-- ════════════════════════════════════════
+     TESTING MODE  (z-index 320, above map)
+     Three views: tm-path | tm-knobit | tm-complete
+     ════════════════════════════════════════ -->
+
+<div id="testing-mode">
+
+  <!-- ── VIEW 1: TESTING PATH ─────────────────── -->
+  <div id="tm-path" class="lm-view">
+    <div class="lm-path-header">
+      <button class="lm-back-btn" onclick="closeTestingMode()" title="Back to map">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="3.5" r="1.8" stroke="currentColor" stroke-width="1.2"/>
+          <circle cx="2.5" cy="12" r="1.8" stroke="currentColor" stroke-width="1.2"/>
+          <circle cx="13.5" cy="12" r="1.8" stroke="currentColor" stroke-width="1.2"/>
+          <line x1="6.5" y1="5" x2="3.8" y2="10.3" stroke="currentColor" stroke-width="1.1"/>
+          <line x1="9.5" y1="5" x2="12.2" y2="10.3" stroke="currentColor" stroke-width="1.1"/>
+          <line x1="4.3" y1="12" x2="11.7" y2="12" stroke="currentColor" stroke-width="1.1"/>
+        </svg>
+      </button>
+      <div class="lm-path-meta">
+        <div class="lm-path-crumb" id="tm-path-crumb">Mathematics › Algebra</div>
+        <div class="lm-path-title" id="tm-path-title">Linear Equations</div>
+      </div>
+    </div>
+
+    <div class="lm-progress-track">
+      <div class="lm-progress-fill" id="tm-progress-fill" style="width:0%"></div>
+    </div>
+    <div class="lm-progress-label" id="tm-progress-label"></div>
+
+    <div class="lm-knobit-list" id="tm-knobit-list">
+      <!-- populated by testing.js -->
+    </div>
+
+    <div class="lm-start-bar">
+      <button class="lm-start-btn" id="tm-start-btn" onclick="startTestKnobit()">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+          <circle cx="7.5" cy="7.5" r="6" stroke="white" stroke-width="1.3"/>
+          <path d="M6 5l4 2.5L6 10V5z" fill="white"/>
+        </svg>
+        <span id="tm-start-btn-label">Start learning</span>
+      </button>
+    </div>
+  </div><!-- /tm-path -->
+
+
+  <!-- ── VIEW 2: TESTING KNOBIT LESSON ──────────────────── -->
+  <div id="tm-knobit" class="lm-view">
+
+    <!-- sub-nav bar -->
+    <div class="kn-nav">
+      <button class="kn-nav-back" onclick="showTmView('tm-path')" title="Back to path">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M8 2L3 6.5 8 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="kn-progress-wrap">
+        <div class="kn-nav-label" id="tm-knobit-nav-label">Solving one-step equations</div>
+        <div class="kn-progress-track">
+          <div class="kn-progress-fill" id="tn-progress-fill-bar" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="kn-phase-chips">
+        <span class="kn-chip" id="tm-chip-explain" data-phase="explain">Explain</span>
+        <span class="kn-chip" id="tm-chip-demonstrate" data-phase="demonstrate">Demonstrate</span>
+        <span class="kn-chip" id="tm-chip-practice" data-phase="practice">Practice</span>
+        <span class="kn-chip" id="tm-chip-meaning" data-phase="meaning">Meaning</span>
+      </div>
+    </div>
+
+    <!-- scrollable block stream -->
+    <div class="kn-stream" id="tn-stream"></div>
+
+    <!-- sticky action area -->
+    <div class="kn-action-area" id="tn-action-area">
+      <div class="kn-button-row" id="tn-button-row"></div>
+      <div class="ask-bar">
+        <input type="text" class="ask-input" id="tm-ask-input" placeholder="Ask anything…" autocomplete="off">
+        <button class="ask-send" id="tm-ask-send" title="Send">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <path d="M13 7.5L2 2l2.5 5.5L2 13l11-5.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /tm-knobit -->
+
+
+  <!-- ── VIEW 3: TESTING COMPLETE ──────────────────── -->
+  <div id="tm-complete" class="lm-view">
+    <div class="lm-complete-badge">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <path d="M20 6l3.5 8.5L32 16l-6 6 1.5 9L20 27l-7.5 4 1.5-9-6-6 8.5-1.5L20 6z"
+          stroke="#C4826A" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="lm-complete-title">Unit complete!</div>
+    <div class="lm-complete-sub">
+      You've finished all 7 knobits in <strong>Linear Equations</strong>.
+      You're building real fluency — keep the momentum going.
+    </div>
+
+    <div class="lm-complete-stats">
+      <div class="lm-complete-stat">
+        <div class="lm-cstat-num">7</div>
+        <div class="lm-cstat-label">Knobits<br>mastered</div>
+      </div>
+      <div class="lm-complete-stat">
+        <div class="lm-cstat-num">94%</div>
+        <div class="lm-cstat-label">Accuracy<br>rate</div>
+      </div>
+      <div class="lm-complete-stat">
+        <div class="lm-cstat-num">+84</div>
+        <div class="lm-cstat-label">XP<br>earned</div>
+      </div>
+    </div>
+
+    <div class="lm-complete-actions">
+      <button class="lm-complete-btn-primary" onclick="closeTestingMode()">
+        Back to the map
+      </button>
+      <button class="lm-complete-btn-ghost" onclick="showTmView('tm-path')">
+        Review this unit
+      </button>
+    </div>
+  </div><!-- /tm-complete -->
+
+
+</div><!-- /testing-mode -->
+
+
 <script src="js/learning.js?v=4"></script>
+<script src="js/testing.js?v=1"></script>
 <script src="js/layers.js?v=4"></script>
 <script src="js/filters.js?v=4"></script>
 <script src="js/app.js?v=4"></script>
