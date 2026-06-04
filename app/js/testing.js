@@ -2,76 +2,74 @@
    TESTING MODE  —  testing.js
    ───────────────────────────────────────────────────────────────
    Owns  : #testing-mode overlay, tm-path / tm-knobit / tm-complete
-           views, knobit flow (explain → demonstrate → practice → meaning)
-   Exposes: window.Test.open(node, crumb, knobits)
+           views, 4-tier diagnostic flow (Q1 Factual → Q4 Analytical)
+   Exposes: window.Test.open(node, crumb)
             window.Test.close()
             window.Test.showView(id)
-   Calls  : window.MapView.refreshProgress()
+   Calls  : /api/test/question, /api/test/evaluate
    Never  : touch app.js map rendering or #learning-mode
    ═══════════════════════════════════════════════════════════════ */
 
 (function () {
 
   /* ─── State ──────────────────────────────────────────────────── */
-  var _node             = null;
-  var _crumb            = '';
-  var KNOBITS           = [];
-  var KNOBIT_TOTAL      = 0;
-  var KNOBIT_DONE_COUNT = 0;
-  var CURRENT_KNOBIT_IDX = 0;
+  var _node            = null;
+  var _crumb           = '';
+  var _questionNum     = 0;
+  var _history         = [];
+  var _currentQuestion = null;
+  var _loading         = false;
+  var _awaitingAnswer  = false;
+  var _streamBlocks    = [];
 
-  var _phase        = null;
-  var _byteIdx      = 0;
-  var _demoIdx      = 0;
-  var _practiceIdx  = 0;
-  var _streamBlocks = [];
-  var _priorChoices = [];
-  var _loading      = false;
-  var _starting     = false;
-  var _pendingPractice = null;
+  var _PHASES     = ['q1', 'q2', 'q3', 'q4'];
+  var _TIER_NAMES = ['', 'Factual', 'Conceptual', 'Procedural', 'Analytical'];
 
-  var _PHASES = ['explain', 'demonstrate', 'practice', 'meaning'];
-  var MAX_EXPLAIN_BYTES = 6;
-
-  /* ─── API helper ──────────────────────────────────────────────── */
-  function apiInteract(params) {
-    var knobit = KNOBITS[CURRENT_KNOBIT_IDX];
-    if (!knobit) return Promise.reject(new Error('No knobit'));
-    var body = Object.assign({ knobitId: knobit.id }, params);
-    return fetch('/api/test/interact', {
+  /* ─── API helpers ─────────────────────────────────────────────── */
+  function apiQuestion(questionNum, history) {
+    return fetch('/api/test/question', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(body),
+      body:    JSON.stringify({ nodeId: _node.id, questionNum: questionNum, history: history }),
     }).then(function (r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
     });
   }
 
-  function apiComplete(knobitId) {
-    return fetch('/api/test/knobit/' + knobitId + '/complete', { method: 'POST' })
-      .catch(function () {});
+  function apiEvaluate(questionNum, question, options, userAnswer, history) {
+    return fetch('/api/test/evaluate', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        nodeId:      _node.id,
+        questionNum: questionNum,
+        question:    question,
+        options:     options || null,
+        userAnswer:  userAnswer,
+        history:     history,
+      }),
+    }).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
   }
 
   /* ─── Entry / exit ────────────────────────────────────────────── */
   var _searchWrap = null;
 
-  window.openTestingMode = function (node, crumb, knobits) {
+  window.openTestingMode = function (node, crumb) {
     _searchWrap = document.querySelector('.topbar-search-wrap');
     if (_searchWrap) _searchWrap.style.display = 'none';
-    _node             = node;
-    _crumb            = crumb || '';
-    KNOBITS           = Array.isArray(knobits) && knobits.length ? knobits : [];
-    KNOBIT_TOTAL      = KNOBITS.length;
-    KNOBIT_DONE_COUNT = 0;
-    CURRENT_KNOBIT_IDX = 0;
+    _node  = node;
+    _crumb = crumb || '';
 
     var hex = (node && node.color) ? node.color : '#C4826A';
-    var r   = parseInt(hex.slice(1,3), 16);
-    var g   = parseInt(hex.slice(3,5), 16);
-    var b   = parseInt(hex.slice(5,7), 16);
+    var r   = parseInt(hex.slice(1, 3), 16);
+    var g   = parseInt(hex.slice(3, 5), 16);
+    var b   = parseInt(hex.slice(5, 7), 16);
     document.documentElement.style.setProperty('--lm-accent', hex);
-    document.documentElement.style.setProperty('--lm-accent-soft', 'rgba('+r+','+g+','+b+',0.13)');
+    document.documentElement.style.setProperty('--lm-accent-soft', 'rgba(' + r + ',' + g + ',' + b + ',0.13)');
 
     _buildPathView();
     showTmView('tm-path');
@@ -84,9 +82,11 @@
     if (overlay) overlay.classList.remove('active');
     var sw = _searchWrap || document.querySelector('.topbar-search-wrap');
     if (sw) sw.style.display = '';
-    _searchWrap = null;
-    _node   = null;
-    KNOBITS = [];
+    _searchWrap      = null;
+    _node            = null;
+    _history         = [];
+    _questionNum     = 0;
+    _awaitingAnswer  = false;
   };
 
   /* ─── View switching ──────────────────────────────────────────── */
@@ -97,7 +97,7 @@
     });
   };
 
-  /* ─── View 1 — Testing Path ───────────────────────────────────── */
+  /* ─── View 1 — Intro / path ───────────────────────────────────── */
   function _buildPathView() {
     var crumbEl = document.getElementById('tm-path-crumb');
     var titleEl = document.getElementById('tm-path-title');
@@ -107,365 +107,212 @@
 
     if (crumbEl) crumbEl.textContent = _crumb;
     if (titleEl) titleEl.textContent = _node ? _node.label : '';
+    if (fillEl)  fillEl.style.width  = '0%';
+    if (labelEl) labelEl.textContent = '4 questions — from recall to analysis';
 
-    var pct = KNOBIT_TOTAL ? Math.round((KNOBIT_DONE_COUNT / KNOBIT_TOTAL) * 100) : 0;
-    if (fillEl)  fillEl.style.width   = pct + '%';
-    if (labelEl) labelEl.textContent  = pct + '% complete' + (pct < 100 ? ' — keep going!' : '');
+    var startLabel = document.getElementById('tm-start-btn-label');
+    if (startLabel) startLabel.textContent = 'Start test';
 
     if (!listEl) return;
     listEl.innerHTML = '';
 
-    if (!KNOBITS.length) {
-      listEl.innerHTML = '<div style="color:#8A7E72;font-size:13px;padding:14px 0">No content available yet — try again in a moment.</div>';
-      return;
-    }
+    var tiers = [
+      { num: 1, name: 'Factual',    desc: 'Recall a core term or definition' },
+      { num: 2, name: 'Conceptual', desc: 'Explain a mechanism or relationship' },
+      { num: 3, name: 'Procedural', desc: 'Apply a method to a concrete problem' },
+      { num: 4, name: 'Analytical', desc: 'Diagnose a scenario or evaluate a system' },
+    ];
 
-    KNOBITS.forEach(function (k, i) {
-      var done    = i < KNOBIT_DONE_COUNT;
-      var current = i === CURRENT_KNOBIT_IDX;
-      var item    = document.createElement('div');
-      item.className = 'lm-knobit-item' + (done ? ' done' : '') + (current ? ' current' : '');
+    tiers.forEach(function (t) {
+      var item = document.createElement('div');
+      item.className = 'lm-knobit-item';
+      item.style.cursor = 'default';
 
-      var num       = document.createElement('div');
+      var num = document.createElement('div');
       num.className = 'lm-knobit-num';
-      num.textContent = done ? '✓' : String(i + 1);
+      num.textContent = String(t.num);
       item.appendChild(num);
 
-      var name       = document.createElement('div');
-      name.className = 'lm-knobit-name';
-      name.textContent = k.title || ('Knobit ' + (i + 1));
-      item.appendChild(name);
+      var info = document.createElement('div');
+      info.style.flex = '1';
 
-      if (current) {
-        item.addEventListener('click', window.startTestKnobit);
-      }
+      var name = document.createElement('div');
+      name.className = 'lm-knobit-name';
+      name.textContent = t.name;
+      info.appendChild(name);
+
+      var desc = document.createElement('div');
+      desc.style.cssText = 'font-size:12px;color:#9A8E86;margin-top:2px';
+      desc.textContent = t.desc;
+      info.appendChild(desc);
+
+      item.appendChild(info);
       listEl.appendChild(item);
     });
   }
 
-  /* ─── View 2 — Knobit lesson ──────────────────────────────────── */
+  /* ─── View 2 — Question flow ──────────────────────────────────── */
   window.startTestKnobit = function () {
-    if (!KNOBITS.length || _starting) return;
-    _starting = true;
-    var k = KNOBITS[CURRENT_KNOBIT_IDX];
-
-    _streamBlocks   = [];
-    _priorChoices   = [];
-    _byteIdx        = 0;
-    _demoIdx        = 0;
-    _practiceIdx    = 0;
-    _pendingPractice = null;
+    _questionNum     = 0;
+    _history         = [];
+    _currentQuestion = null;
+    _awaitingAnswer  = false;
+    _streamBlocks    = [];
 
     var stream = document.getElementById('tn-stream');
     if (stream) stream.innerHTML = '';
-    var navLabel = document.getElementById('tm-knobit-nav-label');
-    if (navLabel) navLabel.textContent = k.title || '';
 
-    _setPhase('explain');
+    _setChip(null);
+    _setAnswerInputState(false);
     showTmView('tm-knobit');
 
-    _setButtonRow('');
-    _appendPhaseDivider('Explain');
+    _advanceQuestion();
+  };
+
+  function _advanceQuestion() {
+    _questionNum++;
+    _updateProgressBar();
+    _setChip('q' + _questionNum);
+
+    var navLabel = document.getElementById('tm-knobit-nav-label');
+    if (navLabel) navLabel.textContent = 'Q' + _questionNum + ' — ' + (_TIER_NAMES[_questionNum] || '');
+
+    _showLoadingBlock();
+    apiQuestion(_questionNum, _history)
+      .then(function (q) {
+        _removeLoadingBlock();
+        _currentQuestion = q;
+        _appendQuestionBlock(q);
+        _setAnswerInputState(true, q.type === 'mcq');
+      }).catch(function () {
+        _removeLoadingBlock();
+        _appendBlock({ type: 'note', content: 'Connection error — please try again.' });
+      });
+  }
+
+  function _appendQuestionBlock(q) {
+    _appendPhaseDivider('Q' + _questionNum + ' — ' + (_TIER_NAMES[_questionNum] || ''));
+
+    var text = q.question || '';
+    if (q.type === 'mcq' && q.options && q.options.length) {
+      text += '\n\n' + q.options.map(function (o, i) {
+        return String.fromCharCode(65 + i) + '. ' + o;
+      }).join('\n');
+    }
+    _appendBlock({ type: 'byte', content: text });
+    _awaitingAnswer = true;
+  }
+
+  window.testSendAsk = function () {
+    if (!_awaitingAnswer) return;
+    var inp = document.getElementById('tm-ask-input');
+    var ans = inp ? inp.value.trim() : '';
+    if (!ans) return;
+    if (inp) inp.value = '';
+
+    _awaitingAnswer = false;
+    _setAnswerInputState(false);
+    _appendBlock({ type: 'user', content: ans });
     _showLoadingBlock();
 
-    apiInteract({ phase: 'explain', byteIndex: 0, priorChoices: [] })
-      .then(function (d) {
-        _starting = false;
+    var q = _currentQuestion || {};
+    apiEvaluate(_questionNum, q.question || '', q.options || null, ans, _history)
+      .then(function (result) {
         _removeLoadingBlock();
-        _appendBlock({ type: 'byte', content: d.text || '' });
-        _setButtonRow('explain-options');
+
+        _history.push({
+          question: q.question || '',
+          answer:   ans,
+          correct:  result.correct || false,
+        });
+
+        var fb = (result.correct ? '✓ ' : '✗ ') + (result.feedback || '');
+        _appendBlock({ type: 'feedback', content: fb });
+
+        if (_questionNum === 4) {
+          _updateProgressBar();
+          setTimeout(function () { _showFinalScore(result); }, 700);
+        } else {
+          setTimeout(_advanceQuestion, 1000);
+        }
       }).catch(function () {
-        _starting = false;
-        _onApiError();
+        _removeLoadingBlock();
+        _awaitingAnswer = true;
+        _setAnswerInputState(true, q.type === 'mcq');
+        _appendBlock({ type: 'note', content: 'Connection error — please try again.' });
       });
   };
 
-  /* ─── Phase chip management ───────────────────────────────────── */
-  function _setPhase(phase) {
-    _phase = phase;
-    var pcts = { explain: 0, demonstrate: 25, practice: 50, meaning: 75 };
-    var bar  = document.getElementById('tn-progress-fill-bar');
-    if (bar) bar.style.width = (pcts[phase] || 0) + '%';
+  function _showFinalScore(result) {
+    var score     = result.finalScore !== undefined ? result.finalScore : '?';
+    var breakdown = result.scoreBreakdown || '';
 
+    _appendPhaseDivider('Result');
+    _appendBlock({ type: 'meaning', content: score + '% — ' + breakdown });
+
+    setTimeout(function () {
+      var correctCount = _history.filter(function (h) { return h.correct; }).length;
+
+      var t = document.querySelector('#testing-mode .lm-complete-title');
+      var s = document.querySelector('#testing-mode .lm-complete-sub');
+      if (t) t.textContent = 'Diagnostic complete';
+      if (s) s.textContent = breakdown;
+
+      var stat = document.querySelector('#testing-mode .lm-complete-stats');
+      if (stat) {
+        var cards = stat.querySelectorAll('.lm-complete-stat');
+        if (cards[0]) cards[0].innerHTML = '<div class="lm-cstat-num">4/4</div><div class="lm-cstat-label">Questions<br>answered</div>';
+        if (cards[1]) cards[1].innerHTML = '<div class="lm-cstat-num">' + score + '%</div><div class="lm-cstat-label">Mastery<br>score</div>';
+        if (cards[2]) cards[2].innerHTML = '<div class="lm-cstat-num">' + correctCount + '/4</div><div class="lm-cstat-label">Questions<br>correct</div>';
+      }
+      showTmView('tm-complete');
+    }, 2200);
+  }
+
+  /* ─── Progress bar ────────────────────────────────────────────── */
+  function _updateProgressBar() {
+    var pct   = Math.round((_questionNum / 4) * 100);
+    var barEl = document.getElementById('tn-progress-fill-bar');
+    var fillEl = document.getElementById('tm-progress-fill');
+    if (barEl)  barEl.style.width  = pct + '%';
+    if (fillEl) fillEl.style.width = pct + '%';
+  }
+
+  /* ─── Chip management ─────────────────────────────────────────── */
+  function _setChip(activePhase) {
     var overlay = document.getElementById('testing-mode');
-    if (overlay) overlay.querySelectorAll('.kn-chip').forEach(function (chip) {
-      var cp  = chip.dataset.phase;
-      var pi  = _PHASES.indexOf(phase);
-      var ci  = _PHASES.indexOf(cp);
+    if (!overlay) return;
+    overlay.querySelectorAll('.kn-chip').forEach(function (chip) {
+      var cp = chip.dataset.phase;
+      var pi = _PHASES.indexOf(activePhase);
+      var ci = _PHASES.indexOf(cp);
       chip.classList.remove('active', 'done-chip');
-      if (cp === phase) chip.classList.add('active');
-      else if (ci < pi)  chip.classList.add('done-chip');
+      if (cp === activePhase) chip.classList.add('active');
+      else if (activePhase && ci >= 0 && ci < pi) chip.classList.add('done-chip');
     });
   }
 
-  /* ─── Button rows ─────────────────────────────────────────────── */
-  function _setButtonRow(type) {
-    var area = document.getElementById('tn-button-row');
-    if (!area) return;
-    area.innerHTML = '';
-    if (!type) return;
-
-    function btn(label, handler) {
-      var b = document.createElement('button');
-      b.className   = 'kn-option-btn';
-      b.textContent = label;
-      b.addEventListener('click', handler);
-      area.appendChild(b);
-      return b;
-    }
-
-    if (type === 'explain-options') {
-      btn('I understand',       function () { window.testExplainOpt('ok');      });
-      btn("I don't understand", function () { window.testExplainOpt('no');      });
-      btn('Too simplistic',     function () { window.testExplainOpt('simpler'); });
-      btn('Too complex',        function () { window.testExplainOpt('complex'); });
-    } else if (type === 'demo-1') {
-      btn('View next example',  function () { window.testDemoOpt('next');    });
-    } else if (type === 'demo-2') {
-      btn('I understand, no more needed', function () { window.testDemoOpt('ok');      });
-      btn('Give me another',              function () { window.testDemoOpt('another'); });
-    } else if (type === 'demo-3') {
-      btn('I understand — ready to practice', function () { window.testDemoOpt('ok');       });
-      btn("Still don't understand",           function () { window.testDemoOpt('still-no'); });
-    } else if (type === 'practice-submit') {
-      btn('Submit answer', function () { window.testPracticeSubmit(); });
-    } else if (type === 'practice-next') {
-      btn('Yes, next problem', function () { window.testPracticeNext(); });
-      btn("No, I'm done",      function () { window.testPracticeDone(); });
-    } else if (type === 'meaning-options') {
-      btn('I understand',       function () { window.testMeaningOpt('ok');      });
-      btn("I don't understand", function () { window.testMeaningOpt('no');      });
-      btn('Too simplistic',     function () { window.testMeaningOpt('simpler'); });
-      btn('Too complex',        function () { window.testMeaningOpt('complex'); });
-    }
-  }
-
-  /* ─── Explain ─────────────────────────────────────────────────── */
-  window.testExplainOpt = function (opt) {
-    var label = { ok: 'I understand', no: "I don't understand", simpler: 'Too simplistic', complex: 'Too complex' }[opt];
-    _lockButtons(label);
-    _priorChoices.push(opt);
-    _setButtonRow('');
-
-    if (opt === 'ok') {
-      _byteIdx++;
-      if (_byteIdx >= MAX_EXPLAIN_BYTES) {
-        _enterDemonstrate();
-        return;
-      }
-    }
-
-    var lastContent = _getLastContent(['byte']);
-    _showLoadingBlock();
-    var action = opt === 'ok' ? undefined : (opt === 'no' ? 'rephrase' : opt);
-    apiInteract({
-      phase:        'explain',
-      action:       action,
-      byteIndex:    _byteIdx,
-      priorChoices: _priorChoices,
-      original:     lastContent,
-    }).then(function (d) {
-      _removeLoadingBlock();
-      _appendBlock({ type: 'byte', content: d.text || '' });
-      _setButtonRow('explain-options');
-    }).catch(_onApiError);
-  };
-
-  /* ─── Demonstrate ─────────────────────────────────────────────── */
-  function _enterDemonstrate() {
-    _appendPhaseDivider('Demonstrate');
-    _demoIdx = 0;
-    _setPhase('demonstrate');
-    _fetchDemo();
-  }
-
-  function _fetchDemo() {
-    _showLoadingBlock();
-    apiInteract({ phase: 'demonstrate', byteIndex: _demoIdx })
-      .then(function (d) {
-        _removeLoadingBlock();
-        var ex   = d.demonstrate || {};
-        var html = '<strong>Example ' + (_demoIdx + 1) + '</strong><br>' +
-                   _escHtml(ex.body || '') +
-                   (ex.whatIDid ? '<br><em style="opacity:0.55;font-size:0.95em">What I did: ' + _escHtml(ex.whatIDid) + '</em>' : '');
-        _appendBlock({ type: 'example', rawHtml: html });
-        var rowType = _demoIdx === 0 ? 'demo-1' : _demoIdx === 1 ? 'demo-2' : 'demo-3';
-        _setButtonRow(rowType);
-      }).catch(_onApiError);
-  }
-
-  window.testDemoOpt = function (opt) {
-    if (opt === 'ok') {
-      _lockButtons('I understand');
-      _setButtonRow('');
-      _enterPractice();
-    } else if (opt === 'next' || opt === 'another') {
-      _lockButtons(opt === 'next' ? 'View next' : 'Give me another');
-      _demoIdx++;
-      _setButtonRow('');
-      _fetchDemo();
-    } else {
-      _lockButtons("Still don't understand");
-      _appendBlock({ type: 'note', content: 'Try YouTube: "' + (_node ? _node.label : '') + ' explained"' });
-      _setButtonRow('');
-      setTimeout(_enterPractice, 1200);
-    }
-  };
-
-  /* ─── Practice ────────────────────────────────────────────────── */
-  function _enterPractice() {
-    _appendPhaseDivider('Practice');
-    _practiceIdx = 0;
-    _setPhase('practice');
-    _fetchPractice();
-  }
-
-  function _fetchPractice() {
-    _showLoadingBlock();
-    apiInteract({ phase: 'practice', byteIndex: _practiceIdx })
-      .then(function (d) {
-        _removeLoadingBlock();
-        var prob = d.practice || {};
-        _pendingPractice = prob;
-
-        var wrapper = _appendBlock({ type: 'practice', content: 'Problem ' + (_practiceIdx + 1) + ': ' + (prob.question || '') });
-        if (wrapper) {
-          var inp         = document.createElement('textarea');
-          inp.id          = 'tn-practice-input';
-          inp.className   = 'kn-answer-input';
-          inp.placeholder = 'Your answer…';
-          inp.rows        = 2;
-          wrapper.appendChild(inp);
-        }
-        _setButtonRow('practice-submit');
-      }).catch(_onApiError);
-  }
-
-  window.testPracticeSubmit = function () {
-    var inp = document.getElementById('tn-practice-input');
-    var ans = inp ? inp.value.trim() : '';
-    if (!ans) return;
-    if (inp) inp.disabled = true;
-    _lockButtons('Submit answer');
-    _setButtonRow('');
-    _showLoadingBlock();
-
-    var prob = _pendingPractice || {};
-    apiInteract({
-      phase:      'practice',
-      action:     'grade',
-      question:   prob.question   || '',
-      expected:   prob.expected   || '',
-      userAnswer: ans,
-    }).then(function (d) {
-      _removeLoadingBlock();
-      var g  = d.grade || {};
-      var fb = (g.correct ? '✓ ' : '✗ ') + (g.feedback || '');
-      _appendBlock({ type: 'feedback', content: fb });
-      _setButtonRow('practice-next');
-    }).catch(_onApiError);
-  };
-
-  window.testPracticeNext = function () {
-    _lockButtons('Yes, next problem');
-    _practiceIdx++;
-    _setButtonRow('');
-    _fetchPractice();
-  };
-
-  window.testPracticeDone = function () {
-    _lockButtons("I'm done");
-    _setButtonRow('');
-    _enterMeaning();
-  };
-
-  /* ─── Meaning ─────────────────────────────────────────────────── */
-  function _enterMeaning() {
-    _appendPhaseDivider('Meaning');
-    _setPhase('meaning');
-    _showLoadingBlock();
-    apiInteract({ phase: 'meaning' })
-      .then(function (d) {
-        _removeLoadingBlock();
-        _appendBlock({ type: 'meaning', content: d.text || '' });
-        _setButtonRow('meaning-options');
-      }).catch(_onApiError);
-  }
-
-  window.testMeaningOpt = function (opt) {
-    if (opt === 'ok') {
-      _lockButtons('I understand');
-      _setButtonRow('');
-      _completeKnobit();
-      return;
-    }
-    var label = { no: "I don't understand", simpler: 'Too simplistic', complex: 'Too complex' }[opt];
-    _lockButtons(label);
-    var lastContent = _getLastContent(['meaning']);
-    _showLoadingBlock();
-    apiInteract({ phase: 'meaning', action: opt, original: lastContent })
-      .then(function (d) {
-        _removeLoadingBlock();
-        _appendBlock({ type: 'meaning', content: d.text || '' });
-        _setButtonRow('meaning-options');
-      }).catch(_onApiError);
-  };
-
-  /* ─── Knobit completion ───────────────────────────────────────── */
-  function _completeKnobit() {
-    var k = KNOBITS[CURRENT_KNOBIT_IDX];
-    KNOBIT_DONE_COUNT++;
-    apiComplete(k.id);
-
-    if (CURRENT_KNOBIT_IDX + 1 >= KNOBIT_TOTAL) {
-      _showUnitComplete();
-    } else {
-      CURRENT_KNOBIT_IDX++;
-      _buildPathView();
-      showTmView('tm-path');
-    }
-  }
-
-  function _showUnitComplete() {
-    var t = document.querySelector('#testing-mode .lm-complete-title');
-    var s = document.querySelector('#testing-mode .lm-complete-sub');
-    if (t) t.textContent = 'Unit complete!';
-    if (s) s.textContent = _node ? _node.label : '';
-
-    var stat = document.querySelector('#testing-mode .lm-complete-stats');
-    if (stat) {
-      var cards = stat.querySelectorAll('.lm-complete-stat');
-      if (cards[0]) cards[0].innerHTML = '<div class="lm-cstat-num">' + KNOBIT_TOTAL + '</div><div class="lm-cstat-label">Knobits</div>';
-    }
-    showTmView('tm-complete');
-  }
-
-  /* ─── Ask bar ─────────────────────────────────────────────────── */
-  window.testSendAsk = function () {
+  /* ─── Answer input ────────────────────────────────────────────── */
+  function _setAnswerInputState(enabled, isMcq) {
     var inp = document.getElementById('tm-ask-input');
-    var q   = inp ? inp.value.trim() : '';
-    if (!q) return;
-    if (inp) inp.value = '';
-
-    _appendBlock({ type: 'user', content: q });
-    _showLoadingBlock();
-
-    var context = _streamBlocks.slice(-3).map(function (b) { return b.content || ''; }).join(' ');
-    apiInteract({ phase: 'ask', question: q, context: context })
-      .then(function (d) {
-        _removeLoadingBlock();
-        _appendBlock({ type: 'note', content: d.text || '' });
-        if (_phase === 'explain')  _setButtonRow('explain-options');
-        if (_phase === 'meaning')  _setButtonRow('meaning-options');
-      }).catch(_onApiError);
-  };
+    var btn = document.getElementById('tm-ask-send');
+    if (!inp) return;
+    inp.disabled = !enabled;
+    if (btn) btn.disabled = !enabled;
+    if (enabled) {
+      inp.placeholder = isMcq ? 'Type A, B, C, or D…' : 'Type your answer…';
+      inp.focus();
+    } else {
+      inp.placeholder = 'Waiting…';
+    }
+  }
 
   /* ─── Block stream ────────────────────────────────────────────── */
   function _appendPhaseDivider(name) {
     var s = document.getElementById('tn-stream');
     if (!s) return;
-    var d       = document.createElement('div');
-    d.className = 'phase-divider';
+    var d = document.createElement('div');
+    d.className   = 'phase-divider';
     d.textContent = '── ' + name + ' ──';
     s.appendChild(d);
     _scrollStream();
@@ -476,12 +323,13 @@
     if (!s) return null;
     _streamBlocks.push(block);
 
-    var el       = document.createElement('div');
+    var el = document.createElement('div');
     el.className = 'block block-' + block.type;
 
     if (block.rawHtml) {
       el.innerHTML = block.rawHtml;
     } else {
+      el.style.whiteSpace = 'pre-wrap';
       el.textContent = block.content || '';
     }
 
@@ -502,7 +350,7 @@
     _loading = true;
     var s = document.getElementById('tn-stream');
     if (!s) return;
-    var d       = document.createElement('div');
+    var d = document.createElement('div');
     d.id        = 'tn-loading-block';
     d.className = 'block block-loading';
     d.innerHTML = '<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>';
@@ -516,24 +364,6 @@
     if (el) el.remove();
   }
 
-  function _lockButtons(chosenLabel) {
-    var area = document.getElementById('tn-button-row');
-    if (!area) return;
-    area.querySelectorAll('button').forEach(function (b) {
-      b.classList.add('choice-locked');
-      b.disabled = true;
-    });
-  }
-
-  function _getLastContent(types) {
-    for (var i = _streamBlocks.length - 1; i >= 0; i--) {
-      if (!types || types.indexOf(_streamBlocks[i].type) !== -1) {
-        return _streamBlocks[i].content || '';
-      }
-    }
-    return '';
-  }
-
   function _scrollStream() {
     var s = document.getElementById('tn-stream');
     if (!s) return;
@@ -542,23 +372,8 @@
     }
   }
 
-  function _escHtml(str) {
-    return String(str || '')
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
-
-  function _onApiError() {
-    _removeLoadingBlock();
-    _appendBlock({ type: 'note', content: 'Connection error — please try again.' });
-  }
-
   /* ─── Static event wiring ─────────────────────────────────────── */
   document.addEventListener('DOMContentLoaded', function () {
-    var backBtn = document.getElementById('tn-back');
-    if (backBtn) backBtn.addEventListener('click', function () {
-      _buildPathView(); showTmView('tm-path');
-    });
-
     var askInp = document.getElementById('tm-ask-input');
     if (askInp) askInp.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); window.testSendAsk(); }
@@ -579,8 +394,7 @@
 
 })();
 
-/* ─── public namespace ──────────────────────────────────────────
-   Other modules call window.Test.*  — never openTestingMode directly */
+/* ─── public namespace ────────────────────────────────────────── */
 window.Test = {
   open:     window.openTestingMode,
   close:    window.closeTestingMode,
