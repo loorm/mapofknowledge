@@ -22,6 +22,7 @@
   var _streamBlocks = [];
   var _priorChoices = [];
   var _loading      = false;
+  var _starting     = false;   // guard against double-start
   var _pendingPractice = null;
 
   var _PHASES = ['explain', 'demonstrate', 'practice', 'meaning'];
@@ -133,7 +134,8 @@
 
   /* ─── View 2 — Knobit lesson ──────────────────────────────────── */
   window.startKnobit = function () {
-    if (!KNOBITS.length) return;
+    if (!KNOBITS.length || _starting) return;
+    _starting = true;
     var k = KNOBITS[CURRENT_KNOBIT_IDX];
 
     _streamBlocks   = [];
@@ -157,10 +159,14 @@
 
     apiInteract({ phase: 'explain', byteIndex: 0, priorChoices: [] })
       .then(function (d) {
+        _starting = false;
         _removeLoadingBlock();
         _appendBlock({ type: 'byte', content: d.text || '' });
         _setButtonRow('explain-options');
-      }).catch(_onApiError);
+      }).catch(function () {
+        _starting = false;
+        _onApiError();
+      });
   };
 
   /* ─── Phase chip management ───────────────────────────────────── */
@@ -199,7 +205,7 @@
     if (type === 'explain-options') {
       btn('I understand',       function () { window.explainOpt('ok');      });
       btn("I don't understand", function () { window.explainOpt('no');      });
-      btn('Too simplistic',     function () { window.explainOpt('simple');  });
+      btn('Too simplistic',     function () { window.explainOpt('simpler'); });
       btn('Too complex',        function () { window.explainOpt('complex'); });
     } else if (type === 'demo-1') {
       btn('View next example',  function () { window.demoOpt('next');    });
@@ -217,14 +223,14 @@
     } else if (type === 'meaning-options') {
       btn('I understand',       function () { window.meaningOpt('ok');      });
       btn("I don't understand", function () { window.meaningOpt('no');      });
-      btn('Too simplistic',     function () { window.meaningOpt('simple');  });
+      btn('Too simplistic',     function () { window.meaningOpt('simpler'); });
       btn('Too complex',        function () { window.meaningOpt('complex'); });
     }
   }
 
   /* ─── Explain ─────────────────────────────────────────────────── */
   window.explainOpt = function (opt) {
-    var label = { ok: 'I understand', no: "I don't understand", simple: 'Too simplistic', complex: 'Too complex' }[opt];
+    var label = { ok: 'I understand', no: "I don't understand", simpler: 'Too simplistic', complex: 'Too complex' }[opt];
     _lockButtons(label);
     _priorChoices.push(opt);
     _setButtonRow('');
@@ -239,9 +245,11 @@
 
     var lastContent = _getLastContent(['byte']);
     _showLoadingBlock();
+    // action mapping: 'ok' → advance (undefined), 'no' → 'rephrase', 'simpler'/'complex' → pass through
+    var action = opt === 'ok' ? undefined : (opt === 'no' ? 'rephrase' : opt);
     apiInteract({
       phase:        'explain',
-      action:       opt === 'ok' ? undefined : (opt === 'no' ? 'rephrase' : opt),
+      action:       action,
       byteIndex:    _byteIdx,
       priorChoices: _priorChoices,
       original:     lastContent,
@@ -380,7 +388,7 @@
       _completeKnobit();
       return;
     }
-    var label = { no: "I don't understand", simple: 'Too simplistic', complex: 'Too complex' }[opt];
+    var label = { no: "I don't understand", simpler: 'Too simplistic', complex: 'Too complex' }[opt];
     _lockButtons(label);
     var lastContent = _getLastContent(['meaning']);
     _showLoadingBlock();

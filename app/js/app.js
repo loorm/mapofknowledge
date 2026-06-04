@@ -434,8 +434,16 @@ function init(data, emergentData) {
         .catch(() => { if (sbOverview) sbOverview.textContent = ''; });
     }
 
+    // Reset toggle to off immediately — correct state will be set by API response below
+    if (sbToggle) {
+      sbToggle.classList.remove('on');
+      sbToggle.style.cursor = 'pointer';
+    }
+
     // Knowledge %
     if (sbPct) {
+      sbPct.textContent = '0%';
+      if (sbBadge) sbBadge.textContent = '';
       fetch(`/api/nodes/${nodeExtId}/knowledge`)
         .then(r => r.json())
         .then(({ percentage, source }) => {
@@ -445,20 +453,22 @@ function init(data, emergentData) {
             sbBadge.textContent = source === 'tested' ? 'Tested' : source === 'self_reported' ? 'Self-reported' : '';
           }
           if (sbToggle) {
+            // Show as 'on' only if self-reported 100%
             sbToggle.classList.toggle('on', percentage >= 100 && source === 'self_reported');
           }
         })
         .catch(() => {});
     }
 
-    // I know this toggle
+    // I know this toggle — wire once, but handler always reads current node via closure over _currentSidebarNodeId
     if (sbToggle && !sbToggle._wired) {
       sbToggle._wired = true;
-      sbToggle.style.cursor = 'pointer';
       sbToggle.addEventListener('click', function () {
+        const currentId = sidebar._currentNodeId;
+        if (!currentId) return;
         const isOn = sbToggle.classList.toggle('on');
         const pct  = isOn ? 100 : 0;
-        fetch(`/api/nodes/${nodeExtId}/knowledge`, {
+        fetch(`/api/nodes/${currentId}/knowledge`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ percentage: pct, source: 'self_reported' }),
@@ -468,6 +478,8 @@ function init(data, emergentData) {
         }).catch(() => {});
       });
     }
+    // Always update which node the toggle is acting on
+    sidebar._currentNodeId = nodeExtId;
   }
 
   function closeSidebar() {
