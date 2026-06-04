@@ -11,30 +11,26 @@
 
 window.Test = (function () {
 
-  /* ─── overlay helpers ───────────────────────────────────────── */
-  function _showOverlay() {
-    var lm = document.getElementById('learning-mode');
-    if (lm) lm.classList.add('active');
-    if (window.Learn && window.Learn.showView) window.Learn.showView('lm-test');
+  /* ─── public API — copied directly from openLearningMode/closeLearningMode ── */
+  function open(node, crumb) {
+    // Step 1: hide search (identical to openLearningMode line 1)
     var sw = document.querySelector('.topbar-search-wrap');
     if (sw) sw.style.display = 'none';
-  }
-
-  function _hideOverlay() {
-    var lm = document.getElementById('learning-mode');
-    if (lm) lm.classList.remove('active');
-    var sw = document.querySelector('.topbar-search-wrap');
-    if (sw) sw.style.display = '';
-  }
-
-  /* ─── public API ────────────────────────────────────────────── */
-  function open(node, crumb) {
-    _showOverlay();
+    // Step 2: switch to test view (replaces _buildPathView + showLmView('lm-path'))
+    if (window.showLmView) window.showLmView('lm-test');
+    // Step 3: show overlay (identical to openLearningMode last 2 lines)
+    var overlay = document.getElementById('learning-mode');
+    if (overlay) overlay.classList.add('active');
+    // Step 4: start test flow
     _start(node, crumb);
   }
 
   function close() {
-    _hideOverlay();
+    // Identical to closeLearningMode
+    var overlay = document.getElementById('learning-mode');
+    if (overlay) overlay.classList.remove('active');
+    var sw = document.querySelector('.topbar-search-wrap');
+    if (sw) sw.style.display = '';
   }
 
   /* ─── test flow ─────────────────────────────────────────────── */
