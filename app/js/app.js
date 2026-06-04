@@ -488,7 +488,7 @@ function init(data, emergentData) {
           if (old) old.parentNode.removeChild(old);
           var div = document.createElement('div');
           div.id = '_test_live';
-          div.style.cssText = 'position:fixed;top:52px;left:0;right:0;bottom:0;z-index:350;display:flex;flex-direction:column;';
+          div.style.cssText = 'position:fixed;top:52px;left:0;right:0;bottom:0;background:#EEF1F6;z-index:350;display:flex;flex-direction:column;';
           div.innerHTML =
             '<div id="tm-header">' +
               '<button id="tm-back" title="Exit test" onclick="window.Test.close()">' +
