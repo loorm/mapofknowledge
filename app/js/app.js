@@ -981,10 +981,11 @@ function init(data, emergentData) {
       if (cache[id]) return cache[id];
       const n = allNodes[id];
       if (!n) return (cache[id] = [0, 0]);
-      if (n.level === 5) {
+      if (progressMap[String(id)] !== undefined) {
         const pct = (progressMap[String(id)] || 0) / 100;
         return (cache[id] = [pct, 1]);
       }
+      if (n.level === 5) return (cache[id] = [0, 1]);
       const kids = childrenOf[id] || [];
       let kSum = 0, tSum = 0;
       kids.forEach(cid => {
