@@ -518,20 +518,14 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
 }
 
 /* ═══════════════════════════════════════════
-   TEST MODE OVERLAY
-   z-index 325 (above map, just above learning)
+   TEST MODE  (#lm-test view inside #learning-mode)
    Visually distinct: cooler blue-slate palette
    ═══════════════════════════════════════════ */
 
-#test-mode {
-  position: fixed;
-  top: 52px; left: 0; right: 0; bottom: 0;
-  z-index: 325;
-  display: none;
+#lm-test {
   flex-direction: column;
   background: #EEF1F6;
 }
-#test-mode.active { display: flex; }
 
 /* ── Header bar ── */
 #tm-header {
