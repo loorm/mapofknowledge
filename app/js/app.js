@@ -60,6 +60,18 @@ fetch('/api/map')
     document.body.innerHTML = '<div style="color:white;padding:20px">Could not load map — please refresh or log in again.</div>';
   });
 
+// Load user's knowledge progress and overlay on map
+let progressMap = {};
+function loadProgress() {
+  fetch('/api/map/progress')
+    .then(r => r.json())
+    .then(data => {
+      progressMap = data;
+      applyProgressOverlay();
+    })
+    .catch(() => {});
+}
+
 function init(data, emergentData) {
   // ── Build lookup structures ────────────────────────────────────────────────
   const allNodes = {};
@@ -708,6 +720,25 @@ function init(data, emergentData) {
     refreshNodeColors();
   };
 
+  function applyProgressOverlay() {
+    if (!node) return;
+    node
+      .attr('stroke', d => {
+        const pct = progressMap[String(d.id)] || 0;
+        if (pct >= 100) return '#8BAD7E';          // sage — fully known
+        if (pct >= 50)  return '#C4A55A';           // amber — partially known
+        return d.level <= 2 ? 'rgba(255,255,255,0.25)' : 'none';
+      })
+      .attr('stroke-width', d => {
+        const pct = progressMap[String(d.id)] || 0;
+        if (pct >= 100) return 2.5;
+        if (pct >= 50)  return 1.5;
+        return d.level <= 2 ? 0.5 : 0;
+      });
+  }
+
+  window.refreshProgress = function() { loadProgress(); };
+
   // ── Emergent tick ─────────────────────────────────────────────────────────
   function tickedEmergent() {
     if (emergentNode) {
@@ -873,6 +904,25 @@ function init(data, emergentData) {
     }
   };
 
+  // ── Knowledge label set builder (called by filters.js for "My Knowledge") ───
+  // Takes progressMap {externalId: pct} and threshold (e.g. 50).
+  // Returns a Set of node labels for matching nodes AND all their ancestors.
+  window.buildKnowledgeLabelSet = function (progressMap, threshold) {
+    const labelSet = new Set();
+    Object.entries(progressMap).forEach(([extId, pct]) => {
+      if (pct < threshold) return;
+      // Walk up the ancestor chain adding labels
+      const node = allNodes[extId];
+      if (!node) return;
+      let cur = extId;
+      while (cur !== undefined) {
+        if (allNodes[cur]) labelSet.add(allNodes[cur].label);
+        cur = parentOf[cur];
+      }
+    });
+    return labelSet;
+  };
+
   // ── Tilt API (called by tilt.js) ──────────────────────────────────────────
   window.setTilt = function (angle) {
     tiltAngle = angle;
@@ -885,4 +935,5 @@ function init(data, emergentData) {
   // ── Initial build ──────────────────────────────────────────────────────────
   rebuild();
   rebuildEmergent();
+  setTimeout(loadProgress, 800);  // load after D3 settles
 }
