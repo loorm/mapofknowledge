@@ -28,6 +28,7 @@
 
   /* ─── Entry / exit ────────────────────────────────────────────── */
   window.openTestMode = function (node, crumb) {
+    console.log('[TM] openTestMode called, overlay=', overlay, 'stream=', stream);
     _node        = node;
     _crumb       = crumb || '';
     _questionNum = 1;
@@ -39,16 +40,17 @@
     if (_searchWrap) _searchWrap.style.display = 'none';
 
     // Reset UI
-    stream.innerHTML      = '';
-    resultDiv.style.display = 'none';
-    inputArea.style.display = '';
-    answerInput.value     = '';
-    answerInput.disabled  = false;
+    if (stream) stream.innerHTML = '';
+    if (resultDiv) resultDiv.style.display = 'none';
+    if (inputArea) inputArea.style.display = '';
+    if (answerInput) { answerInput.value = ''; answerInput.disabled = false; }
 
     if (nodeLabelEl) nodeLabelEl.textContent = node.label || '';
     _updateProgress();
 
+    console.log('[TM] adding active class');
     overlay.classList.add('active');
+    console.log('[TM] overlay classList now:', overlay.className, 'display:', getComputedStyle(overlay).display);
     _loadQuestion();
   };
 

@@ -189,6 +189,11 @@ function init(data, emergentData) {
     svg.transition().duration(300).call(zoomBehaviour.scaleBy, 1 / 1.4);
   });
 
+  // Home/reset zoom — centers map at scale=1 (continent-level overview)
+  window.resetMapZoom = function () {
+    svg.transition().duration(600).call(zoomBehaviour.transform, d3.zoomIdentity);
+  };
+
   // ── Continent pre-seeding ──────────────────────────────────────────────────
   const continentNames = Object.keys(CONTINENTS);
   const seedRadius = Math.min(w, h) * 0.75;
