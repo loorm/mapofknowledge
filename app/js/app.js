@@ -705,27 +705,35 @@ function init(data, emergentData) {
     return false;
   }
 
+  function nodePassesActive(nodeId) {
+    // Label-based curriculum filter
+    if (activeFilterSet && !nodePassesFilter(nodeId)) return false;
+    // ID-based knowledge filter
+    if (knowledgeFilterIds && !knowledgeFilterIds.has(String(nodeId))) return false;
+    return true;
+  }
+
   function refreshNodeColors() {
     if (!node) return;
     node
-      .attr('fill', d => (!activeFilterSet || nodePassesFilter(d.id)) ? d.color : '#585858')
+      .attr('fill', d => nodePassesActive(d.id) ? d.color : '#585858')
       .attr('fill-opacity', d => {
         const base = d.level === 1 ? 1 : d.level === 2 ? 0.85 : 0.7;
-        return (!activeFilterSet || nodePassesFilter(d.id)) ? base : 0.3;
+        return nodePassesActive(d.id) ? base : 0.3;
       });
     if (!link) return;
     link
       .attr('stroke', d => {
         const srcId = typeof d.source === 'object' ? d.source.id : d.source;
         const tgtId = typeof d.target === 'object' ? d.target.id : d.target;
-        if (activeFilterSet && !(nodePassesFilter(srcId) && nodePassesFilter(tgtId))) return '#585858';
+        if (!nodePassesActive(srcId) || !nodePassesActive(tgtId)) return '#585858';
         const src = allNodes[srcId];
         return src ? (CONTINENTS[src.continent] || '#444') : '#444';
       })
       .attr('stroke-opacity', d => {
         const srcId = typeof d.source === 'object' ? d.source.id : d.source;
         const tgtId = typeof d.target === 'object' ? d.target.id : d.target;
-        if (activeFilterSet && !(nodePassesFilter(srcId) && nodePassesFilter(tgtId))) return 0.06;
+        if (!nodePassesActive(srcId) || !nodePassesActive(tgtId)) return 0.06;
         const src = allNodes[srcId];
         return src?.level === 1 ? 0.5 : src?.level === 2 ? 0.35 : src?.level === 3 ? 0.2 : 0.12;
       });
@@ -920,23 +928,38 @@ function init(data, emergentData) {
     }
   };
 
-  // ── Knowledge label set builder (called by filters.js for "My Knowledge") ───
-  // Takes progressMap {externalId: pct} and threshold (e.g. 50).
-  // Returns a Set of node labels for matching nodes AND all their ancestors.
-  window.buildKnowledgeLabelSet = function (progressMap, threshold) {
-    const labelSet = new Set();
-    Object.entries(progressMap).forEach(([extId, pct]) => {
-      if (pct < threshold) return;
-      // Walk up the ancestor chain adding labels
-      const node = allNodes[extId];
-      if (!node) return;
-      let cur = extId;
+  // ── Knowledge ID filter (called by filters.js for "My Knowledge") ───────────
+  // Uses node external IDs directly — avoids the label-based filter's tendency
+  // to light up entire domains. Only colors the exact known nodes plus the
+  // specific ancestor PATH (not siblings at each level).
+  let knowledgeFilterIds = null;  // Set<externalId> | null
+
+  window.setKnowledgeFilter = function (progressMap, threshold) {
+    // Collect IDs of known nodes (>= threshold %)
+    const directIds = new Set(
+      Object.entries(progressMap)
+        .filter(([, pct]) => pct >= threshold)
+        .map(([id]) => String(id))
+    );
+
+    // Walk up the ancestor chain for each known node so parents also light up.
+    // This colors the specific path (L5→L4→L3→L2→L1) but NOT siblings.
+    const allIds = new Set(directIds);
+    directIds.forEach(id => {
+      let cur = parentOf[id];
       while (cur !== undefined) {
-        if (allNodes[cur]) labelSet.add(allNodes[cur].label);
+        allIds.add(String(cur));
         cur = parentOf[cur];
       }
     });
-    return labelSet;
+
+    knowledgeFilterIds = allIds;
+    refreshNodeColors();
+  };
+
+  window.clearKnowledgeFilter = function () {
+    knowledgeFilterIds = null;
+    refreshNodeColors();
   };
 
   // ── Tilt API (called by tilt.js) ──────────────────────────────────────────

@@ -49,7 +49,12 @@
   }
 
   /* ─── Entry / exit ────────────────────────────────────────────── */
+  var _searchWrap = null;
+
   window.openLearningMode = function (node, crumb, knobits) {
+    // Hide search box — meaningless in learning view
+    _searchWrap = document.querySelector('.topbar-search-wrap');
+    if (_searchWrap) _searchWrap.style.display = 'none';
     _node             = node;
     _crumb            = crumb || '';
     KNOBITS           = Array.isArray(knobits) && knobits.length ? knobits : [];
@@ -74,6 +79,8 @@
   window.closeLearningMode = function () {
     var overlay = document.getElementById('learning-mode');
     if (overlay) overlay.classList.remove('active');
+    // Restore search box
+    if (_searchWrap) { _searchWrap.style.display = ''; _searchWrap = null; }
     _node   = null;
     KNOBITS = [];
   };

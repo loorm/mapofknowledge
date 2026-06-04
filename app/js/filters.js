@@ -297,19 +297,15 @@
 
       var filter = FILTERS[fid];
       if (filter && filter.dynamic) {
-        // "My Knowledge" — build label set from user's actual progress
-        applyToMap(null);  // clear while loading
+        // "My Knowledge" — use ID-based filter, not label-based
         fetch('/api/map/progress')
           .then(function (r) { return r.json(); })
           .then(function (progress) {
-            // Use app.js exposed helper to convert IDs → label set including ancestors
-            var labelSet = (typeof window.buildKnowledgeLabelSet === 'function')
-              ? window.buildKnowledgeLabelSet(progress, 50)
-              : new Set();
-            filter.labels = labelSet;
-            applyToMap(labelSet.size ? labelSet : null);
+            if (typeof window.setKnowledgeFilter === 'function') {
+              window.setKnowledgeFilter(progress, 50);
+            }
           })
-          .catch(function () { applyToMap(null); });
+          .catch(function () {});
       } else {
         applyToMap(filter ? filter.labels : null);
       }
@@ -332,6 +328,7 @@
     });
     if (clearBtn) clearBtn.classList.add('hidden');
     applyToMap(null);
+    if (typeof window.clearKnowledgeFilter === 'function') window.clearKnowledgeFilter();
   }
 
   function applyToMap(labelSet) {
