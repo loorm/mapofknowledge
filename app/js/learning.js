@@ -87,7 +87,7 @@
 
   /* ─── View switching ──────────────────────────────────────────── */
   window.showLmView = function (id) {
-    ['lm-path', 'lm-knobit', 'lm-complete'].forEach(function (v) {
+    ['lm-path', 'lm-knobit', 'lm-complete', 'lm-test'].forEach(function (v) {
       var el = document.getElementById(v);
       if (el) el.classList.toggle('active', v === id);
     });
