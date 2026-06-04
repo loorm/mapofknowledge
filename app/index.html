@@ -246,8 +246,7 @@
         <span class="sb-knowledge-label">Your Knowledge</span>
         <span class="sb-knowledge-badge">Finished</span>
       </div>
-      <div class="sb-pct">72%</div>
-      <div class="sb-pct-sub">Based on your interactions with related<br>topics in Physics and Mathematics.</div>
+      <div class="sb-pct">0%</div>
     </div>
 
     <!-- I know this -->
@@ -298,6 +297,41 @@
      LEARNING MODE  (z-index 320, above map)
      Three views: lm-path | lm-knobit | lm-complete
      ════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════
+     TEST MODE OVERLAY
+     ════════════════════════════════════════ -->
+<div id="test-mode">
+
+  <div id="tm-header">
+    <button id="tm-back" title="Exit test">
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+        <path d="M1 1l9 9M10 1L1 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <div id="tm-node-label">Topic</div>
+    <div id="tm-mode-badge">Knowledge Test</div>
+    <div id="tm-progress">Q 1 / 4</div>
+  </div>
+
+  <div id="tm-stream"></div>
+
+  <div id="tm-input-area">
+    <textarea id="tm-answer-input" placeholder="Your answer…" rows="3"></textarea>
+    <button id="tm-submit-btn">Submit answer</button>
+  </div>
+
+  <div id="tm-result" style="display:none">
+    <div id="tm-result-score-wrap">
+      <div id="tm-result-score">0%</div>
+      <div id="tm-result-label">Mastery score</div>
+    </div>
+    <div id="tm-result-breakdown"></div>
+    <button id="tm-result-back">Back to map</button>
+  </div>
+
+</div>
+
+
 <div id="learning-mode">
 
   <!-- ── VIEW 1: LEARNING PATH ─────────────────── -->
@@ -430,5 +464,6 @@
 <script src="js/filters.js"></script>
 <script src="js/app.js"></script>
 <script src="js/tilt.js"></script>
+<script src="js/test.js"></script>
 </body>
 </html>

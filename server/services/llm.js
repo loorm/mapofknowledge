@@ -254,6 +254,101 @@ Question: "${question}"`,
   return msg.content[0].text.trim();
 }
 
+// ── 4-tier knowledge test ─────────────────────────────────────────────────────
+// questionNum: 1-4  history: [{question, answer, correct}]
+// Returns: { question, type: 'open'|'mcq', options?: string[] }
+async function generateTestQuestion(nodeLabel, breadcrumb, questionNum, history) {
+  const tiers = [
+    'Factual (Remember): one question on core terminology or a foundational definition.',
+    'Conceptual (Understand): one question asking the learner to explain a mechanism or relationship. No calculations.',
+    'Procedural (Apply): one question requiring step-by-step execution with specific numbers/inputs.',
+    'Analytical (Evaluate): one question presenting a scenario or anomaly to diagnose or critique.',
+  ];
+
+  const correctCount = history.filter(h => h.correct).length;
+  const lastWasWrong = history.length > 0 && !history[history.length - 1].correct;
+  const adaptNote = questionNum === 4 && correctCount >= 3
+    ? 'The learner has done very well. Make this question genuinely expert-level.'
+    : lastWasWrong
+    ? 'The previous answer was incorrect. Adjust difficulty slightly downward.'
+    : '';
+
+  const historyText = history.map((h, i) =>
+    `Q${i + 1}: ${h.question}\nAnswer: ${h.answer}\nCorrect: ${h.correct}`
+  ).join('\n\n');
+
+  const msg = await client.messages.create({
+    model: SONNET,
+    max_tokens: 400,
+    system: [{
+      type: 'text',
+      text: `You are a knowledge diagnostic examiner. You generate exactly one question per tier of a 4-tier framework.
+Return ONLY valid JSON with these fields:
+- "question": the question text (string)
+- "type": "open" or "mcq"
+- "options": array of 4 strings if type is "mcq", omit if "open"
+Do not add any explanation outside the JSON.`,
+      cache_control: { type: 'ephemeral' },
+    }],
+    messages: [{
+      role: 'user',
+      content: `Topic: "${nodeLabel}" (${breadcrumb})
+Tier ${questionNum}: ${tiers[questionNum - 1]}
+${adaptNote}
+${historyText ? `\nPrevious Q&A:\n${historyText}` : ''}
+
+Generate question ${questionNum}. Choose open or MCQ based on what best tests this tier.
+For MCQ: provide exactly 4 options, one correct. Return JSON only.`,
+    }],
+  });
+
+  return parseJSON(msg.content[0].text.trim());
+}
+
+// Evaluate one answer and return feedback.
+// If questionNum === 4, also return final mastery score with breakdown.
+async function evaluateTestAnswer(nodeLabel, breadcrumb, questionNum, question, options, userAnswer, history) {
+  const isLast = questionNum === 4;
+  const allQA = [...history, { question, answer: userAnswer }];
+  const historyText = allQA.map((h, i) =>
+    `Q${i + 1}: ${h.question}\nAnswer: ${h.answer}`
+  ).join('\n\n');
+
+  const msg = await client.messages.create({
+    model: SONNET,
+    max_tokens: isLast ? 600 : 300,
+    system: [{
+      type: 'text',
+      text: `You are a knowledge diagnostic evaluator. Return ONLY valid JSON. No text outside the JSON object.`,
+      cache_control: { type: 'ephemeral' },
+    }],
+    messages: [{
+      role: 'user',
+      content: isLast
+        ? `Topic: "${nodeLabel}" (${breadcrumb})
+
+Full Q&A:
+${historyText}
+
+Evaluate all four answers. Return JSON with:
+- "correct": boolean (is the current Q4 answer correct?)
+- "feedback": 1-2 sentence feedback on the Q4 answer
+- "finalScore": integer 0-100
+- "scoreBreakdown": string (2-4 sentences explaining the score — what they got right, what they missed)`
+        : `Topic: "${nodeLabel}"
+Question: "${question}"
+${options ? `Options: ${options.map((o, i) => `${i + 1}. ${o}`).join(' | ')}` : ''}
+Answer: "${userAnswer}"
+
+Return JSON with:
+- "correct": boolean
+- "feedback": 1-2 sentences — confirm if correct or explain the right answer briefly`,
+    }],
+  });
+
+  return parseJSON(msg.content[0].text.trim());
+}
+
 module.exports = {
   generateOverview,
   generateKnobits,
@@ -264,4 +359,6 @@ module.exports = {
   gradePractice,
   generateMeaning,
   answerQuestion,
+  generateTestQuestion,
+  evaluateTestAnswer,
 };
