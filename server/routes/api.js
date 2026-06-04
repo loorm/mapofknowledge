@@ -463,7 +463,6 @@ async function getNodeBreadcrumb(nodeDbId) {
 // Generate the next test question
 router.post('/test/question', async (req, res) => {
   const { nodeId, questionNum, history = [] } = req.body;
-  console.log('[api/test/question] nodeId=%s q=%s', nodeId, questionNum);
   try {
     const [nodes] = await db.execute(
       'SELECT id AS db_id, label, level FROM nodes WHERE external_id = ?', [nodeId]
