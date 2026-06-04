@@ -51,6 +51,16 @@
   /* ─── Load next question ─────────────────────────────────────── */
   function _loadQuestion() {
     _setInputLoading(true, 'Generating question ' + _questionNum + ' of 4');
+    // Show loading state in stream so we can confirm the fetch is running
+    var stream = el('tm-stream');
+    var loadingDiv = null;
+    if (stream) {
+      loadingDiv = document.createElement('div');
+      loadingDiv.className = 'tm-block tm-question';
+      loadingDiv.style.opacity = '0.5';
+      loadingDiv.textContent = 'Generating question ' + _questionNum + '…';
+      stream.appendChild(loadingDiv);
+    }
     fetch('/api/test/question', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -58,16 +68,22 @@
     })
       .then(function (r) { return r.json(); })
       .then(function (q) {
+        if (loadingDiv && loadingDiv.parentNode) loadingDiv.parentNode.removeChild(loadingDiv);
         _currentQ = q;
         _setInputLoading(false);
-        _appendQuestion(q);
+        if (q && q.question) {
+          _appendQuestion(q);
+        } else {
+          _appendError('Server returned: ' + JSON.stringify(q));
+        }
         _updateProgress();
         var inp = el('tm-answer-input');
         if (inp) inp.focus();
       })
-      .catch(function () {
+      .catch(function (err) {
+        if (loadingDiv && loadingDiv.parentNode) loadingDiv.parentNode.removeChild(loadingDiv);
         _setInputLoading(false);
-        _appendError('Could not generate question — please try again.');
+        _appendError('Could not generate question: ' + (err && err.message ? err.message : 'network error'));
       });
   }
 

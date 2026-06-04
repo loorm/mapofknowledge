@@ -463,6 +463,7 @@ async function getNodeBreadcrumb(nodeDbId) {
 // Generate the next test question
 router.post('/test/question', async (req, res) => {
   const { nodeId, questionNum, history = [] } = req.body;
+  console.log('[api/test/question] nodeId=%s q=%s', nodeId, questionNum);
   try {
     const [nodes] = await db.execute(
       'SELECT id AS db_id, label, level FROM nodes WHERE external_id = ?', [nodeId]
@@ -473,6 +474,7 @@ router.post('/test/question', async (req, res) => {
 
     const breadcrumb = await getNodeBreadcrumb(db_id);
     const result = await llm.generateTestQuestion(label, breadcrumb, questionNum, history);
+    console.log('[api/test/question] ok, question type=%s', result && result.type);
     res.json(result);
   } catch (err) {
     console.error('[api/test/question]', err.message);
