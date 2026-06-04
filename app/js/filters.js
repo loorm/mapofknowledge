@@ -331,6 +331,8 @@
     if (typeof window.clearKnowledgeFilter === 'function') window.clearKnowledgeFilter();
   }
 
+  window.clearActiveFilter = deactivate;
+
   function applyToMap(labelSet) {
     /* setMapFilter is exposed by app.js after the map loads.
        If called before the map is ready, it's a no-op. */
