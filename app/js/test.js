@@ -263,12 +263,15 @@
   }
 
   /* ─── Event wiring ────────────────────────────────────────────── */
-  document.getElementById('tm-back').addEventListener('click', window.closeTestMode);
-  document.getElementById('tm-result-back').addEventListener('click', window.closeTestMode);
-
-  submitBtn.addEventListener('click', _submitAnswer);
-  answerInput.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); _submitAnswer(); }
-  });
+  try {
+    document.getElementById('tm-back').addEventListener('click', window.closeTestMode);
+    document.getElementById('tm-result-back').addEventListener('click', window.closeTestMode);
+    submitBtn.addEventListener('click', _submitAnswer);
+    answerInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); _submitAnswer(); }
+    });
+  } catch (e) {
+    console.error('[test.js] Event wiring failed:', e);
+  }
 
 })();
