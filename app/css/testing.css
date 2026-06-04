@@ -1,0 +1,50 @@
+/* ═══════════════════════════════════════════
+   TESTING MODE  —  full-viewport overlay
+   Parallel to learning.css / #learning-mode
+   ═══════════════════════════════════════════ */
+
+#testing-mode {
+  position: fixed;
+  top: 52px; left: 0; right: 0; bottom: 0;
+  z-index: 320;
+  display: none;
+  background: #F5EEE8;
+  --lm-accent: #C4826A;
+  --lm-accent-soft: rgba(196,130,106,0.12);
+}
+#testing-mode.active { display: flex; }
+
+#testing-mode::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 55% at 50% 0%,
+    var(--lm-accent-soft) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+#testing-mode > * { position: relative; z-index: 1; }
+
+#tm-path {
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#tm-knobit {
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#tm-complete {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 28px;
+  text-align: center;
+  overflow-y: auto;
+}
+
+#tn-button-row {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 10px 0 4px;
+}
