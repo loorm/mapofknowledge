@@ -244,13 +244,13 @@ router.post('/learn/knobit/:id/complete', async (req, res) => {
 
     // Recompute node knowledge %
     const [krow] = await db.execute(
-      `SELECT k.node_id, n.external_id AS nodeExtId, k.locale
+      `SELECT k.node_id, n.external_id AS nodeExtId, n.label AS nodeLabel, k.locale
        FROM knobits k JOIN nodes n ON k.node_id = n.id
        WHERE k.id = ?`,
       [knobitId]
     );
     if (krow.length) {
-      const { node_id, nodeExtId, locale } = krow[0];
+      const { node_id, nodeExtId, nodeLabel, locale } = krow[0];
       const [[{ total }]] = await db.execute(
         'SELECT COUNT(*) AS total FROM knobits WHERE node_id = ? AND locale = ?',
         [node_id, locale]
@@ -270,12 +270,161 @@ router.post('/learn/knobit/:id/complete', async (req, res) => {
            percentage = VALUES(percentage), source = 'tested', updated_at = NOW()`,
         [passportId, nodeExtId, pct]
       );
+
+      if (pct === 100) {
+        // Check if credential already exists
+        const credTitle = `${nodeLabel} — Completed`;
+        const [[existing]] = await db.execute(
+          `SELECT id FROM passport_credentials
+           WHERE passport_id = ? AND type = 'platform' AND title = ?`,
+          [passportId, credTitle]
+        );
+        if (!existing) {
+          const crypto = require('crypto');
+          const hash = crypto.createHash('sha256')
+            .update(`${passportId}-${nodeExtId}-${Date.now()}`)
+            .digest('hex')
+            .substring(0, 16);
+          await db.execute(
+            `INSERT INTO passport_credentials
+               (passport_id, type, title, issuer, awarded_date, score_pct, threshold_pct,
+                blockchain_hash, sort_order)
+             VALUES (?, 'platform', ?, 'Map of Knowledge · KaiQ Platform', CURDATE(), 100, 80, ?, 0)`,
+            [passportId, credTitle, '0x' + hash]
+          );
+          // Also add a learning event
+          await db.execute(
+            `INSERT INTO passport_events
+               (passport_id, event_date, title, institution, result, type, sort_order)
+             VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', 'Score: 100%', 'assessment', 0)`,
+            [passportId, `Completed: ${nodeLabel}`]
+          );
+        }
+      }
     }
 
     res.json({ ok: true });
   } catch (err) {
     console.error('[api/learn/knobit/complete]', err.message);
     res.status(500).json({ error: 'Failed to save knobit completion' });
+  }
+});
+
+// ── Map progress for current user ────────────────────────────────────────────
+router.get('/map/progress', async (req, res) => {
+  const passportId = req.user?.passport_id;
+  if (!passportId) return res.json({});
+  try {
+    const [rows] = await db.execute(
+      `SELECT node_external_id AS id, percentage
+       FROM user_node_knowledge WHERE passport_id = ? AND percentage > 0`,
+      [passportId]
+    );
+    const map = {};
+    rows.forEach(r => { map[r.id] = r.percentage; });
+    res.json(map);
+  } catch (err) {
+    res.status(500).json({});
+  }
+});
+
+// ── Full profile data for current user ───────────────────────────────────────
+router.get('/profile', async (req, res) => {
+  const passportId = req.user?.passport_id;
+  if (!passportId) return res.status(400).json({ error: 'No passport' });
+
+  try {
+    const [[passport]] = await db.execute(
+      'SELECT * FROM learner_passports WHERE id = ?', [passportId]
+    );
+
+    const [credentials] = await db.execute(
+      `SELECT * FROM passport_credentials WHERE passport_id = ? ORDER BY awarded_date DESC, id DESC`,
+      [passportId]
+    );
+
+    const [competence] = await db.execute(
+      `SELECT * FROM passport_competence WHERE passport_id = ? ORDER BY type, sort_order`,
+      [passportId]
+    );
+
+    // Top learned nodes as competence items derived from map progress
+    const [mapKnowledge] = await db.execute(
+      `SELECT n.label, n.level, u.percentage, u.source,
+              (SELECT n2.label FROM nodes n2 WHERE n2.id = n.parent_id) AS parent_label
+       FROM user_node_knowledge u
+       JOIN nodes n ON n.external_id = u.node_external_id
+       WHERE u.passport_id = ? AND u.percentage >= 50
+       ORDER BY u.percentage DESC, n.level ASC
+       LIMIT 20`,
+      [passportId]
+    );
+
+    const [events] = await db.execute(
+      `SELECT * FROM passport_events WHERE passport_id = ? ORDER BY event_date DESC, id DESC`,
+      [passportId]
+    );
+
+    const [tags] = await db.execute(
+      'SELECT * FROM passport_tags WHERE passport_id = ? ORDER BY sort_order',
+      [passportId]
+    );
+
+    const [learningStyle] = await db.execute(
+      'SELECT * FROM passport_learning_style WHERE passport_id = ?',
+      [passportId]
+    );
+
+    const [aspirations] = await db.execute(
+      'SELECT * FROM passport_aspirations WHERE passport_id = ? ORDER BY sort_order',
+      [passportId]
+    );
+
+    const [objectives] = await db.execute(
+      'SELECT * FROM passport_objectives WHERE passport_id = ? ORDER BY sort_order',
+      [passportId]
+    );
+
+    const [plans] = await db.execute(
+      'SELECT * FROM passport_plans WHERE passport_id = ? ORDER BY sort_order',
+      [passportId]
+    );
+
+    res.json({
+      passport,
+      credentials,
+      competence,
+      mapKnowledge,
+      events,
+      tags,
+      learningStyle: learningStyle[0] || null,
+      aspirations,
+      objectives,
+      plans,
+    });
+  } catch (err) {
+    console.error('[api/profile]', err.message);
+    res.status(500).json({ error: 'Failed to load profile' });
+  }
+});
+
+// ── Update basic passport identity ───────────────────────────────────────────
+router.post('/profile/identity', async (req, res) => {
+  const passportId = req.user?.passport_id;
+  if (!passportId) return res.status(400).json({ error: 'No passport' });
+  const { display_name, pronouns, birth_year, location, cultural_background, tagline, about } = req.body;
+  try {
+    await db.execute(
+      `UPDATE learner_passports
+       SET display_name=?, pronouns=?, birth_year=?, location=?,
+           cultural_background=?, tagline=?, about=?, updated_at=NOW()
+       WHERE id=?`,
+      [display_name||null, pronouns||null, birth_year||null, location||null,
+       cultural_background||null, tagline||null, about||null, passportId]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update identity' });
   }
 });
 

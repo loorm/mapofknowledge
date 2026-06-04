@@ -31,7 +31,7 @@
   <div class="topbar-banner">
     <div class="topbar-banner-inner">
       <span class="topbar-banner-dot"></span>
-      Learner Passport — Liisa Tamm
+      Learner Passport — Loading…
     </div>
   </div>
 
@@ -54,8 +54,8 @@
 
   <div class="pnav-avatar-wrap">
     <div class="pnav-avatar-circle">LT</div>
-    <div class="pnav-name">Liisa Tamm</div>
-    <div class="pnav-tagline">Independent learner<br>Tartu, Estonia</div>
+    <div class="pnav-name">Loading…</div>
+    <div class="pnav-tagline">Loading…</div>
   </div>
 
   <div class="pnav-divider"></div>
@@ -93,7 +93,7 @@
     <div class="p-section-body two-col">
 
       <!-- Identity -->
-      <div class="p-card s1">
+      <div class="p-card s1" id="identity-card">
         <div class="p-card-title">Identity</div>
         <div class="p-kv">
           <div class="p-kv-label">Full name</div>
@@ -120,7 +120,7 @@
       </div>
 
       <!-- About -->
-      <div class="p-card s1">
+      <div class="p-card s1" id="about-card">
         <div class="p-card-title">About</div>
         <div class="p-kv-value" style="font-size:13px;color:#4A4038;line-height:1.75">
           A computer scientist by training and an independent learner by vocation. Liisa moves between machine learning, philosophy of mind, music theory, and language acquisition — not as separate pursuits but as different angles on questions about structure, meaning, and how knowledge works.
@@ -130,7 +130,7 @@
       </div>
 
       <!-- Interests & values -->
-      <div class="p-card s1">
+      <div class="p-card s1" id="interests-card">
         <div class="p-card-title">Interests &amp; Values</div>
         <div style="margin-bottom:13px">
           <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#8A7E72;margin-bottom:8px">Core interests</div>
@@ -155,7 +155,7 @@
       </div>
 
       <!-- How I learn -->
-      <div class="p-card s1">
+      <div class="p-card s1" id="learning-style-card">
         <div class="p-card-title">How I Learn</div>
         <div class="p-kv">
           <div class="p-kv-label">Modalities</div>
@@ -197,7 +197,7 @@
     <div class="p-section-body">
 
       <!-- Events ledger -->
-      <div class="p-card s2">
+      <div class="p-card s2" id="events-ledger">
         <div class="p-card-title">Events</div>
 
         <div class="p-ledger-row">
@@ -488,7 +488,7 @@
     <div class="p-section-body two-col">
 
       <!-- Map of Knowledge — internal credentials -->
-      <div class="p-card s4 span2">
+      <div class="p-card s4 span2" id="platform-credentials-card">
         <div class="p-card-title">Map of Knowledge — Platform Credentials</div>
 
         <div class="p-cred">
@@ -515,7 +515,7 @@
 
       </div>
 
-      <div class="p-card s4">
+      <div class="p-card s4" id="qualifications-card">
         <div class="p-card-title">Qualifications</div>
         <div class="p-cred">
           <div class="p-cred-icon qual">🎓</div>
@@ -547,7 +547,7 @@
         </div>
       </div>
 
-      <div class="p-card s4 span2">
+      <div class="p-card s4 span2" id="certifications-card">
         <div class="p-card-title">Certifications &amp; Badges</div>
 
         <div class="p-cred">
@@ -598,7 +598,7 @@
     <div class="p-section-body">
 
       <!-- Knowledge (domains + languages) -->
-      <div class="p-card s5">
+      <div class="p-card s5" id="knowledge-card">
         <div class="p-card-title">Knowledge</div>
         <div style="font-size:11px;color:#9A8E86;margin-bottom:14px">
           ● ● ● ● ● expert &nbsp;·&nbsp; ● ● ● ● ○ advanced &nbsp;·&nbsp; ● ● ● ○ ○ working &nbsp;·&nbsp; ● ● ○ ○ ○ developing &nbsp;·&nbsp; ● ○ ○ ○ ○ introductory
@@ -704,7 +704,7 @@
       </div>
 
       <!-- Skills (technical + learning practice) -->
-      <div class="p-card s5">
+      <div class="p-card s5" id="skills-card">
         <div class="p-card-title">Skills</div>
 
         <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#8A7E72;margin-bottom:10px">Technical</div>
@@ -830,7 +830,7 @@
     <div class="p-section-body">
 
       <!-- Aspirations -->
-      <div class="p-card s6">
+      <div class="p-card s6" id="aspirations-card">
         <div class="p-card-title">Aspirations — long-term learning direction</div>
 
         <div class="p-aspiration">
@@ -856,7 +856,7 @@
       </div>
 
       <!-- Objectives -->
-      <div class="p-card s6">
+      <div class="p-card s6" id="objectives-card">
         <div class="p-card-title">Objectives — specific learning outcomes to achieve</div>
 
         <div class="p-objective">
@@ -910,7 +910,7 @@
       </div>
 
       <!-- Plans -->
-      <div class="p-card s6">
+      <div class="p-card s6" id="plans-card">
         <div class="p-card-title">Plans — concrete next steps</div>
 
         <div class="p-plan">
@@ -968,5 +968,6 @@
 
 
 </main>
+<script src="js/profile.js"></script>
 </body>
 </html>

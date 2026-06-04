@@ -17,22 +17,8 @@
     'my-knowledge': {
       label: 'My Knowledge',
       color: '#9B8FB5',
-      // MA in Law graduate, ~20 years post-graduation.
-      // Core: all of Law (L2) and its full descendant tree.
-      // Adjacent: fields a lawyer necessarily studies.
-      labels: new Set([
-        /* Social Sciences */
-        'Law',                   // L2 — entire law domain + all children
-        'Political Science',     // constitutional law, governance
-        'Sociology',             // sociology of law, criminology
-        'Economics',             // commercial law, economic analysis of law
-        /* Philosophy */
-        'Ethics',                // legal ethics, moral philosophy, rights theory
-        'Political philosophy',  // jurisprudence, social contract, theory of state
-        'Logic',                 // legal reasoning, formal argumentation
-        /* Humanities */
-        'History',               // Roman law, legal history, comparative law
-      ])
+      dynamic: true,      // resolved at click-time from /api/map/progress
+      labels: new Set()   // populated dynamically; ≥50% knowledge threshold
     },
 
     'estonian-basic-school': {
@@ -308,7 +294,25 @@
         el.classList.toggle('active', el.dataset.filterId === fid);
       });
       if (clearBtn) clearBtn.classList.remove('hidden');
-      applyToMap(FILTERS[fid] ? FILTERS[fid].labels : null);
+
+      var filter = FILTERS[fid];
+      if (filter && filter.dynamic) {
+        // "My Knowledge" — build label set from user's actual progress
+        applyToMap(null);  // clear while loading
+        fetch('/api/map/progress')
+          .then(function (r) { return r.json(); })
+          .then(function (progress) {
+            // Use app.js exposed helper to convert IDs → label set including ancestors
+            var labelSet = (typeof window.buildKnowledgeLabelSet === 'function')
+              ? window.buildKnowledgeLabelSet(progress, 50)
+              : new Set();
+            filter.labels = labelSet;
+            applyToMap(labelSet.size ? labelSet : null);
+          })
+          .catch(function () { applyToMap(null); });
+      } else {
+        applyToMap(filter ? filter.labels : null);
+      }
     }
   });
 
