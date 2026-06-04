@@ -465,23 +465,16 @@ function init(data, emergentData) {
         testBtnEl.disabled = false;
         testBtnEl.style.opacity = '';
         testBtnEl.style.cursor = '';
-        testBtnEl.onclick = async function () {
-          const originalHTML = testBtnEl.innerHTML;
-          testBtnEl.disabled = true;
-          testBtnEl.innerHTML =
-            '<span style="opacity:0.75;font-size:12px">Preparing your test</span>' +
-            '<span class="sb-learn-dots"><span class="sb-learn-dot"></span>' +
-            '<span class="sb-learn-dot"></span><span class="sb-learn-dot"></span></span>';
-          await new Promise(r => setTimeout(r, 100)); // allow repaint
-          testBtnEl.innerHTML = originalHTML;
-          testBtnEl.disabled = false;
+        testBtnEl.onclick = function () {
           closeSidebar();
-          if (typeof window.openTestMode === 'function') {
-            try { openTestMode(d, crumb); }
-            catch (err) { console.error('[Test mode] openTestMode threw:', err); }
-          } else {
-            console.error('[Test mode] window.openTestMode is not defined — test.js may not have loaded');
-          }
+          // Show overlay — exact same pattern as the Learn this button / openLearningMode
+          const lmOverlay = document.getElementById('learning-mode');
+          if (lmOverlay) lmOverlay.classList.add('active');
+          if (typeof window.showLmView === 'function') window.showLmView('lm-test');
+          const sw = document.querySelector('.topbar-search-wrap');
+          if (sw) sw.style.display = 'none';
+          // Hand off to test.js for state + question loading
+          if (typeof window.initTest === 'function') window.initTest(d, crumb);
         };
       } else {
         testBtnEl.disabled = true;

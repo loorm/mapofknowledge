@@ -1,26 +1,25 @@
 /* ══════════════════════════════════════════════
    TEST MODE  —  js/test.js
    4-Tier Knowledge Diagnostic
-   Lives inside #learning-mode as the #lm-test view.
-   Exposes: window.openTestMode(node, crumb)
-            window.closeTestMode()
+   #lm-test lives inside #learning-mode (shown by app.js onclick).
+   Exposes: window.initTest(node, crumb)   — set up state + load Q1
+            window.closeTestMode()         — called by back buttons
    ══════════════════════════════════════════════ */
 
 (function () {
 
   /* ─── State ──────────────────────────────────────────────────── */
-  var _node         = null;
-  var _crumb        = '';
-  var _questionNum  = 1;
-  var _history      = [];
-  var _currentQ     = null;
-  var _submitting   = false;
+  var _node        = null;
+  var _crumb       = '';
+  var _questionNum = 1;
+  var _history     = [];
+  var _currentQ    = null;
+  var _submitting  = false;
 
-  /* ─── DOM refs (grabbed lazily to avoid timing issues) ────────── */
   function el(id) { return document.getElementById(id); }
 
   /* ─── Entry / exit ────────────────────────────────────────────── */
-  window.openTestMode = function (node, crumb) {
+  window.initTest = function (node, crumb) {
     _node        = node;
     _crumb       = crumb || '';
     _questionNum = 1;
@@ -28,11 +27,11 @@
     _currentQ    = null;
     _submitting  = false;
 
-    var stream     = el('tm-stream');
-    var resultDiv  = el('tm-result');
-    var inputArea  = el('tm-input-area');
-    var answerInput= el('tm-answer-input');
-    var nodeLabelEl= el('tm-node-label');
+    var stream      = el('tm-stream');
+    var resultDiv   = el('tm-result');
+    var inputArea   = el('tm-input-area');
+    var answerInput = el('tm-answer-input');
+    var nodeLabelEl = el('tm-node-label');
 
     if (stream)      stream.innerHTML = '';
     if (resultDiv)   resultDiv.style.display = 'none';
@@ -41,26 +40,11 @@
     if (nodeLabelEl) nodeLabelEl.textContent = node.label || '';
 
     _updateProgress();
-
-    // Show via learning-mode overlay (same mechanism as Learn this)
-    var lmOverlay = el('learning-mode');
-    if (lmOverlay) lmOverlay.classList.add('active');
-    if (typeof window.showLmView === 'function') window.showLmView('lm-test');
-
-    // Hide search box
-    var searchWrap = document.querySelector('.topbar-search-wrap');
-    if (searchWrap) searchWrap.style.display = 'none';
-
     _loadQuestion();
   };
 
   window.closeTestMode = function () {
-    if (typeof window.closeLearningMode === 'function') {
-      window.closeLearningMode();
-    } else {
-      var lmOverlay = el('learning-mode');
-      if (lmOverlay) lmOverlay.classList.remove('active');
-    }
+    if (typeof window.closeLearningMode === 'function') window.closeLearningMode();
     _node = null;
   };
 
@@ -70,11 +54,7 @@
     fetch('/api/test/question', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({
-        nodeId:      _node.id,
-        questionNum: _questionNum,
-        history:     _history,
-      }),
+      body:    JSON.stringify({ nodeId: _node.id, questionNum: _questionNum, history: _history }),
     })
       .then(function (r) { return r.json(); })
       .then(function (q) {
@@ -95,28 +75,22 @@
   function _submitAnswer() {
     if (_submitting || !_currentQ) return;
     var answerInput = el('tm-answer-input');
-    var submitBtn   = el('tm-submit-btn');
     var answer = answerInput ? answerInput.value.trim() : '';
     if (!answer) return;
 
     _submitting = true;
     if (answerInput) answerInput.disabled = true;
-    if (submitBtn)   submitBtn.disabled   = true;
-
+    _setInputLoading(true, 'Evaluating your answer');
     _appendAnswer(answer);
     if (answerInput) answerInput.value = '';
-    _setInputLoading(true, 'Evaluating your answer');
 
     fetch('/api/test/evaluate', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({
-        nodeId:      _node.id,
-        questionNum: _questionNum,
-        question:    _currentQ.question,
-        options:     _currentQ.options || null,
-        userAnswer:  answer,
-        history:     _history,
+        nodeId: _node.id, questionNum: _questionNum,
+        question: _currentQ.question, options: _currentQ.options || null,
+        userAnswer: answer, history: _history,
       }),
     })
       .then(function (r) { return r.json(); })
@@ -132,7 +106,8 @@
           _questionNum++;
           _updateProgress();
           if (answerInput) answerInput.disabled = false;
-          if (submitBtn)   submitBtn.disabled   = false;
+          var sb = el('tm-submit-btn');
+          if (sb) sb.disabled = false;
           setTimeout(_loadQuestion, 600);
         }
       })
@@ -162,13 +137,12 @@
     if (typeof window.refreshProgress === 'function') window.refreshProgress();
   }
 
-  /* ─── Progress indicator ─────────────────────────────────────── */
+  /* ─── Helpers ────────────────────────────────────────────────── */
   function _updateProgress() {
-    var progressEl = el('tm-progress');
-    if (progressEl) progressEl.textContent = 'Q ' + _questionNum + ' / 4';
+    var p = el('tm-progress');
+    if (p) p.textContent = 'Q ' + _questionNum + ' / 4';
   }
 
-  /* ─── Stream builders ────────────────────────────────────────── */
   function _appendQuestion(q) {
     var stream = el('tm-stream');
     if (!stream) return;
@@ -177,12 +151,12 @@
 
     var tierNames = ['', 'Factual', 'Conceptual', 'Procedural', 'Analytical'];
     var lbl = document.createElement('div');
-    lbl.className   = 'tm-block-tier';
+    lbl.className = 'tm-block-tier';
     lbl.textContent = 'Q' + _questionNum + ' — ' + (tierNames[_questionNum] || '');
     wrap.appendChild(lbl);
 
     var text = document.createElement('div');
-    text.className   = 'tm-block-text';
+    text.className = 'tm-block-text';
     text.textContent = q.question;
     wrap.appendChild(text);
 
@@ -192,7 +166,7 @@
       opts.className = 'tm-options';
       q.options.forEach(function (opt, i) {
         var row = document.createElement('div');
-        row.className   = 'tm-option';
+        row.className = 'tm-option';
         row.textContent = (i + 1) + '.  ' + opt;
         opts.appendChild(row);
       });
@@ -210,7 +184,7 @@
     var stream = el('tm-stream');
     if (!stream) return;
     var div = document.createElement('div');
-    div.className   = 'tm-block tm-user-answer';
+    div.className = 'tm-block tm-user-answer';
     div.textContent = text;
     _fadeIn(div, stream);
     _scrollStream(stream);
@@ -220,7 +194,7 @@
     var stream = el('tm-stream');
     if (!stream) return;
     var div = document.createElement('div');
-    div.className   = 'tm-block tm-feedback ' + (correct ? 'tm-correct' : 'tm-wrong');
+    div.className = 'tm-block tm-feedback ' + (correct ? 'tm-correct' : 'tm-wrong');
     div.textContent = (correct ? '✓ ' : '✗ ') + text;
     _fadeIn(div, stream);
     _scrollStream(stream);
@@ -230,37 +204,34 @@
     var stream = el('tm-stream');
     if (!stream) return;
     var div = document.createElement('div');
-    div.className   = 'tm-block tm-error';
+    div.className = 'tm-block tm-error';
     div.textContent = text;
     _fadeIn(div, stream);
     _scrollStream(stream);
   }
 
   function _setInputLoading(on, label) {
-    var submitBtn = el('tm-submit-btn');
-    if (!submitBtn) return;
-    submitBtn.disabled = on;
+    var sb = el('tm-submit-btn');
+    if (!sb) return;
+    sb.disabled = on;
     if (on) {
-      submitBtn.innerHTML =
+      sb.innerHTML =
         '<span style="opacity:0.75;font-size:12px">' + (label || 'Loading') + '</span>' +
-        '<span class="sb-learn-dots">' +
-        '<span class="sb-learn-dot"></span>' +
-        '<span class="sb-learn-dot"></span>' +
-        '<span class="sb-learn-dot"></span>' +
-        '</span>';
+        '<span class="sb-learn-dots"><span class="sb-learn-dot"></span>' +
+        '<span class="sb-learn-dot"></span><span class="sb-learn-dot"></span></span>';
     } else {
-      submitBtn.textContent = 'Submit answer';
+      sb.textContent = 'Submit answer';
     }
   }
 
   function _fadeIn(div, stream) {
-    div.style.opacity   = '0';
+    div.style.opacity = '0';
     div.style.transform = 'translateY(8px)';
     stream.appendChild(div);
     requestAnimationFrame(function () {
       div.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
-      div.style.opacity    = '1';
-      div.style.transform  = 'translateY(0)';
+      div.style.opacity = '1';
+      div.style.transform = 'translateY(0)';
     });
   }
 
@@ -270,18 +241,12 @@
     }
   }
 
-  /* ─── Event wiring (delegated via onclick in HTML) ───────────── */
+  /* ─── Event wiring ────────────────────────────────────────────── */
   document.addEventListener('click', function (e) {
-    var submitBtn = el('tm-submit-btn');
-    if (e.target === submitBtn) _submitAnswer();
-
-    var inp = el('tm-answer-input');
-    // keydown handled below via addEventListener
+    if (e.target === el('tm-submit-btn')) _submitAnswer();
   });
-
   document.addEventListener('keydown', function (e) {
-    var inp = el('tm-answer-input');
-    if (e.key === 'Enter' && !e.shiftKey && document.activeElement === inp) {
+    if (e.key === 'Enter' && !e.shiftKey && document.activeElement === el('tm-answer-input')) {
       e.preventDefault();
       _submitAnswer();
     }
