@@ -402,12 +402,28 @@ function init(data, emergentData) {
         (crumbParts.length ? " › " + crumbParts.join(" › ") : "");
       learnBtn.onclick = async function () {
         if (d.level !== 5) return;
+
+        // Instant feedback — API can take several seconds on first visit
+        const originalHTML = learnBtn.innerHTML;
+        learnBtn.disabled = true;
+        learnBtn.innerHTML =
+          '<span style="opacity:0.75;font-size:12px">Creating your learning path</span>' +
+          '<span class="sb-learn-dots">' +
+          '<span class="sb-learn-dot"></span>' +
+          '<span class="sb-learn-dot"></span>' +
+          '<span class="sb-learn-dot"></span>' +
+          '</span>';
+
+        const restore = () => { learnBtn.innerHTML = originalHTML; learnBtn.disabled = false; };
+
         try {
           const r = await fetch(`/api/nodes/${d.id}/learn`, { method: 'POST' });
           const { knobits } = await r.json();
+          restore();
           closeSidebar();
           openLearningMode(d, crumb, knobits);
         } catch (err) {
+          restore();
           closeSidebar();
           openLearningMode(d, crumb, null);
         }
