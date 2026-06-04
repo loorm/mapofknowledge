@@ -10,7 +10,7 @@ function parseJSON(text) {
     .replace(/^```\s*/,     '')
     .replace(/```\s*$/,     '')
     .trim();
-  return parseJSON(cleaned);
+  return JSON.parse(cleaned);
 }
 
 const HAIKU  = 'claude-haiku-4-5';
