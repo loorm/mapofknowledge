@@ -194,10 +194,12 @@ router.post('/learn/interact', async (req, res) => {
     let result;
 
     if (phase === 'explain') {
-      if (action === 'simpler' || action === 'complex' || action === 'rephrase') {
+      if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
+        // Adapt the CURRENT byte — original holds what was shown
         result = { text: await llm.generateRephrase(nodeLabel, title, original, action) };
       } else {
-        result = { text: await llm.generateExplainByte(nodeLabel, title, byteIndex, priorChoices) };
+        // Advance forward — original holds the previous byte so LLM can build on it
+        result = { text: await llm.generateExplainByte(nodeLabel, title, byteIndex, original) };
       }
     } else if (phase === 'demonstrate') {
       result = { demonstrate: await llm.generateDemonstrate(nodeLabel, title, byteIndex) };
@@ -208,7 +210,11 @@ router.post('/learn/interact', async (req, res) => {
         result = { practice: await llm.generatePractice(nodeLabel, title, byteIndex) };
       }
     } else if (phase === 'meaning') {
-      result = { text: await llm.generateMeaning(nodeLabel, title) };
+      if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
+        result = { text: await llm.generateRephrase(nodeLabel, title, original, action) };
+      } else {
+        result = { text: await llm.generateMeaning(nodeLabel, title) };
+      }
     } else if (phase === 'ask') {
       result = { text: await llm.answerQuestion(nodeLabel, title, action || 'general', question, context) };
     } else {

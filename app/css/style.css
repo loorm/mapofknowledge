@@ -413,16 +413,21 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
 
 .sb-toggle {
   width: 40px; height: 22px; border-radius: 11px;
-  background: #8BAD7E;
+  background: rgba(58,48,40,0.15);   /* off: grey */
   position: relative;
   flex-shrink: 0;
+  cursor: pointer;
+  transition: background 0.2s;
 }
+.sb-toggle.on { background: #8BAD7E; }  /* on: sage green */
 .sb-toggle-thumb {
-  position: absolute; top: 3px; right: 3px;
+  position: absolute; top: 3px; left: 3px;  /* off: left */
   width: 16px; height: 16px; border-radius: 50%;
   background: #fff;
   box-shadow: 0 1px 4px rgba(0,0,0,0.20);
+  transition: transform 0.2s;
 }
+.sb-toggle.on .sb-toggle-thumb { transform: translateX(18px); }  /* on: slide right */
 
 /* Test me button */
 .sb-test-btn {
