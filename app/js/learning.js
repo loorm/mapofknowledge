@@ -79,8 +79,10 @@
   window.closeLearningMode = function () {
     var overlay = document.getElementById('learning-mode');
     if (overlay) overlay.classList.remove('active');
-    // Restore search box
-    if (_searchWrap) { _searchWrap.style.display = ''; _searchWrap = null; }
+    // Restore search box — always, whether hidden by learning or test mode
+    var sw = _searchWrap || document.querySelector('.topbar-search-wrap');
+    if (sw) sw.style.display = '';
+    _searchWrap = null;
     _node   = null;
     KNOBITS = [];
   };
