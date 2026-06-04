@@ -473,8 +473,16 @@ function init(data, emergentData) {
           if (typeof window.showLmView === 'function') window.showLmView('lm-test');
           const sw = document.querySelector('.topbar-search-wrap');
           if (sw) sw.style.display = 'none';
+          // Set node label directly so it always shows
+          const tmLabel = document.getElementById('tm-node-label');
+          if (tmLabel) tmLabel.textContent = d.label || '';
           // Hand off to test.js for state + question loading
-          if (typeof window.initTest === 'function') window.initTest(d, crumb);
+          if (typeof window.initTest === 'function') {
+            window.initTest(d, crumb);
+          } else {
+            const tmStream = document.getElementById('tm-stream');
+            if (tmStream) tmStream.innerHTML = '<div style="padding:20px;color:#c44;font-size:14px">Please reload the page and try again.</div>';
+          }
         };
       } else {
         testBtnEl.disabled = true;
