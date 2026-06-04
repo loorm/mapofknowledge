@@ -471,7 +471,12 @@ function init(data, emergentData) {
           testBtnEl.innerHTML = originalHTML;
           testBtnEl.disabled = false;
           closeSidebar();
-          if (typeof window.openTestMode === 'function') openTestMode(d, crumb);
+          if (typeof window.openTestMode === 'function') {
+            try { openTestMode(d, crumb); }
+            catch (err) { console.error('[Test mode] openTestMode threw:', err); }
+          } else {
+            console.error('[Test mode] window.openTestMode is not defined — test.js may not have loaded');
+          }
         };
       } else {
         testBtnEl.disabled = true;
