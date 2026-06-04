@@ -482,13 +482,37 @@ function init(data, emergentData) {
         testBtnEl.style.cursor = '';
         testBtnEl.onclick = function () {
           closeSidebar();
-          // Minimal: fresh div appended to body, no existing infrastructure
-          var existing = document.getElementById('_test_live');
-          if (existing) existing.parentNode.removeChild(existing);
+          var sw = document.querySelector('.topbar-search-wrap');
+          if (sw) sw.style.display = 'none';
+          var old = document.getElementById('_test_live');
+          if (old) old.parentNode.removeChild(old);
           var div = document.createElement('div');
           div.id = '_test_live';
-          div.style.cssText = 'position:fixed;top:52px;left:0;right:0;bottom:0;background:#EEF1F6;z-index:350;font-family:system-ui,sans-serif;';
+          div.style.cssText = 'position:fixed;top:52px;left:0;right:0;bottom:0;z-index:350;display:flex;flex-direction:column;';
+          div.innerHTML =
+            '<div id="tm-header">' +
+              '<button id="tm-back" title="Exit test" onclick="window.Test.close()">' +
+                '<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 1l9 9M10 1L1 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>' +
+              '</button>' +
+              '<div id="tm-node-label"></div>' +
+              '<div id="tm-mode-badge">Knowledge Test</div>' +
+              '<div id="tm-progress">Q 1 / 4</div>' +
+            '</div>' +
+            '<div id="tm-stream"></div>' +
+            '<div id="tm-input-area">' +
+              '<textarea id="tm-answer-input" placeholder="Your answer…" rows="3"></textarea>' +
+              '<button id="tm-submit-btn">Submit answer</button>' +
+            '</div>' +
+            '<div id="tm-result" style="display:none">' +
+              '<div id="tm-result-score-wrap">' +
+                '<div id="tm-result-score">0%</div>' +
+                '<div id="tm-result-label">Mastery score</div>' +
+              '</div>' +
+              '<div id="tm-result-breakdown"></div>' +
+              '<button id="tm-result-back" onclick="window.Test.close()">Back to map</button>' +
+            '</div>';
           document.body.appendChild(div);
+          window.Test.open(d, crumb);
         };
       } else {
         testBtnEl.disabled = true;
