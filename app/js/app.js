@@ -472,25 +472,7 @@ function init(data, emergentData) {
           if (typeof window.showLmView === 'function') window.showLmView('lm-test');
           const sw = document.querySelector('.topbar-search-wrap');
           if (sw) sw.style.display = 'none';
-          const tmLabel = document.getElementById('tm-node-label');
-          if (tmLabel) tmLabel.textContent = d.label || '';
-
-          // Reset and show loading directly — no test.js dependency
-          const tmResult = document.getElementById('tm-result');
-          const tmInputArea = document.getElementById('tm-input-area');
-          const tmStream = document.getElementById('tm-stream');
-          if (tmResult) tmResult.style.display = 'none';
-          if (tmInputArea) tmInputArea.style.display = '';
-          if (tmStream) {
-            tmStream.innerHTML = '';
-            const ld = document.createElement('div');
-            ld.className = 'tm-block tm-question';
-            ld.style.opacity = '0.6';
-            ld.textContent = 'Generating question 1…';
-            tmStream.appendChild(ld);
-          }
-
-          if (typeof window.initTest === 'function') window.initTest(d, crumb);
+          startTest(d, crumb);
         };
       } else {
         testBtnEl.disabled = true;
@@ -536,11 +518,21 @@ function init(data, emergentData) {
         .catch(() => {});
     }
 
-    // I know this toggle — wire once, but handler always reads current node via closure over _currentSidebarNodeId
+    // I know this toggle — only active for L4/L5
+    if (sbToggle) {
+      if (d.level >= 4) {
+        sbToggle.style.opacity = '';
+        sbToggle.style.pointerEvents = '';
+      } else {
+        sbToggle.style.opacity = '0.3';
+        sbToggle.style.pointerEvents = 'none';
+      }
+    }
     if (sbToggle && !sbToggle._wired) {
       sbToggle._wired = true;
       sbToggle.addEventListener('click', function () {
         const currentId = sidebar._currentNodeId;
+        const currentNode = allNodes[currentId];
         if (!currentId) return;
         const isOn = sbToggle.classList.toggle('on');
         const pct  = isOn ? 100 : 0;
@@ -552,6 +544,18 @@ function init(data, emergentData) {
           if (sbPct) sbPct.textContent = `${percentage}%`;
           if (sbBadge) sbBadge.textContent = percentage >= 100 ? 'Self-reported' : '';
         }).catch(() => {});
+        // L4 at 100%: cascade to all L5 children
+        if (isOn && currentNode && currentNode.level === 4) {
+          (childrenOf[currentId] || []).forEach(cid => {
+            if (allNodes[cid] && allNodes[cid].level === 5) {
+              fetch(`/api/nodes/${cid}/knowledge`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ percentage: 100, source: 'self_reported' }),
+              }).catch(() => {});
+            }
+          });
+        }
       });
     }
     // Always update which node the toggle is acting on
@@ -561,6 +565,143 @@ function init(data, emergentData) {
   function closeSidebar() {
     sidebar.classList.remove("open");
     sidebar.style.background = "";
+  }
+
+  // ── Test mode (fully self-contained, no test.js dependency) ──────────────────
+  function startTest(node, crumb) {
+    const elId = id => document.getElementById(id);
+    const tmLabel = elId('tm-node-label');
+    const stream  = elId('tm-stream');
+    const result  = elId('tm-result');
+    const inputArea  = elId('tm-input-area');
+    const answerInput= elId('tm-answer-input');
+    const submitBtn  = elId('tm-submit-btn');
+    const progress   = elId('tm-progress');
+
+    if (tmLabel) tmLabel.textContent = node.label || '';
+    if (result)  result.style.display = 'none';
+    if (inputArea) inputArea.style.display = '';
+    if (stream)  stream.innerHTML = '';
+    if (progress) progress.textContent = 'Q 1 / 4';
+
+    const state = { node, crumb, questionNum: 1, history: [], currentQ: null, submitting: false };
+
+    function tmBlock(cls, text) {
+      const div = document.createElement('div');
+      div.className = cls;
+      div.textContent = text;
+      if (stream) {
+        stream.appendChild(div);
+        if (stream.scrollHeight - stream.scrollTop - stream.clientHeight < 200) stream.scrollTop = stream.scrollHeight;
+      }
+      return div;
+    }
+
+    function loadQ() {
+      if (progress) progress.textContent = 'Q ' + state.questionNum + ' / 4';
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Generating question…'; }
+      const ld = tmBlock('tm-block tm-question', 'Generating question ' + state.questionNum + ' of 4…');
+      ld.style.opacity = '0.45';
+
+      fetch('/api/test/question', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nodeId: state.node.id, questionNum: state.questionNum, history: state.history }),
+      })
+        .then(r => r.json())
+        .then(q => {
+          if (ld.parentNode) ld.parentNode.removeChild(ld);
+          if (!q || !q.question) { tmBlock('tm-block tm-error', 'Server error: ' + JSON.stringify(q)); return; }
+          state.currentQ = q;
+
+          const wrap = document.createElement('div');
+          wrap.className = 'tm-block tm-question';
+          const tierNames = ['', 'Factual', 'Conceptual', 'Procedural', 'Analytical'];
+          const lbl = document.createElement('div');
+          lbl.className = 'tm-block-tier';
+          lbl.textContent = 'Q' + state.questionNum + ' — ' + (tierNames[state.questionNum] || '');
+          wrap.appendChild(lbl);
+          const txt = document.createElement('div');
+          txt.className = 'tm-block-text';
+          txt.textContent = q.question;
+          wrap.appendChild(txt);
+          if (q.type === 'mcq' && q.options && q.options.length) {
+            const opts = document.createElement('div');
+            opts.className = 'tm-options';
+            q.options.forEach((opt, i) => {
+              const row = document.createElement('div');
+              row.className = 'tm-option';
+              row.textContent = (i + 1) + '.  ' + opt;
+              opts.appendChild(row);
+            });
+            wrap.appendChild(opts);
+            if (answerInput) answerInput.placeholder = 'Enter number (1–' + q.options.length + ')';
+          } else {
+            if (answerInput) answerInput.placeholder = 'Your answer…';
+          }
+          if (stream) { stream.appendChild(wrap); stream.scrollTop = stream.scrollHeight; }
+          if (answerInput) { answerInput.disabled = false; answerInput.value = ''; answerInput.focus(); }
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit answer'; }
+        })
+        .catch(err => {
+          if (ld.parentNode) ld.parentNode.removeChild(ld);
+          tmBlock('tm-block tm-error', 'Could not load question: ' + (err && err.message || 'network error'));
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit answer'; }
+        });
+    }
+
+    function submitAnswer() {
+      if (state.submitting || !state.currentQ) return;
+      const answer = answerInput ? answerInput.value.trim() : '';
+      if (!answer) return;
+      state.submitting = true;
+      if (answerInput) answerInput.disabled = true;
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Evaluating…'; }
+      tmBlock('tm-block tm-user-answer', answer);
+      if (answerInput) answerInput.value = '';
+
+      fetch('/api/test/evaluate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nodeId: state.node.id, questionNum: state.questionNum,
+          question: state.currentQ.question, options: state.currentQ.options || null,
+          userAnswer: answer, history: state.history,
+        }),
+      })
+        .then(r => r.json())
+        .then(ev => {
+          state.history.push({ question: state.currentQ.question, answer, correct: ev.correct });
+          tmBlock('tm-block tm-feedback ' + (ev.correct ? 'tm-correct' : 'tm-wrong'), (ev.correct ? '✓ ' : '✗ ') + ev.feedback);
+          state.submitting = false;
+          if (state.questionNum === 4 && ev.finalScore !== undefined) {
+            setTimeout(() => {
+              if (inputArea) inputArea.style.display = 'none';
+              if (result) result.style.display = '';
+              const scoreEl = document.getElementById('tm-result-score');
+              const bdEl    = document.getElementById('tm-result-breakdown');
+              if (scoreEl) { scoreEl.textContent = ev.finalScore + '%'; scoreEl.style.color = ev.finalScore >= 80 ? '#8BAD7E' : ev.finalScore >= 50 ? '#C4A55A' : '#C4826A'; }
+              if (bdEl) bdEl.textContent = ev.scoreBreakdown || '';
+              if (typeof window.refreshProgress === 'function') window.refreshProgress();
+            }, 900);
+          } else {
+            state.questionNum++;
+            state.currentQ = null;
+            if (answerInput) answerInput.disabled = false;
+            setTimeout(loadQ, 600);
+          }
+        })
+        .catch(() => {
+          tmBlock('tm-block tm-error', 'Evaluation failed — please try again.');
+          state.submitting = false;
+          if (answerInput) answerInput.disabled = false;
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit answer'; }
+        });
+    }
+
+    if (submitBtn) submitBtn.onclick = submitAnswer;
+    if (answerInput) answerInput.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitAnswer(); } };
+    loadQ();
   }
 
   // ── Click to highlight ─────────────────────────────────────────────────────
