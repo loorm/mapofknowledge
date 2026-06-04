@@ -525,6 +525,8 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
 #lm-test {
   flex-direction: column;
   background: #EEF1F6;
+  flex: 1;
+  overflow: hidden;
 }
 
 /* ── Header bar ── */
