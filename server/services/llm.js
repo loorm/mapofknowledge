@@ -2,6 +2,17 @@ const Anthropic = require('@anthropic-ai/sdk');
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+// LLMs sometimes wrap JSON in markdown fences despite instructions.
+// Strip them before parsing.
+function parseJSON(text) {
+  const cleaned = text.trim()
+    .replace(/^```json\s*/i, '')
+    .replace(/^```\s*/,     '')
+    .replace(/```\s*$/,     '')
+    .trim();
+  return parseJSON(cleaned);
+}
+
 const HAIKU  = 'claude-haiku-4-5';
 const SONNET = 'claude-sonnet-4-6';
 
@@ -58,7 +69,7 @@ Return a JSON array. Each object has exactly:
 Typically 5–12 knobits, progressing from foundational to nuanced.`,
     }],
   });
-  return JSON.parse(msg.content[0].text.trim());
+  return parseJSON(msg.content[0].text.trim());
 }
 
 // ── Explain phase — ADVANCE to next byte ("I understand") ────────────────────
@@ -155,7 +166,7 @@ Respond with valid JSON, two fields only:
 No markdown fences. Just the JSON object.`,
     }],
   });
-  return JSON.parse(msg.content[0].text.trim());
+  return parseJSON(msg.content[0].text.trim());
 }
 
 // ── Practice phase ────────────────────────────────────────────────────────────
@@ -177,7 +188,7 @@ Respond with valid JSON, two fields only:
 No markdown fences. Just the JSON object.`,
     }],
   });
-  return JSON.parse(msg.content[0].text.trim());
+  return parseJSON(msg.content[0].text.trim());
 }
 
 // ── Grade a practice answer ───────────────────────────────────────────────────
@@ -200,7 +211,7 @@ Respond with valid JSON, two fields only:
 No markdown fences. Just the JSON object.`,
     }],
   });
-  return JSON.parse(msg.content[0].text.trim());
+  return parseJSON(msg.content[0].text.trim());
 }
 
 // ── Meaning phase ─────────────────────────────────────────────────────────────
