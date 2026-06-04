@@ -458,4 +458,88 @@ async function getNodeBreadcrumb(nodeDbId) {
   return rows.map(r => r.label).join(' › ');
 }
 
+// ── 4-Tier Knowledge Test ────────────────────────────────────────────────────
+
+// Generate the next test question
+router.post('/test/question', async (req, res) => {
+  const { nodeId, questionNum, history = [] } = req.body;
+  try {
+    const [nodes] = await db.execute(
+      'SELECT id AS db_id, label, level FROM nodes WHERE external_id = ?', [nodeId]
+    );
+    if (!nodes.length) return res.status(404).json({ error: 'Node not found' });
+    const { db_id, label, level } = nodes[0];
+    if (level < 4) return res.status(400).json({ error: 'Test only available for L4 and L5 nodes' });
+
+    const breadcrumb = await getNodeBreadcrumb(db_id);
+    const result = await llm.generateTestQuestion(label, breadcrumb, questionNum, history);
+    res.json(result);
+  } catch (err) {
+    console.error('[api/test/question]', err.message);
+    res.status(500).json({ error: 'Failed to generate question' });
+  }
+});
+
+// Evaluate an answer and optionally return final score
+router.post('/test/evaluate', async (req, res) => {
+  const { nodeId, questionNum, question, options, userAnswer, history = [] } = req.body;
+  const passportId = req.user?.passport_id;
+
+  try {
+    const [nodes] = await db.execute(
+      'SELECT id AS db_id, label, level FROM nodes WHERE external_id = ?', [nodeId]
+    );
+    if (!nodes.length) return res.status(404).json({ error: 'Node not found' });
+    const { db_id, label } = nodes[0];
+    const breadcrumb = await getNodeBreadcrumb(db_id);
+
+    const evaluation = await llm.evaluateTestAnswer(
+      label, breadcrumb, questionNum, question, options, userAnswer, history
+    );
+
+    // On completion (Q4), save result to DB and update knowledge
+    if (questionNum === 4 && evaluation.finalScore !== undefined && passportId) {
+      const allAnswers = [...history, { question, answer: userAnswer, correct: evaluation.correct }];
+      await db.execute(
+        `INSERT INTO test_sessions
+           (user_id, node_id, questions, answers, score, llm_feedback, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, NOW())`,
+        [
+          req.user.id,
+          db_id,
+          JSON.stringify(allAnswers.map(h => h.question)),
+          JSON.stringify(allAnswers.map(h => h.answer)),
+          evaluation.finalScore,
+          JSON.stringify({ breakdown: evaluation.scoreBreakdown }),
+        ]
+      );
+
+      // Update knowledge — tested source has highest priority
+      await db.execute(
+        `INSERT INTO user_node_knowledge
+           (passport_id, node_external_id, percentage, source, updated_at)
+         VALUES (?, ?, ?, 'tested', NOW())
+         ON DUPLICATE KEY UPDATE
+           percentage = VALUES(percentage),
+           source = 'tested',
+           updated_at = NOW()`,
+        [passportId, nodeId, evaluation.finalScore]
+      );
+
+      // Add learning event to passport
+      await db.execute(
+        `INSERT INTO passport_events
+           (passport_id, event_date, title, institution, result, type, sort_order)
+         VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', ?, 'assessment', 0)`,
+        [passportId, `Knowledge test: ${label}`, `Score: ${evaluation.finalScore}%`]
+      );
+    }
+
+    res.json(evaluation);
+  } catch (err) {
+    console.error('[api/test/evaluate]', err.message);
+    res.status(500).json({ error: 'Evaluation failed' });
+  }
+});
+
 module.exports = router;

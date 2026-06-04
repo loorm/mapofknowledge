@@ -453,6 +453,34 @@ function init(data, emergentData) {
       }
     }
 
+    // Test me — active for L4 and L5 nodes
+    const testBtnEl = document.querySelector('.sb-test-btn');
+    if (testBtnEl) {
+      if (d.level >= 4) {
+        testBtnEl.disabled = false;
+        testBtnEl.style.opacity = '';
+        testBtnEl.style.cursor = '';
+        testBtnEl.onclick = async function () {
+          const originalHTML = testBtnEl.innerHTML;
+          testBtnEl.disabled = true;
+          testBtnEl.innerHTML =
+            '<span style="opacity:0.75;font-size:12px">Preparing your test</span>' +
+            '<span class="sb-learn-dots"><span class="sb-learn-dot"></span>' +
+            '<span class="sb-learn-dot"></span><span class="sb-learn-dot"></span></span>';
+          await new Promise(r => setTimeout(r, 100)); // allow repaint
+          testBtnEl.innerHTML = originalHTML;
+          testBtnEl.disabled = false;
+          closeSidebar();
+          if (typeof window.openTestMode === 'function') openTestMode(d, crumb);
+        };
+      } else {
+        testBtnEl.disabled = true;
+        testBtnEl.style.opacity = '0.4';
+        testBtnEl.style.cursor = 'not-allowed';
+        testBtnEl.onclick = null;
+      }
+    }
+
     // Overview
     if (sbOverview) {
       sbOverview.textContent = 'Loading…';
@@ -478,7 +506,8 @@ function init(data, emergentData) {
           if (!sbPct) return;
           sbPct.textContent = `${percentage}%`;
           if (sbBadge) {
-            sbBadge.textContent = source === 'tested' ? 'Tested' : source === 'self_reported' ? 'Self-reported' : '';
+            const sourceLabel = { tested: 'Tested', self_reported: 'Self-reported', estimated: 'Estimated' };
+            sbBadge.textContent = sourceLabel[source] || '';
           }
           if (sbToggle) {
             // Show as 'on' only if self-reported 100%
@@ -719,7 +748,15 @@ function init(data, emergentData) {
       .attr('fill', d => nodePassesActive(d.id) ? d.color : '#585858')
       .attr('fill-opacity', d => {
         const base = d.level === 1 ? 1 : d.level === 2 ? 0.85 : 0.7;
-        return nodePassesActive(d.id) ? base : 0.3;
+        if (!nodePassesActive(d.id)) return 0.18;
+        // Proportional opacity when My Knowledge filter is active
+        if (knowledgePropMap) {
+          const pct = knowledgePropMap[String(d.id)] || 0;
+          // Scale: 0%→0.18 (dim), 1-99%→0.3–0.85, 100%→full
+          if (pct <= 0) return 0.18;
+          return Math.min(base, 0.25 + (pct / 100) * (base - 0.25));
+        }
+        return base;
       });
     if (!link) return;
     link
@@ -932,33 +969,58 @@ function init(data, emergentData) {
   // Uses node external IDs directly — avoids the label-based filter's tendency
   // to light up entire domains. Only colors the exact known nodes plus the
   // specific ancestor PATH (not siblings at each level).
-  let knowledgeFilterIds = null;  // Set<externalId> | null
+  let knowledgeFilterIds = null;   // Set<externalId> | null
+  let knowledgePropMap   = null;   // {externalId: 0-100} — proportional % per node
+
+  // Proportional knowledge % per node: fraction of L5 descendants that are known.
+  // Memoised bottom-up pass — O(n) total.
+  function computeProportionalKnowledge(progressMap) {
+    const cache = {};  // id → [knownFraction, totalL5Count]
+
+    function stats(id) {
+      if (cache[id]) return cache[id];
+      const n = allNodes[id];
+      if (!n) return (cache[id] = [0, 0]);
+      if (n.level === 5) {
+        const pct = (progressMap[String(id)] || 0) / 100;
+        return (cache[id] = [pct, 1]);
+      }
+      const kids = childrenOf[id] || [];
+      let kSum = 0, tSum = 0;
+      kids.forEach(cid => {
+        const [k, t] = stats(cid);
+        kSum += k; tSum += t;
+      });
+      return (cache[id] = [kSum, tSum]);
+    }
+
+    const result = {};
+    Object.keys(allNodes).forEach(id => {
+      const [k, t] = stats(id);
+      result[id] = t > 0 ? Math.round((k / t) * 100) : 0;
+    });
+    return result;
+  }
 
   window.setKnowledgeFilter = function (progressMap, threshold) {
-    // Collect IDs of known nodes (>= threshold %)
-    const directIds = new Set(
-      Object.entries(progressMap)
-        .filter(([, pct]) => pct >= threshold)
+    // Compute proportional knowledge for every node
+    const propMap = computeProportionalKnowledge(progressMap);
+
+    // Include nodes with at least 1% proportional knowledge (any source)
+    knowledgeFilterIds = new Set(
+      Object.entries(propMap)
+        .filter(([, pct]) => pct > 0)
         .map(([id]) => String(id))
     );
+    // Store proportional percentages for use in refreshNodeColors
+    knowledgePropMap = propMap;
 
-    // Walk up the ancestor chain for each known node so parents also light up.
-    // This colors the specific path (L5→L4→L3→L2→L1) but NOT siblings.
-    const allIds = new Set(directIds);
-    directIds.forEach(id => {
-      let cur = parentOf[id];
-      while (cur !== undefined) {
-        allIds.add(String(cur));
-        cur = parentOf[cur];
-      }
-    });
-
-    knowledgeFilterIds = allIds;
     refreshNodeColors();
   };
 
   window.clearKnowledgeFilter = function () {
     knowledgeFilterIds = null;
+    knowledgePropMap   = null;
     refreshNodeColors();
   };
 
