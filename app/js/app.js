@@ -482,7 +482,15 @@ function init(data, emergentData) {
         testBtnEl.style.cursor = '';
         testBtnEl.onclick = function () {
           closeSidebar();
-          window.Test.open(d, crumb);
+          // Minimal: fresh div appended to body, no existing infrastructure
+          var existing = document.getElementById('_test_live');
+          if (existing) existing.parentNode.removeChild(existing);
+          var div = document.createElement('div');
+          div.id = '_test_live';
+          div.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#EEF1F6;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:system-ui,sans-serif;';
+          div.innerHTML = '<h2 style="color:#1E3A5F;margin:0 0 12px">Test: ' + (d.label || '') + '</h2>' +
+                          '<button onclick="document.body.removeChild(document.getElementById(\'_test_live\'))" style="padding:8px 20px;border:none;background:#1E3A5F;color:#fff;border-radius:8px;cursor:pointer;font-size:14px">Close</button>';
+          document.body.appendChild(div);
         };
       } else {
         testBtnEl.disabled = true;
