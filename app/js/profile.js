@@ -66,11 +66,11 @@
     // Learning needs and preferences card
     const aboutCard = document.getElementById('about-card');
     if (aboutCard) {
-      aboutCard.innerHTML = about
+      aboutCard.innerHTML = `<div class="p-card-title">Learning needs and preferences</div>` + (about
         ? `<div class="p-kv-value" style="font-size:13px;color:#4A4038;line-height:1.75;white-space:pre-wrap">${esc(about)}</div>
            <button class="p-edit-btn" onclick="window.editAbout()">Edit</button>`
         : `${empty('Describe how and when and where you learn best, and any special needs that impact your learning.')}
-           <button class="p-edit-btn" onclick="window.editAbout()">Add</button>`;
+           <button class="p-edit-btn" onclick="window.editAbout()">Add</button>`);
     }
   }
 
