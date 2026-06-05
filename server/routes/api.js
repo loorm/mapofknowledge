@@ -528,6 +528,7 @@ async function updateAncestorKnowledge(passportId, nodeExtId) {
     );
 
     for (const anc of ancestors) {
+      // Compute average % from all L5 descendants
       const [[{ total, sumPct }]] = await db.execute(
         `WITH RECURSIVE desc_tree AS (
            SELECT id, external_id, level FROM nodes WHERE id = ?
@@ -545,17 +546,30 @@ async function updateAncestorKnowledge(passportId, nodeExtId) {
         [anc.db_id, passportId]
       );
 
-      if (total > 0) {
-        const estPct = Math.round(sumPct / total);
+      if (!total) continue;
+
+      // Never touch explicit self_reported or tested entries
+      const [existing] = await db.execute(
+        `SELECT source FROM user_node_knowledge WHERE passport_id = ? AND node_external_id = ?`,
+        [passportId, anc.external_id]
+      );
+      if (existing.length && ['self_reported', 'tested'].includes(existing[0].source)) continue;
+
+      const estPct = Math.round(sumPct / total);
+
+      if (estPct > 0) {
         await db.execute(
           `INSERT INTO user_node_knowledge
              (passport_id, node_external_id, percentage, source, updated_at)
            VALUES (?, ?, ?, 'estimated', NOW())
-           ON DUPLICATE KEY UPDATE
-             percentage = IF(source NOT IN ('self_reported','tested'), VALUES(percentage), percentage),
-             source     = IF(source NOT IN ('self_reported','tested'), 'estimated', source),
-             updated_at = IF(source NOT IN ('self_reported','tested'), NOW(), updated_at)`,
+           ON DUPLICATE KEY UPDATE percentage = VALUES(percentage), source = 'estimated', updated_at = NOW()`,
           [passportId, anc.external_id, estPct]
+        );
+      } else {
+        // Drop estimated row when % falls back to 0
+        await db.execute(
+          `DELETE FROM user_node_knowledge WHERE passport_id = ? AND node_external_id = ? AND source = 'estimated'`,
+          [passportId, anc.external_id]
         );
       }
     }
