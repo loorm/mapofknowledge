@@ -211,9 +211,7 @@
     const ledger = document.getElementById('events-ledger');
     if (!ledger) return;
 
-    const filtered  = _filteredEvents();
-    const showing   = filtered.slice(0, _evShowing);
-    const remaining = Math.max(0, filtered.length - _evShowing);
+    const filtered = _filteredEvents();
 
     // Type filter pills
     const typePills = ['all','activity','assessment','evidence'].map(function(t) {
@@ -225,21 +223,27 @@
         color:${active ? '#C4826A' : '#8A7E72'};font-size:11px;font-weight:600;font-family:inherit;cursor:pointer">${label}</button>`;
     }).join('');
 
+    const hasDates  = _evFilter.dateFrom || _evFilter.dateTo;
+    const clearLink = hasDates
+      ? `<button onclick="window.clearEvDates()" style="background:none;border:none;cursor:pointer;font-size:11px;color:#C4826A;padding:0;font-family:inherit">Clear dates</button>`
+      : '';
+
     const filterRow = `
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap">
         <div style="display:flex;gap:4px">${typePills}</div>
         <div style="display:flex;gap:4px;margin-left:auto;align-items:center">
-          <input type="date" class="p-edit-input" style="padding:3px 8px;font-size:11px;min-width:130px"
-            value="${_evFilter.dateFrom}" onchange="window.setEvDateFilter('from',this.value)">
+          <input type="date" class="p-edit-input" style="padding:3px 8px;font-size:11px;width:118px"
+            value="${_evFilter.dateFrom}" onblur="window.setEvDateFilter('from',this.value)">
           <span style="font-size:11px;color:#9A8E86">–</span>
-          <input type="date" class="p-edit-input" style="padding:3px 8px;font-size:11px;min-width:130px"
-            value="${_evFilter.dateTo}" onchange="window.setEvDateFilter('to',this.value)">
+          <input type="date" class="p-edit-input" style="padding:3px 8px;font-size:11px;width:118px"
+            value="${_evFilter.dateTo}" onblur="window.setEvDateFilter('to',this.value)">
+          ${clearLink}
         </div>
       </div>`;
 
-    const evHtml = !showing.length
+    const rowsHtml = !filtered.length
       ? empty(_allEvents.length ? 'No events match your filter.' : 'Your learning events will appear here.')
-      : showing.map(function(ev) {
+      : filtered.map(function(ev) {
           var titleHtml = esc(ev.title);
           if (ev.node_external_id) {
             var sep = ev.title.indexOf(': ');
@@ -263,17 +267,14 @@
           </div>`;
         }).join('');
 
-    const moreBtn = remaining > 0
-      ? `<button class="p-edit-btn" onclick="window.loadMoreEvents()" style="margin-top:8px">
-           Load more (${remaining} remaining)
-         </button>`
-      : '';
+    const scrollList = `<div style="max-height:380px;overflow-y:auto">${rowsHtml}</div>`;
+    const moreBtn = '';
 
     const today   = new Date().toISOString().split('T')[0];
     const srcOpts = ['Book','YouTube video','Conference','Workshop','Self-study period','Other']
       .map(function(s) { return `<option value="${s}">${s}</option>`; }).join('');
 
-    ledger.innerHTML = `<div class="p-card-title">Events</div>` + filterRow + evHtml + moreBtn + `
+    ledger.innerHTML = `<div class="p-card-title">Events</div>` + filterRow + scrollList + `
       <button class="p-edit-btn" id="ev-add-btn" style="margin-top:10px"
         onclick="document.getElementById('ev-form').style.display='';this.style.display='none';document.getElementById('ev-title').focus()">
         + Add activity
@@ -306,15 +307,15 @@
   }
 
   window.setEvTypeFilter = function(type) {
-    _evFilter.type = type; _evShowing = 5; _renderEventsWithState();
+    _evFilter.type = type; _renderEventsWithState();
   };
   window.setEvDateFilter = function(which, val) {
     if (which === 'from') _evFilter.dateFrom = val;
     else _evFilter.dateTo = val;
-    _evShowing = 5; _renderEventsWithState();
+    _renderEventsWithState();
   };
-  window.loadMoreEvents = function() {
-    _evShowing += 5; _renderEventsWithState();
+  window.clearEvDates = function() {
+    _evFilter.dateFrom = ''; _evFilter.dateTo = ''; _renderEventsWithState();
   };
 
   window.saveManualEvent = function () {
