@@ -549,15 +549,16 @@ router.get('/profile', async (req, res) => {
 router.post('/profile/identity', async (req, res) => {
   const passportId = req.user?.passport_id;
   if (!passportId) return res.status(400).json({ error: 'No passport' });
-  const { display_name, pronouns, birth_year, location, cultural_background, tagline, about } = req.body;
+  // Only update fields that were actually sent — prevents wiping unrelated fields
+  const ALLOWED = ['display_name', 'birth_year', 'location', 'cultural_background', 'about'];
+  const updates = {};
+  ALLOWED.forEach(f => { if (req.body[f] !== undefined) updates[f] = req.body[f] || null; });
+  if (!Object.keys(updates).length) return res.json({ ok: true });
   try {
+    const sets = Object.keys(updates).map(f => `${f} = ?`).join(', ');
     await db.execute(
-      `UPDATE learner_passports
-       SET display_name=?, pronouns=?, birth_year=?, location=?,
-           cultural_background=?, tagline=?, about=?, updated_at=NOW()
-       WHERE id=?`,
-      [display_name||null, pronouns||null, birth_year||null, location||null,
-       cultural_background||null, tagline||null, about||null, passportId]
+      `UPDATE learner_passports SET ${sets}, updated_at = NOW() WHERE id = ?`,
+      [...Object.values(updates), passportId]
     );
     res.json({ ok: true });
   } catch (err) {

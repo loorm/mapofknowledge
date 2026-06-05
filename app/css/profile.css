@@ -438,8 +438,35 @@ a.p-event-node-link:hover { border-bottom-color: #C4826A; }
   background: #fff;
   outline: none;
   transition: border-color 0.14s;
+  box-sizing: border-box;
+  -webkit-appearance: none;
 }
 .p-edit-input:focus { border-color: #C4826A; }
+select.p-edit-input { cursor: pointer; }
+
+/* ── Field tooltip (ⓘ) ──────────────────── */
+.p-kv-label { position: relative; }
+.p-tip {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: rgba(58,48,40,0.10); color: #9A8E86;
+  font-size: 9px; font-style: normal;
+  cursor: default; margin-left: 5px; vertical-align: middle;
+  position: relative;
+}
+.p-tip::after {
+  content: attr(data-tip);
+  position: absolute; bottom: calc(100% + 8px); left: 0;
+  background: #2C2820; color: #fff;
+  font-size: 11px; font-weight: 400; line-height: 1.55;
+  padding: 9px 12px; border-radius: 9px;
+  white-space: normal; width: 230px;
+  pointer-events: none;
+  opacity: 0; transition: opacity 0.15s;
+  z-index: 100;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+}
+.p-tip:hover::after { opacity: 1; }
 
 .p-edit-btn {
   margin-top: 12px;
