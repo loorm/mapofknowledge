@@ -82,6 +82,36 @@ router.get('/nodes/:id/overview', async (req, res) => {
   }
 });
 
+// ── Most recent in-progress learning path ────────────────────────────────────
+router.get('/learn/resume', async (req, res) => {
+  const passportId = req.user?.passport_id;
+  const locale     = req.user?.locale || 'en';
+  if (!passportId) return res.json({});
+
+  try {
+    const [rows] = await db.execute(
+      `SELECT n.external_id AS nodeId, n.label,
+              COUNT(k.id)          AS total,
+              COUNT(kp.knobit_id)  AS done,
+              MAX(kp.completed_at) AS last_activity
+       FROM knobits k
+       JOIN nodes n ON k.node_id = n.id
+       LEFT JOIN knobit_progress kp
+              ON k.id = kp.knobit_id AND kp.passport_id = ?
+       WHERE k.locale = ?
+       GROUP BY n.id, n.external_id, n.label
+       HAVING done > 0 AND done < total
+       ORDER BY last_activity DESC
+       LIMIT 1`,
+      [passportId, locale]
+    );
+    res.json(rows.length ? rows[0] : {});
+  } catch (err) {
+    console.error('[api/learn/resume]', err.message);
+    res.json({});
+  }
+});
+
 // ── Knobit progress for current user ─────────────────────────────────────────
 router.get('/nodes/:id/learn-progress', async (req, res) => {
   const { id }      = req.params;

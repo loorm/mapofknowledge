@@ -1090,6 +1090,55 @@ function init(data, emergentData) {
   // Keep legacy aliases so filters.js / tilt.js / HTML inline calls still work
   window.refreshProgress = window.MapView.refreshProgress;
 
+  // ── Continue chip ──────────────────────────────────────────────────────────
+  (function () {
+    const chip        = document.getElementById('continue-chip');
+    const topicEl     = document.getElementById('continue-chip-topic');
+    const progressEl  = document.getElementById('continue-chip-progress');
+    const toggleBtn   = document.getElementById('continue-chip-toggle');
+    if (!chip) return;
+
+    fetch('/api/learn/resume')
+      .then(r => r.json())
+      .then(({ nodeId, label, done, total }) => {
+        if (!nodeId) return;
+        topicEl.textContent    = label;
+        progressEl.textContent = `${done}/${total}`;
+        chip.classList.add('visible');
+
+        // Click chip body → open learning mode
+        chip.addEventListener('click', function (e) {
+          if (e.target.closest('.continue-chip-toggle')) return;
+          if (chip.classList.contains('collapsed')) {
+            chip.classList.remove('collapsed');
+            return;
+          }
+          const node = allNodes[nodeId];
+          if (!node) return;
+          const crumb = (function () {
+            const chain = [];
+            let cur = nodeId;
+            while (parentOf[cur] !== undefined) { cur = parentOf[cur]; chain.unshift(allNodes[cur]); }
+            const domain = chain[0];
+            const mid    = chain.slice(1).map(n => n.label);
+            return (domain ? domain.label : '') + (mid.length ? ' › ' + mid.join(' › ') : '');
+          }());
+          fetch(`/api/nodes/${nodeId}/learn`, { method: 'POST' })
+            .then(r => r.json())
+            .then(({ knobits }) => { window.Learn.open(node, crumb, knobits); })
+            .catch(() => { window.Learn.open(node, crumb, null); });
+        });
+
+        // Collapse toggle
+        toggleBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const collapsed = chip.classList.toggle('collapsed');
+          const chevron   = toggleBtn.querySelector('path');
+          if (chevron) chevron.setAttribute('d', collapsed ? 'M3.5 2l3.5 3-3.5 3' : 'M6.5 2L3 5l3.5 3');
+        });
+      }).catch(() => {});
+  }());
+
   // ── Initial build ──────────────────────────────────────────────────────────
   rebuild();
   rebuildEmergent();
