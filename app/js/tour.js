@@ -16,10 +16,11 @@
   /* ─── Step definitions ─────────────────────────────────────── */
   var STEPS = [
     {
-      target:   null,
-      position: 'bottom-center',
+      target:   '#ctrl-zoom',
+      position: 'left',
       title:    'Welcome to the Map of Knowledge',
-      text:     'Every concept humans have ever studied — over 10,000 of them — organised as a living, interactive graph. Zoom in to explore, drag nodes, and click anything that catches your eye.',
+      text:     'Every concept humans have ever studied — over 10,000 of them — organised as an interactive graph. Use these controls to zoom in and explore, drag nodes around, and click anything that catches your eye.',
+      padding:  10,
     },
     {
       target:   '#ctrl-left-stack',
