@@ -54,8 +54,10 @@
           <div class="p-kv-value" data-field="birth_year">${esc(passport.birth_year || '')}</div>
           <div class="p-kv-label">Language</div>
           <div class="p-kv-value" data-field="location">${esc(passport.location || '')}</div>
-          <div class="p-kv-label">Cultural background</div>
+          <div class="p-kv-label">Culture</div>
           <div class="p-kv-value" data-field="cultural_background">${esc(passport.cultural_background || '')}</div>
+          <div class="p-kv-label">ID number</div>
+          <div class="p-kv-value" data-field="id_number">${esc(passport.id_number || '')}</div>
         </div>
         <button class="p-edit-btn" onclick="window.editIdentity()">Edit identity</button>`;
     }
@@ -340,11 +342,8 @@
       yearOpts += '<option value="' + y + '"' + (String(vals.birth_year) === String(y) ? ' selected' : '') + '>' + y + '</option>';
     }
 
-    // Language dropdown
-    var LANGUAGES = ['English','Estonian','Finnish','Latvian','Lithuanian','Russian',
-      'German','French','Spanish','Portuguese','Italian','Swedish','Norwegian',
-      'Danish','Polish','Dutch','Hungarian','Czech','Ukrainian','Arabic',
-      'Chinese (Mandarin)','Japanese','Korean','Hindi','Other'];
+    // Language dropdown (extend list as platform adds language support)
+    var LANGUAGES = ['English'];
     var langOpts = '<option value="">—</option>' + LANGUAGES.map(function(l) {
       return '<option value="' + l + '"' + (vals.location === l ? ' selected' : '') + '>' + l + '</option>';
     }).join('');
@@ -364,11 +363,18 @@
           <select class="p-edit-input" data-field="location">${langOpts}</select>
         </div>
         <div class="p-kv-label">
-          Cultural background
+          Culture
           <span class="p-tip" data-tip="We use this to personalise your learning content. It can indicate your nationality, geographic region, religion, or other cultural context — leave blank if you prefer not to share.">ⓘ</span>
         </div>
         <div class="p-kv-value">
           <input class="p-edit-input" data-field="cultural_background" value="${esc(vals.cultural_background || '')}" placeholder="Optional">
+        </div>
+        <div class="p-kv-label">
+          ID number
+          <span class="p-tip" data-tip="Your national ID, social security, driver's licence or similar. Used to resolve identity disputes, if needed.">ⓘ</span>
+        </div>
+        <div class="p-kv-value">
+          <input class="p-edit-input" data-field="id_number" value="${esc(vals.id_number || '')}" placeholder="Optional">
         </div>
       </div>
       <button class="p-edit-btn primary" onclick="window.saveIdentity()">Save</button>
