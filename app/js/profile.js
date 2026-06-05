@@ -94,10 +94,78 @@
         <div class="p-tags">${iHtml}</div>
       </div>
       <div>
-        <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#8A7E72;margin-bottom:8px">What matters</div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#8A7E72;margin-bottom:8px">Values</div>
         <div class="p-tags">${vHtml}</div>
-      </div>`;
+      </div>
+      <button class="p-edit-btn" onclick="window.editInterests()">Edit</button>`;
   }
+
+  window.editInterests = function () {
+    const card = document.getElementById('interests-card');
+    if (!card) return;
+
+    function tagRow(t) {
+      return `<span class="p-tag ${esc(t.type)}" style="display:inline-flex;align-items:center;gap:5px">
+        ${esc(t.text)}
+        <button onclick="window.deleteTag(${t.id})" style="background:none;border:none;cursor:pointer;color:inherit;opacity:0.6;font-size:11px;padding:0;line-height:1" title="Remove">×</button>
+      </span>`;
+    }
+
+    function addRow(type) {
+      return `<div style="display:flex;gap:6px;margin-top:8px">
+        <input id="tag-input-${type}" class="p-edit-input" style="flex:1" placeholder="Add ${type}…" onkeydown="if(event.key==='Enter')window.addTag('${type}')">
+        <button class="p-edit-btn primary" onclick="window.addTag('${type}')" style="margin-top:0;white-space:nowrap">+ Add</button>
+      </div>`;
+    }
+
+    function rebuild() {
+      fetch('/api/profile').then(r => r.json()).then(d => {
+        const interests = (d.tags || []).filter(t => t.type === 'interest');
+        const values    = (d.tags || []).filter(t => t.type === 'value');
+        document.getElementById('tag-list-interest').innerHTML =
+          interests.length ? interests.map(tagRow).join('') : '<span style="color:#9A8E86;font-size:12px">None yet</span>';
+        document.getElementById('tag-list-value').innerHTML =
+          values.length ? values.map(tagRow).join('') : '<span style="color:#9A8E86;font-size:12px">None yet</span>';
+      });
+    }
+    window._rebuildTags = rebuild;
+
+    fetch('/api/profile').then(r => r.json()).then(d => {
+      const interests = (d.tags || []).filter(t => t.type === 'interest');
+      const values    = (d.tags || []).filter(t => t.type === 'value');
+      card.innerHTML = `
+        <div style="margin-bottom:16px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#8A7E72;margin-bottom:8px">Core interests</div>
+          <div class="p-tags" id="tag-list-interest">${interests.length ? interests.map(tagRow).join('') : '<span style="color:#9A8E86;font-size:12px">None yet</span>'}</div>
+          ${addRow('interest')}
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#8A7E72;margin-bottom:8px">Values</div>
+          <div class="p-tags" id="tag-list-value">${values.length ? values.map(tagRow).join('') : '<span style="color:#9A8E86;font-size:12px">None yet</span>'}</div>
+          ${addRow('value')}
+        </div>
+        <button class="p-edit-btn" onclick="window.loadProfile()" style="margin-top:14px">Done</button>`;
+    });
+  };
+
+  window.addTag = function (type) {
+    const inp = document.getElementById('tag-input-' + type);
+    const text = inp ? inp.value.trim() : '';
+    if (!text) return;
+    inp.value = '';
+    fetch('/api/profile/tags', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, text }),
+    }).then(() => { if (window._rebuildTags) window._rebuildTags(); })
+      .catch(() => {});
+  };
+
+  window.deleteTag = function (id) {
+    fetch('/api/profile/tags/' + id, { method: 'DELETE' })
+      .then(() => { if (window._rebuildTags) window._rebuildTags(); })
+      .catch(() => {});
+  };
 
   function renderLearningStyle(style) {
     const card = document.getElementById('learning-style-card');

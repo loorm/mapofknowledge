@@ -545,6 +545,39 @@ router.get('/profile', async (req, res) => {
   }
 });
 
+// ── Interests & Values (passport_tags) ───────────────────────────────────────
+router.post('/profile/tags', async (req, res) => {
+  const passportId = req.user?.passport_id;
+  if (!passportId) return res.status(400).json({ error: 'No passport' });
+  const { type, text } = req.body;
+  if (!['interest', 'value'].includes(type) || !text?.trim()) {
+    return res.status(400).json({ error: 'type and text required' });
+  }
+  try {
+    const [result] = await db.execute(
+      'INSERT INTO passport_tags (passport_id, type, text, sort_order) VALUES (?, ?, ?, 0)',
+      [passportId, type, text.trim()]
+    );
+    res.json({ id: result.insertId, type, text: text.trim() });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to add tag' });
+  }
+});
+
+router.delete('/profile/tags/:id', async (req, res) => {
+  const passportId = req.user?.passport_id;
+  if (!passportId) return res.status(400).json({ error: 'No passport' });
+  try {
+    await db.execute(
+      'DELETE FROM passport_tags WHERE id = ? AND passport_id = ?',
+      [req.params.id, passportId]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete tag' });
+  }
+});
+
 // ── Update basic passport identity ───────────────────────────────────────────
 router.post('/profile/identity', async (req, res) => {
   const passportId = req.user?.passport_id;
