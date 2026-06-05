@@ -649,23 +649,79 @@ function init(data, emergentData) {
   svg.on("click", () => { resetHighlight(); closeSidebar(); });
 
   // ── Search ─────────────────────────────────────────────────────────────────
-  const searchBox   = document.getElementById("search-box");
-  const searchClear = document.getElementById("search-clear");
+  const searchBox      = document.getElementById("search-box");
+  const searchClear    = document.getElementById("search-clear");
+  const searchDropdown = document.getElementById("search-dropdown");
+
+  function escHtml(s) {
+    return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function closeDropdown() {
+    if (searchDropdown) searchDropdown.classList.remove('visible');
+  }
+
+  function clearSearch() {
+    searchBox.value = '';
+    searchClear.style.display = 'none';
+    closeDropdown();
+    resetHighlight();
+  }
 
   searchBox.addEventListener("input", function() {
     searchClear.style.display = this.value ? "flex" : "none";
     const q = this.value.trim().toLowerCase();
-    if (!q) { resetHighlight(); return; }
-    const matches = new Set();
-    simNodes.forEach(n => { if (n.label.toLowerCase().includes(q)) matches.add(n.id); });
-    if (node) node.attr("fill-opacity", n => matches.has(n.id) ? 1 : 0.06);
+    if (!q) { resetHighlight(); closeDropdown(); return; }
+
+    // Match against ALL nodes including hidden L5
+    const allMatches = Object.values(allNodes).filter(n => n.label.toLowerCase().includes(q));
+
+    // Highlight visible matches on map
+    const visibleMatchIds = new Set(allMatches.filter(n => visibleIds.has(n.id)).map(n => n.id));
+    if (node) node.attr("fill-opacity", n => visibleMatchIds.has(n.id) ? 1 : 0.06);
     if (link) link.attr("stroke-opacity", 0.03);
+
+    // Dropdown for ≤5 matches
+    if (searchDropdown) {
+      if (allMatches.length > 0 && allMatches.length <= 5) {
+        searchDropdown.innerHTML = allMatches.map(n =>
+          `<div class="search-dropdown-item" data-node-id="${escHtml(n.id)}">
+            <span class="search-dropdown-name">${escHtml(n.label)}</span>
+            <span class="search-dropdown-domain">${escHtml(n.continent)}</span>
+          </div>`
+        ).join('');
+        searchDropdown.classList.add('visible');
+      } else {
+        closeDropdown();
+      }
+    }
+  });
+
+  // Dropdown item click → navigate
+  if (searchDropdown) {
+    searchDropdown.addEventListener('click', function(e) {
+      const item = e.target.closest('.search-dropdown-item');
+      if (!item) return;
+      clearSearch();
+      navigateToNode(item.dataset.nodeId);
+    });
+  }
+
+  // Enter key → navigate on exact match
+  searchBox.addEventListener("keydown", function(e) {
+    if (e.key !== 'Enter') return;
+    const q = this.value.trim().toLowerCase();
+    const exact = Object.values(allNodes).find(n => n.label.toLowerCase() === q);
+    if (exact) { clearSearch(); navigateToNode(exact.id); }
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.topbar-search-wrap')) closeDropdown();
   });
 
   searchClear.addEventListener("click", function() {
-    searchBox.value = "";
-    searchClear.style.display = "none";
-    resetHighlight();
+    clearSearch();
     searchBox.focus();
   });
 
@@ -1094,38 +1150,37 @@ function init(data, emergentData) {
   // Keep legacy aliases so filters.js / tilt.js / HTML inline calls still work
   window.refreshProgress = window.MapView.refreshProgress;
 
+  // ── Node navigation (shared by deep-link and search) ─────────────────────
+  function navigateToNode(nodeId) {
+    function zoomAndOpen() {
+      const t = allNodes[nodeId];
+      if (!t || !t.x) return;
+      const cw = window.innerWidth, ch = window.innerHeight - TOP_BAR_H;
+      const z  = 3.5;
+      svg.transition().duration(800).ease(d3.easeCubicOut)
+        .call(zoomBehaviour.transform,
+          d3.zoomIdentity.translate(cw / 2 - t.x * z, ch / 2 - t.y * z).scale(z))
+        .on('end', function () { highlightAndOpen(t); });
+    }
+    const target = allNodes[nodeId];
+    if (!target) return;
+    if (target.level === 5) {
+      const parentId = parentOf[nodeId];
+      if (parentId && allNodes[parentId] && !allNodes[parentId].expanded) {
+        toggleExpand(allNodes[parentId]);
+        setTimeout(zoomAndOpen, 150);
+        return;
+      }
+    }
+    zoomAndOpen();
+  }
+
   // ── Deep-link navigation (?node=external_id) ──────────────────────────────
   (function () {
     const targetId = new URLSearchParams(window.location.search).get('node');
     if (!targetId) return;
     history.replaceState(null, '', window.location.pathname);
-
-    function navigateTo(nodeId) {
-      const target = allNodes[nodeId];
-      if (!target || !target.x) return;
-      const cw = window.innerWidth, ch = window.innerHeight - TOP_BAR_H;
-      const z  = 3.5;
-      const transform = d3.zoomIdentity
-        .translate(cw / 2 - target.x * z, ch / 2 - target.y * z)
-        .scale(z);
-      svg.transition().duration(800).ease(d3.easeCubicOut)
-        .call(zoomBehaviour.transform, transform)
-        .on('end', function () { highlightAndOpen(target); });
-    }
-
-    setTimeout(function () {
-      const target = allNodes[targetId];
-      if (!target) return;
-      if (target.level === 5) {
-        const parentId = parentOf[targetId];
-        if (parentId && allNodes[parentId] && !allNodes[parentId].expanded) {
-          toggleExpand(allNodes[parentId]);
-          setTimeout(function () { navigateTo(targetId); }, 150);
-          return;
-        }
-      }
-      navigateTo(targetId);
-    }, 1600);
+    setTimeout(function () { navigateToNode(targetId); }, 1600);
   }());
 
   // ── Continue chip ──────────────────────────────────────────────────────────

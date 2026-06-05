@@ -106,6 +106,35 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
 }
 .search-clear:hover { background: rgba(58,48,40,0.18); color: #3A3028; }
 
+.search-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px); left: 0;
+  min-width: 100%; width: max-content; max-width: 340px;
+  background: linear-gradient(145deg, rgba(248,242,236,0.98) 0%, rgba(237,232,246,0.98) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(58,48,40,0.10);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(58,48,40,0.13), 0 0 0 1px rgba(196,130,106,0.35);
+  z-index: 400;
+  overflow: hidden;
+}
+.search-dropdown.visible { display: block; }
+.search-dropdown-item {
+  display: flex; align-items: baseline; gap: 8px;
+  padding: 9px 14px; cursor: pointer;
+  transition: background 0.12s;
+}
+.search-dropdown-item:hover { background: rgba(196,130,106,0.08); }
+.search-dropdown-item:not(:last-child) { border-bottom: 1px solid rgba(58,48,40,0.06); }
+.search-dropdown-name {
+  font-size: 13px; font-weight: 600; color: #2C2820;
+}
+.search-dropdown-domain {
+  font-size: 11px; color: #9A8E86; white-space: nowrap;
+}
+
 .topbar-icon-btn {
   width: 32px; height: 32px; border-radius: 8px;
   background: transparent; border: none; cursor: pointer;
