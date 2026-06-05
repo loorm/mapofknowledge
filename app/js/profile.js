@@ -483,8 +483,8 @@
 
     function credAddForm(type, hasMonth) {
       var dateField = hasMonth
-        ? `<input id="cred-date-${type}" type="month" class="p-edit-input" placeholder="Month and year">`
-        : `<input id="cred-date-${type}" type="number" class="p-edit-input" min="1900" max="2099" placeholder="Year">`;
+        ? `<input id="cred-date-${type}" type="month" class="p-edit-input" style="width:150px">`
+        : `<input id="cred-date-${type}" type="number" class="p-edit-input" style="width:100px" min="1900" max="2099" placeholder="Year">`;
       return `
         <button class="p-edit-btn" id="cred-add-btn-${type}" style="margin-top:10px"
           onclick="document.getElementById('cred-form-${type}').style.display='';this.style.display='none';document.getElementById('cred-title-${type}').focus()">
@@ -494,10 +494,7 @@
           <div style="display:grid;gap:6px">
             <input id="cred-title-${type}" class="p-edit-input" placeholder="Title (required)">
             <input id="cred-issuer-${type}" class="p-edit-input" placeholder="Issuer / Institution">
-            <div style="display:flex;gap:6px">
-              ${dateField}
-              <input id="cred-grade-${type}" class="p-edit-input" style="flex:1" placeholder="Grade / score / note">
-            </div>
+            <div>${dateField}</div>
             <div style="display:flex;gap:6px">
               <button class="p-edit-btn primary" onclick="window.saveCredential('${type}')" style="margin-top:0">Add</button>
               <button class="p-edit-btn" onclick="document.getElementById('cred-form-${type}').style.display='none';document.getElementById('cred-add-btn-${type}').style.display=''" style="margin-top:0">Cancel</button>
@@ -592,10 +589,8 @@
     var titleEl  = document.getElementById('cred-title-' + type);
     var issuerEl = document.getElementById('cred-issuer-' + type);
     var dateEl   = document.getElementById('cred-date-' + type);
-    var gradeEl  = document.getElementById('cred-grade-' + type);
     if (!titleEl || !titleEl.value.trim()) { if (titleEl) titleEl.focus(); return; }
     var dateVal = dateEl ? dateEl.value.trim() : '';
-    // month input gives YYYY-MM; year input gives YYYY — normalise to YYYY-MM for API
     if (dateVal && dateVal.length === 4) dateVal = dateVal + '-01';
     fetch('/api/profile/credentials', {
       method: 'POST',
@@ -605,7 +600,6 @@
         title:        titleEl.value.trim(),
         issuer:       issuerEl ? issuerEl.value.trim() || null : null,
         awarded_date: dateVal || null,
-        grade:        gradeEl ? gradeEl.value.trim() || null : null,
       }),
     }).then(function() { window.loadProfile(); }).catch(function() {});
   };
