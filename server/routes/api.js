@@ -550,6 +550,12 @@ router.get('/profile', async (req, res) => {
       [passportId]
     );
 
+    const [goals] = await db.execute(
+      `SELECT * FROM passport_goals WHERE passport_id = ?
+       ORDER BY status ASC, created_at DESC`,
+      [passportId]
+    );
+
     const [aspirations] = await db.execute(
       'SELECT * FROM passport_aspirations WHERE passport_id = ? ORDER BY sort_order',
       [passportId]
@@ -575,6 +581,7 @@ router.get('/profile', async (req, res) => {
       relationships,
       reflections,
       learningStyle: learningStyle[0] || null,
+      goals,
       aspirations,
       objectives,
       plans,
@@ -639,6 +646,51 @@ router.delete('/profile/events/:id', async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete event' });
+  }
+});
+
+// ── Goals ────────────────────────────────────────────────────────────────────
+router.post('/profile/goals', async (req, res) => {
+  const passportId = req.user?.passport_id;
+  if (!passportId) return res.status(400).json({ error: 'No passport' });
+  const { text } = req.body;
+  if (!text?.trim()) return res.status(400).json({ error: 'text required' });
+  try {
+    const [result] = await db.execute(
+      `INSERT INTO passport_goals (passport_id, text, status, created_at) VALUES (?, ?, 'in_progress', NOW())`,
+      [passportId, text.trim()]
+    );
+    res.json({ id: result.insertId, ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to add goal' });
+  }
+});
+
+router.post('/profile/goals/:id/complete', async (req, res) => {
+  const passportId = req.user?.passport_id;
+  if (!passportId) return res.status(400).json({ error: 'No passport' });
+  try {
+    await db.execute(
+      `UPDATE passport_goals SET status='completed', completed_at=NOW() WHERE id=? AND passport_id=?`,
+      [req.params.id, passportId]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to complete goal' });
+  }
+});
+
+router.delete('/profile/goals/:id', async (req, res) => {
+  const passportId = req.user?.passport_id;
+  if (!passportId) return res.status(400).json({ error: 'No passport' });
+  try {
+    await db.execute(
+      'DELETE FROM passport_goals WHERE id=? AND passport_id=?',
+      [req.params.id, passportId]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete goal' });
   }
 });
 

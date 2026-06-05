@@ -703,42 +703,106 @@
     _reflShowing += 5; _renderReflectionsWithState();
   };
 
-  function renderGoals(aspirations, objectives, plans) {
-    const aspCard = document.getElementById('aspirations-card');
-    if (aspCard) {
-      aspCard.innerHTML = (aspirations || []).length
-        ? aspirations.map(a => `<div class="p-aspiration">
-            <span class="p-aspiration-arrow">→</span><span>${esc(a.text)}</span>
-          </div>`).join('')
-        : empty('What do you want to become as a learner? Your long-term direction.');
+  function renderGoals(goals) {
+    // Hide legacy cards
+    ['objectives-card','plans-card'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+
+    var card = document.getElementById('goals-card');
+    if (!card) return;
+
+    var all      = goals || [];
+    var active   = all.filter(function(g) { return g.status === 'in_progress'; });
+    var done     = all.filter(function(g) { return g.status === 'completed'; });
+
+    var warning = active.length >= 4
+      ? `<div style="background:rgba(196,130,106,0.10);border:1px solid rgba(196,130,106,0.28);
+           border-radius:10px;padding:10px 14px;font-size:12px;color:#7A4030;margin-bottom:12px">
+           ⚠️ You have ${active.length} active goals. Research shows that focusing on fewer goals leads to better outcomes — consider completing one before adding more.
+         </div>`
+      : '';
+
+    function goalRow(g) {
+      var isDone   = g.status === 'completed';
+      var setDate  = g.created_at ? 'Set: ' + fmtDate(g.created_at) : '';
+      var doneDate = g.completed_at ? ' · Completed: ' + fmtDate(g.completed_at) : '';
+      var badge    = isDone
+        ? `<span style="font-size:10px;font-weight:700;letter-spacing:0.6px;color:#5E9052;
+             background:rgba(139,173,126,0.18);padding:2px 8px;border-radius:20px">COMPLETED</span>`
+        : `<span style="font-size:10px;font-weight:700;letter-spacing:0.6px;color:#8A6A3A;
+             background:rgba(196,166,106,0.18);padding:2px 8px;border-radius:20px">IN PROGRESS</span>`;
+      var completeBtn = !isDone
+        ? `<button onclick="window.completeGoal(${g.id})" title="Mark as completed"
+             style="background:none;border:1px solid rgba(94,144,82,0.35);border-radius:6px;
+             cursor:pointer;font-size:11px;font-weight:600;color:#5E9052;padding:2px 8px;
+             font-family:inherit;transition:background 0.12s">✓ Complete</button>`
+        : '';
+      var delBtn = `<button onclick="window.deleteGoal(${g.id})" title="Remove"
+        style="background:none;border:none;cursor:pointer;color:#B0A496;font-size:15px;
+        padding:0;line-height:1">×</button>`;
+      return `<div style="border-radius:12px;padding:14px 16px;
+          background:rgba(255,255,255,${isDone ? '0.35' : '0.55'});
+          border:1px solid rgba(58,48,40,0.08);margin-bottom:8px;
+          opacity:${isDone ? '0.7' : '1'}">
+        <div style="font-size:13px;color:#2C2820;line-height:1.65;margin-bottom:8px">${esc(g.text)}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+          <span style="font-size:11px;color:#9A8E86">${setDate}${doneDate}</span>
+          <div style="display:flex;align-items:center;gap:6px">${badge}${completeBtn}${delBtn}</div>
+        </div>
+      </div>`;
     }
 
-    const objCard = document.getElementById('objectives-card');
-    if (objCard) {
-      objCard.innerHTML = (objectives || []).length
-        ? objectives.map(o => `<div class="p-objective">
-            <div class="p-objective-dot"></div>
-            <div>
-              <div class="p-objective-title">${esc(o.title)}</div>
-              ${o.target_description ? `<div class="p-objective-target">${esc(o.target_description)}</div>` : ''}
-            </div>
-          </div>`).join('')
-        : empty('Specific learning outcomes you want to achieve.');
-    }
+    var activeRows = active.length
+      ? active.map(goalRow).join('')
+      : `<div style="font-size:12px;color:#9A8E86;font-style:italic;padding:8px 0">No active goals yet.</div>`;
+    var doneRows = done.length
+      ? `<div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;
+           color:#B0A496;margin:14px 0 8px">Completed</div>` + done.map(goalRow).join('')
+      : '';
 
-    const planCard = document.getElementById('plans-card');
-    if (planCard) {
-      planCard.innerHTML = (plans || []).length
-        ? plans.map(p => `<div class="p-plan">
-            <div class="p-plan-when">${esc(p.frequency)}</div>
-            <div class="p-plan-body">
-              <div class="p-plan-title">${esc(p.title)}</div>
-              ${p.description ? `<div class="p-plan-desc">${esc(p.description)}</div>` : ''}
-            </div>
-          </div>`).join('')
-        : empty('Concrete next steps with timeframes.');
-    }
+    var addForm = `
+      <button class="p-edit-btn" id="goal-add-btn" style="margin-top:10px"
+        onclick="document.getElementById('goal-form').style.display='';this.style.display='none';document.getElementById('goal-textarea').focus()">
+        + Add goal
+      </button>
+      <div id="goal-form" style="display:none;margin-top:10px">
+        <textarea id="goal-textarea" class="p-edit-input"
+          style="width:100%;min-height:80px;resize:vertical;box-sizing:border-box"
+          placeholder="Describe your goal…"></textarea>
+        <div style="font-size:11px;color:#9A8E86;margin:5px 0 8px;font-style:italic">
+          💡 SMART goals work best: Specific, Measurable, Achievable, Relevant, Time-bound.
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="p-edit-btn primary" onclick="window.saveGoal()" style="margin-top:0">Add</button>
+          <button class="p-edit-btn" onclick="document.getElementById('goal-form').style.display='none';document.getElementById('goal-add-btn').style.display=''" style="margin-top:0">Cancel</button>
+        </div>
+      </div>`;
+
+    card.innerHTML = `<div class="p-card-title">Goals</div>` +
+      warning + activeRows + doneRows + addForm;
   }
+
+  window.saveGoal = function() {
+    var ta = document.getElementById('goal-textarea');
+    if (!ta || !ta.value.trim()) { if (ta) ta.focus(); return; }
+    fetch('/api/profile/goals', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: ta.value.trim() }),
+    }).then(function() { window.loadProfile(); }).catch(function() {});
+  };
+
+  window.completeGoal = function(id) {
+    fetch('/api/profile/goals/' + id + '/complete', { method: 'POST' })
+      .then(function() { window.loadProfile(); }).catch(function() {});
+  };
+
+  window.deleteGoal = function(id) {
+    fetch('/api/profile/goals/' + id, { method: 'DELETE' })
+      .then(function() { window.loadProfile(); }).catch(function() {});
+  };
 
   /* ─── Inline edit for identity ───────────────────────────────── */
   window.editIdentity = function () {
@@ -837,7 +901,7 @@
         renderCredentials(d.credentials, d.mapKnowledge);
         renderCompetence(d.competence, d.mapKnowledge);
         renderReflections(d.reflections);
-        renderGoals(d.aspirations, d.objectives, d.plans);
+        renderGoals(d.goals);
       })
       .catch(err => {
         console.error('Profile load failed:', err);
