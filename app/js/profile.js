@@ -190,22 +190,65 @@
     <button class="p-edit-btn" onclick="window.editLearningStyle()">Edit</button>`;
   }
 
-  function renderEvents(events) {
+  // ── Events state ──────────────────────────────────────────────────
+  var _allEvents  = [];
+  var _evShowing  = 5;
+  var _evFilter   = { type: 'all', dateFrom: '', dateTo: '' };
+
+  function _evDate(ev) { return (ev.event_date || '').toString().split('T')[0]; }
+
+  function _filteredEvents() {
+    return _allEvents.filter(function(ev) {
+      if (_evFilter.type !== 'all' && ev.type !== _evFilter.type) return false;
+      const d = _evDate(ev);
+      if (_evFilter.dateFrom && d < _evFilter.dateFrom) return false;
+      if (_evFilter.dateTo   && d > _evFilter.dateTo)   return false;
+      return true;
+    });
+  }
+
+  function _renderEventsWithState() {
     const ledger = document.getElementById('events-ledger');
     if (!ledger) return;
 
-    const evHtml = (!events || !events.length)
-      ? empty('Your learning events will appear here as you complete nodes and knobits.')
-      : events.slice(0, 10).map(ev => {
-          let titleHtml = esc(ev.title);
+    const filtered  = _filteredEvents();
+    const showing   = filtered.slice(0, _evShowing);
+    const remaining = Math.max(0, filtered.length - _evShowing);
+
+    // Type filter pills
+    const typePills = ['all','activity','assessment','evidence'].map(function(t) {
+      const label  = t === 'all' ? 'All' : t.charAt(0).toUpperCase() + t.slice(1);
+      const active = _evFilter.type === t;
+      return `<button onclick="window.setEvTypeFilter('${t}')"
+        style="padding:3px 10px;border-radius:20px;border:1.5px solid ${active ? '#C4826A' : 'rgba(58,48,40,0.12)'};
+        background:${active ? 'rgba(196,130,106,0.10)' : 'transparent'};
+        color:${active ? '#C4826A' : '#8A7E72'};font-size:11px;font-weight:600;font-family:inherit;cursor:pointer">${label}</button>`;
+    }).join('');
+
+    const filterRow = `
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+        <div style="display:flex;gap:4px">${typePills}</div>
+        <div style="display:flex;gap:4px;margin-left:auto;align-items:center">
+          <input type="date" class="p-edit-input" style="padding:3px 8px;font-size:11px;width:118px"
+            value="${_evFilter.dateFrom}" onchange="window.setEvDateFilter('from',this.value)">
+          <span style="font-size:11px;color:#9A8E86">–</span>
+          <input type="date" class="p-edit-input" style="padding:3px 8px;font-size:11px;width:118px"
+            value="${_evFilter.dateTo}" onchange="window.setEvDateFilter('to',this.value)">
+        </div>
+      </div>`;
+
+    const evHtml = !showing.length
+      ? empty(_allEvents.length ? 'No events match your filter.' : 'Your learning events will appear here.')
+      : showing.map(function(ev) {
+          var titleHtml = esc(ev.title);
           if (ev.node_external_id) {
-            const sep = ev.title.indexOf(': ');
+            var sep = ev.title.indexOf(': ');
             if (sep !== -1) {
               titleHtml = esc(ev.title.slice(0, sep + 2)) +
                 `<a class="p-event-node-link" href="/app/?node=${esc(ev.node_external_id)}">${esc(ev.title.slice(sep + 2))}</a>`;
             }
           }
-          const delBtn = ev.type === 'activity'
+          var delBtn = ev.type === 'activity'
             ? `<button onclick="window.deleteEvent(${ev.id})" title="Remove"
                  style="background:none;border:none;cursor:pointer;color:#B0A496;font-size:15px;padding:0 0 0 6px;line-height:1;vertical-align:middle">×</button>`
             : '';
@@ -218,15 +261,20 @@
             </div>
             <span class="p-type ${esc(ev.type)}">${esc(ev.type.charAt(0).toUpperCase() + ev.type.slice(1))}</span>
           </div>`;
-        }).join('') +
-        (events.length > 10 ? `<div class="p-view-more"><span>+ ${events.length - 10} more events</span></div>` : '');
+        }).join('');
 
-    const today = new Date().toISOString().split('T')[0];
+    const moreBtn = remaining > 0
+      ? `<button class="p-edit-btn" onclick="window.loadMoreEvents()" style="margin-top:8px">
+           Load more (${remaining} remaining)
+         </button>`
+      : '';
+
+    const today   = new Date().toISOString().split('T')[0];
     const srcOpts = ['Book','YouTube video','Conference','Workshop','Self-study period','Other']
-      .map(s => `<option value="${s}">${s}</option>`).join('');
+      .map(function(s) { return `<option value="${s}">${s}</option>`; }).join('');
 
-    ledger.innerHTML = `<div class="p-card-title">Events</div>` + evHtml + `
-      <button class="p-edit-btn" id="ev-add-btn"
+    ledger.innerHTML = `<div class="p-card-title">Events</div>` + filterRow + evHtml + moreBtn + `
+      <button class="p-edit-btn" id="ev-add-btn" style="margin-top:10px"
         onclick="document.getElementById('ev-form').style.display='';this.style.display='none';document.getElementById('ev-title').focus()">
         + Add activity
       </button>
@@ -241,7 +289,8 @@
             <input id="ev-date" type="date" class="p-edit-input" style="flex:1" value="${today}">
             <input id="ev-notes" class="p-edit-input" style="flex:2" placeholder="Test score or other outcome (optional)">
           </div>
-          <textarea id="ev-reflection" class="p-edit-input" style="width:100%;min-height:80px;resize:vertical;box-sizing:border-box" placeholder="Reflection — what did you learn, what surprised you, what would you do differently? (optional)"></textarea>
+          <textarea id="ev-reflection" class="p-edit-input" style="width:100%;min-height:80px;resize:vertical;box-sizing:border-box"
+            placeholder="Reflection — what did you learn, what surprised you, what would you do differently? (optional)"></textarea>
           <div style="display:flex;gap:8px">
             <button class="p-edit-btn primary" onclick="window.saveManualEvent()" style="margin-top:0">Add</button>
             <button class="p-edit-btn" onclick="document.getElementById('ev-form').style.display='none';document.getElementById('ev-add-btn').style.display=''" style="margin-top:0">Cancel</button>
@@ -249,6 +298,24 @@
         </div>
       </div>`;
   }
+
+  function renderEvents(events) {
+    _allEvents  = events || [];
+    _evShowing  = 5;
+    _renderEventsWithState();
+  }
+
+  window.setEvTypeFilter = function(type) {
+    _evFilter.type = type; _evShowing = 5; _renderEventsWithState();
+  };
+  window.setEvDateFilter = function(which, val) {
+    if (which === 'from') _evFilter.dateFrom = val;
+    else _evFilter.dateTo = val;
+    _evShowing = 5; _renderEventsWithState();
+  };
+  window.loadMoreEvents = function() {
+    _evShowing += 5; _renderEventsWithState();
+  };
 
   window.saveManualEvent = function () {
     const title      = document.getElementById('ev-title').value.trim();
@@ -411,28 +478,48 @@
     }
   }
 
-  function renderReflections(reflections) {
+  var _allReflections = [];
+  var _reflShowing    = 5;
+
+  function _renderReflectionsWithState() {
     const card = document.getElementById('reflections-card');
     if (!card) return;
-    if (!reflections || !reflections.length) {
-      card.innerHTML = `<div class="p-card-title">Reflections</div>` +
-        empty('Reflections on your learning will appear here. You can add one when logging an activity.');
-      return;
-    }
-    card.innerHTML = `<div class="p-card-title">Reflections</div>` +
-      reflections.map(r => {
-        const eventLine = r.event_title
-          ? `<div style="font-size:11px;color:#9A8E86;margin-top:8px">
-               On: <em>${esc(r.event_title)}</em>${r.event_date ? ' · ' + fmtDate(r.event_date) : ''}
-             </div>`
-          : '';
-        return `<div class="p-quote" style="margin-bottom:14px">
-          <div style="font-size:10px;color:#B0A496;margin-bottom:6px">${fmtDate(r.created_at)}</div>
-          "${esc(r.text)}"
-          ${eventLine}
-        </div>`;
-      }).join('');
+    const showing   = _allReflections.slice(0, _reflShowing);
+    const remaining = Math.max(0, _allReflections.length - _reflShowing);
+
+    const rowsHtml = !showing.length
+      ? empty('Reflections on your learning will appear here. You can add one when logging an activity.')
+      : showing.map(function(r) {
+          var eventLine = r.event_title
+            ? `<div style="font-size:11px;color:#9A8E86;margin-top:8px">
+                 On: <em>${esc(r.event_title)}</em>${r.event_date ? ' · ' + fmtDate(r.event_date) : ''}
+               </div>`
+            : '';
+          return `<div class="p-quote" style="margin-bottom:14px">
+            <div style="font-size:10px;color:#B0A496;margin-bottom:6px">${fmtDate(r.created_at)}</div>
+            "${esc(r.text)}"
+            ${eventLine}
+          </div>`;
+        }).join('');
+
+    const moreBtn = remaining > 0
+      ? `<button class="p-edit-btn" onclick="window.loadMoreReflections()" style="margin-top:4px">
+           Load more (${remaining} remaining)
+         </button>`
+      : '';
+
+    card.innerHTML = `<div class="p-card-title">Reflections</div>` + rowsHtml + moreBtn;
   }
+
+  function renderReflections(reflections) {
+    _allReflections = reflections || [];
+    _reflShowing    = 5;
+    _renderReflectionsWithState();
+  }
+
+  window.loadMoreReflections = function() {
+    _reflShowing += 5; _renderReflectionsWithState();
+  };
 
   function renderGoals(aspirations, objectives, plans) {
     const aspCard = document.getElementById('aspirations-card');

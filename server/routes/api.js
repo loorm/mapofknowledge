@@ -308,7 +308,7 @@ router.post('/nodes/:id/learn', async (req, res) => {
       await db.execute(
         `INSERT INTO passport_events
            (passport_id, event_date, title, institution, result, node_external_id, type, sort_order)
-         VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', NULL, ?, 'assessment', 0)`,
+         VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', NULL, ?, 'activity', 0)`,
         [passportId, `Started learning: ${node.label}`, id]
       ).catch(() => {});
     }
