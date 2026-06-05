@@ -550,7 +550,7 @@ router.post('/profile/identity', async (req, res) => {
   const passportId = req.user?.passport_id;
   if (!passportId) return res.status(400).json({ error: 'No passport' });
   // Only update fields that were actually sent — prevents wiping unrelated fields
-  const ALLOWED = ['display_name', 'birth_year', 'location', 'cultural_background', 'about'];
+  const ALLOWED = ['display_name', 'birth_year', 'location', 'cultural_background', 'id_number', 'about'];
   const updates = {};
   ALLOWED.forEach(f => { if (req.body[f] !== undefined) updates[f] = req.body[f] || null; });
   if (!Object.keys(updates).length) return res.json({ ok: true });
