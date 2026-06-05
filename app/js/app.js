@@ -81,6 +81,7 @@ Promise.all([
 ]).then(([{ base, emergent }, settings]) => {
   simPreset = SIM_PRESETS[settings.map_animation] || SIM_PRESETS.moderate;
   init(base, emergent);
+  if (window._tourCheckAutoStart) window._tourCheckAutoStart(settings);
 }).catch(() => {
   document.body.innerHTML = '<div style="color:white;padding:20px">Could not load map — please refresh or log in again.</div>';
 });
