@@ -558,6 +558,7 @@ function init(data, emergentData) {
         if (!currentId) return;
         const isOn = sbToggle.classList.toggle('on');
         const pct  = isOn ? 100 : 0;
+        // Server handles L4→L5 cascade internally
         fetch(`/api/nodes/${currentId}/knowledge`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -566,18 +567,6 @@ function init(data, emergentData) {
           if (sbPct) sbPct.textContent = `${percentage}%`;
           if (sbBadge) sbBadge.textContent = percentage >= 100 ? 'Self-reported' : '';
         }).catch(() => {});
-        // L4 toggle: cascade to all L5 children in both directions
-        if (currentNode && currentNode.level === 4) {
-          (childrenOf[currentId] || []).forEach(cid => {
-            if (allNodes[cid] && allNodes[cid].level === 5) {
-              fetch(`/api/nodes/${cid}/knowledge`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ percentage: pct, source: 'self_reported' }),
-              }).catch(() => {});
-            }
-          });
-        }
       });
     }
     // Always update which node the toggle is acting on
