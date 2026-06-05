@@ -460,6 +460,10 @@ function init(data, emergentData) {
     const learnBtnEl = document.querySelector('.sb-learn-btn');
     const nodeExtId  = d.id;
 
+    // Inactive hint
+    const inactiveHint = document.getElementById('sb-inactive-hint');
+    if (inactiveHint) inactiveHint.classList.toggle('visible', d.level < 5);
+
     // Learn this — only active for L5 nodes
     if (learnBtnEl) {
       const learnLabel = learnBtnEl.querySelector('.sb-learn-label');
