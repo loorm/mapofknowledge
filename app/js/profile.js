@@ -474,58 +474,146 @@
   };
 
   function renderCredentials(credentials, mapKnowledge) {
-    // Platform credentials (auto-generated from learning)
-    const platform = (credentials || []).filter(c => c.type === 'platform');
-    const platformCard = document.getElementById('platform-credentials-card');
+    var creds = credentials || [];
+
+    function credDelBtn(id) {
+      return `<button onclick="window.deleteCredential(${id})" title="Remove"
+        style="background:none;border:none;cursor:pointer;color:#B0A496;font-size:15px;padding:0 0 0 6px;line-height:1;vertical-align:middle">×</button>`;
+    }
+
+    function credAddForm(type, hasMonth) {
+      var dateField = hasMonth
+        ? `<input id="cred-date-${type}" type="month" class="p-edit-input" placeholder="Month and year">`
+        : `<input id="cred-date-${type}" type="number" class="p-edit-input" min="1900" max="2099" placeholder="Year">`;
+      return `
+        <button class="p-edit-btn" id="cred-add-btn-${type}" style="margin-top:10px"
+          onclick="document.getElementById('cred-form-${type}').style.display='';this.style.display='none';document.getElementById('cred-title-${type}').focus()">
+          + Add
+        </button>
+        <div id="cred-form-${type}" style="display:none;margin-top:10px">
+          <div style="display:grid;gap:6px">
+            <input id="cred-title-${type}" class="p-edit-input" placeholder="Title (required)">
+            <input id="cred-issuer-${type}" class="p-edit-input" placeholder="Issuer / Institution">
+            <div style="display:flex;gap:6px">
+              ${dateField}
+              <input id="cred-grade-${type}" class="p-edit-input" style="flex:1" placeholder="Grade / score / note">
+            </div>
+            <div style="display:flex;gap:6px">
+              <button class="p-edit-btn primary" onclick="window.saveCredential('${type}')" style="margin-top:0">Add</button>
+              <button class="p-edit-btn" onclick="document.getElementById('cred-form-${type}').style.display='none';document.getElementById('cred-add-btn-${type}').style.display=''" style="margin-top:0">Cancel</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // ── Map of Knowledge Credentials (platform, read-only) ──
+    var platform = creds.filter(function(c) { return c.type === 'platform'; });
+    var platformCard = document.getElementById('platform-credentials-card');
     if (platformCard) {
-      if (!platform.length) {
-        platformCard.innerHTML = empty('Complete all knobits for a node to earn a platform credential here.');
-      } else {
-        platformCard.innerHTML = platform.map(c => `
-          <div class="p-cred">
-            <div class="p-cred-icon internal">🗺️</div>
-            <div>
-              <div class="p-cred-title">${esc(c.title)}</div>
-              <div class="p-cred-issuer">${esc(c.issuer || 'Map of Knowledge · KaiQ Platform')}</div>
-              <div class="p-cred-date">${fmtDate(c.awarded_date)}${c.score_pct ? ` · Score: ${c.score_pct}%` : ''}</div>
-              ${c.blockchain_hash ? `<div class="p-cred-hash">${esc(c.blockchain_hash)}…</div>` : ''}
-            </div>
-          </div>`).join('');
-      }
+      var platRows = !platform.length
+        ? empty('Complete all knobits for a node to earn a platform credential here.')
+        : platform.map(function(c) {
+            return `<div class="p-cred">
+              <div class="p-cred-icon internal">🗺️</div>
+              <div>
+                <div class="p-cred-title">${esc(c.title)}</div>
+                <div class="p-cred-issuer">${esc(c.issuer || 'Map of Knowledge · KaiQ Platform')}</div>
+                <div class="p-cred-date">${fmtDate(c.awarded_date)}${c.score_pct ? ` · Score: ${c.score_pct}%` : ''}</div>
+                ${c.blockchain_hash ? `<div class="p-cred-hash">${esc(c.blockchain_hash)}…</div>` : ''}
+              </div>
+            </div>`;
+          }).join('');
+      platformCard.innerHTML = `<div class="p-card-title">Map of Knowledge Credentials</div>
+        <div style="max-height:300px;overflow-y:auto">${platRows}</div>`;
     }
 
-    // External qualifications
-    const quals = (credentials || []).filter(c => c.type === 'qualification');
-    const qualCard = document.getElementById('qualifications-card');
+    // ── Qualifications ──
+    var quals = creds.filter(function(c) { return c.type === 'qualification'; });
+    var qualCard = document.getElementById('qualifications-card');
     if (qualCard) {
-      qualCard.innerHTML = quals.length
-        ? quals.map(c => `<div class="p-cred">
-            <div class="p-cred-icon qual">🎓</div>
-            <div>
-              <div class="p-cred-title">${esc(c.title)}</div>
-              <div class="p-cred-issuer">${esc(c.issuer || '')}</div>
-              <div class="p-cred-date">${fmtDate(c.awarded_date)}${c.grade ? ` · ${esc(c.grade)}` : ''}</div>
-            </div>
-          </div>`).join('')
-        : empty('Add your formal qualifications (degrees, diplomas).');
+      var qualRows = !quals.length
+        ? empty('Add your formal qualifications — degrees and diplomas.')
+        : quals.map(function(c) {
+            return `<div class="p-cred">
+              <div class="p-cred-icon qual">🎓</div>
+              <div style="flex:1;min-width:0">
+                <div class="p-cred-title">${esc(c.title)}${credDelBtn(c.id)}</div>
+                ${c.issuer ? `<div class="p-cred-issuer">${esc(c.issuer)}</div>` : ''}
+                <div class="p-cred-date">${fmtDate(c.awarded_date)}${c.grade ? ` · ${esc(c.grade)}` : ''}</div>
+              </div>
+            </div>`;
+          }).join('');
+      qualCard.innerHTML = `<div class="p-card-title">Qualifications</div>
+        <div style="max-height:300px;overflow-y:auto">${qualRows}</div>` + credAddForm('qualification', false);
     }
 
-    // Certifications
-    const certs = (credentials || []).filter(c => c.type === 'certification' || c.type === 'award');
-    const certsCard = document.getElementById('certifications-card');
+    // ── Awards & Endorsements ──
+    var awards = creds.filter(function(c) { return c.type === 'award'; });
+    var awardsCard = document.getElementById('awards-card');
+    if (awardsCard) {
+      var awardsRows = !awards.length
+        ? empty('Add awards, honours, and endorsements.')
+        : awards.map(function(c) {
+            return `<div class="p-cred">
+              <div class="p-cred-icon award">⭐</div>
+              <div style="flex:1;min-width:0">
+                <div class="p-cred-title">${esc(c.title)}${credDelBtn(c.id)}</div>
+                ${c.issuer ? `<div class="p-cred-issuer">${esc(c.issuer)}</div>` : ''}
+                <div class="p-cred-date">${fmtDate(c.awarded_date)}${c.grade ? ` · ${esc(c.grade)}` : ''}</div>
+              </div>
+            </div>`;
+          }).join('');
+      awardsCard.innerHTML = `<div class="p-card-title">Awards &amp; Endorsements</div>
+        <div style="max-height:300px;overflow-y:auto">${awardsRows}</div>` + credAddForm('award', false);
+    }
+
+    // ── Certifications & Badges ──
+    var certs = creds.filter(function(c) { return c.type === 'certification'; });
+    var certsCard = document.getElementById('certifications-card');
     if (certsCard) {
-      certsCard.innerHTML = certs.length
-        ? certs.map(c => `<div class="p-cred">
-            <div class="p-cred-icon cert">${c.type === 'award' ? '⭐' : '📋'}</div>
-            <div>
-              <div class="p-cred-title">${esc(c.title)}</div>
-              <div class="p-cred-issuer">${esc(c.issuer || '')}</div>
-              <div class="p-cred-date">${fmtDate(c.awarded_date)}${c.grade ? ` · ${esc(c.grade)}` : ''}</div>
-            </div>
-          </div>`).join('')
-        : empty('Add certifications, badges, and awards.');
+      var certRows = !certs.length
+        ? empty('Add certifications, online courses, and badges.')
+        : certs.map(function(c) {
+            return `<div class="p-cred">
+              <div class="p-cred-icon cert">📋</div>
+              <div style="flex:1;min-width:0">
+                <div class="p-cred-title">${esc(c.title)}${credDelBtn(c.id)}</div>
+                ${c.issuer ? `<div class="p-cred-issuer">${esc(c.issuer)}</div>` : ''}
+                <div class="p-cred-date">${fmtDate(c.awarded_date)}${c.grade ? ` · ${esc(c.grade)}` : ''}</div>
+              </div>
+            </div>`;
+          }).join('');
+      certsCard.innerHTML = `<div class="p-card-title">Certifications &amp; Badges</div>
+        <div style="max-height:300px;overflow-y:auto">${certRows}</div>` + credAddForm('certification', true);
     }
   }
+
+  window.saveCredential = function(type) {
+    var titleEl  = document.getElementById('cred-title-' + type);
+    var issuerEl = document.getElementById('cred-issuer-' + type);
+    var dateEl   = document.getElementById('cred-date-' + type);
+    var gradeEl  = document.getElementById('cred-grade-' + type);
+    if (!titleEl || !titleEl.value.trim()) { if (titleEl) titleEl.focus(); return; }
+    var dateVal = dateEl ? dateEl.value.trim() : '';
+    // month input gives YYYY-MM; year input gives YYYY — normalise to YYYY-MM for API
+    if (dateVal && dateVal.length === 4) dateVal = dateVal + '-01';
+    fetch('/api/profile/credentials', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: type,
+        title:        titleEl.value.trim(),
+        issuer:       issuerEl ? issuerEl.value.trim() || null : null,
+        awarded_date: dateVal || null,
+        grade:        gradeEl ? gradeEl.value.trim() || null : null,
+      }),
+    }).then(function() { window.loadProfile(); }).catch(function() {});
+  };
+
+  window.deleteCredential = function(id) {
+    fetch('/api/profile/credentials/' + id, { method: 'DELETE' })
+      .then(function() { window.loadProfile(); }).catch(function() {});
+  };
 
   function renderCompetence(competence, mapKnowledge) {
     // Knowledge domains from manual passport entries + map data

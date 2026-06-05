@@ -631,6 +631,41 @@ router.delete('/profile/events/:id', async (req, res) => {
   }
 });
 
+// ── Credentials (manual entry) ───────────────────────────────────────────────
+router.post('/profile/credentials', async (req, res) => {
+  const passportId = req.user?.passport_id;
+  if (!passportId) return res.status(400).json({ error: 'No passport' });
+  const { type, title, issuer, awarded_date, grade } = req.body;
+  if (!['qualification','certification','award'].includes(type) || !title?.trim()) {
+    return res.status(400).json({ error: 'type and title required' });
+  }
+  try {
+    const [result] = await db.execute(
+      `INSERT INTO passport_credentials (passport_id, type, title, issuer, awarded_date, grade, sort_order)
+       VALUES (?, ?, ?, ?, ?, ?, 0)`,
+      [passportId, type, title.trim(), issuer || null,
+       awarded_date ? awarded_date + '-01' : null, grade || null]
+    );
+    res.json({ id: result.insertId, ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to add credential' });
+  }
+});
+
+router.delete('/profile/credentials/:id', async (req, res) => {
+  const passportId = req.user?.passport_id;
+  if (!passportId) return res.status(400).json({ error: 'No passport' });
+  try {
+    await db.execute(
+      `DELETE FROM passport_credentials WHERE id = ? AND passport_id = ? AND type != 'platform'`,
+      [req.params.id, passportId]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete credential' });
+  }
+});
+
 // ── Relationships (individuals, groups, providers) ───────────────────────────
 router.post('/profile/relationships', async (req, res) => {
   const passportId = req.user?.passport_id;
