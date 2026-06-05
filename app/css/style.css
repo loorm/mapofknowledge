@@ -200,7 +200,7 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
   white-space: nowrap;
 }
 #continue-chip.visible { display: flex; }
-#continue-chip.collapsed { width: 44px; }
+#continue-chip.collapsed { width: auto; }
 .continue-chip-body {
   display: flex; align-items: center; gap: 8px;
   padding: 0 6px 0 4px;
