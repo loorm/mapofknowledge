@@ -566,14 +566,14 @@ function init(data, emergentData) {
           if (sbPct) sbPct.textContent = `${percentage}%`;
           if (sbBadge) sbBadge.textContent = percentage >= 100 ? 'Self-reported' : '';
         }).catch(() => {});
-        // L4 at 100%: cascade to all L5 children
-        if (isOn && currentNode && currentNode.level === 4) {
+        // L4 toggle: cascade to all L5 children in both directions
+        if (currentNode && currentNode.level === 4) {
           (childrenOf[currentId] || []).forEach(cid => {
             if (allNodes[cid] && allNodes[cid].level === 5) {
               fetch(`/api/nodes/${cid}/knowledge`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ percentage: 100, source: 'self_reported' }),
+                body: JSON.stringify({ percentage: pct, source: 'self_reported' }),
               }).catch(() => {});
             }
           });
