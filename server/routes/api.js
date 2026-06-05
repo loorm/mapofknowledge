@@ -82,6 +82,40 @@ router.get('/nodes/:id/overview', async (req, res) => {
   }
 });
 
+// ── User settings ────────────────────────────────────────────────────────────
+router.get('/settings', async (req, res) => {
+  const userId = req.user?.id;
+  if (!userId) return res.json({});
+  try {
+    const [rows] = await db.execute(
+      'SELECT key_name, value FROM user_settings WHERE user_id = ?', [userId]
+    );
+    const out = {};
+    rows.forEach(r => { out[r.key_name] = r.value; });
+    res.json(out);
+  } catch (err) {
+    res.json({});
+  }
+});
+
+router.post('/settings', async (req, res) => {
+  const userId = req.user?.id;
+  if (!userId) return res.status(400).json({ error: 'Not authenticated' });
+  const { key, value } = req.body;
+  if (!key || value === undefined) return res.status(400).json({ error: 'key and value required' });
+  try {
+    await db.execute(
+      `INSERT INTO user_settings (user_id, key_name, value) VALUES (?, ?, ?)
+       ON DUPLICATE KEY UPDATE value = VALUES(value)`,
+      [userId, key, value]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[api/settings POST]', err.message);
+    res.status(500).json({ error: 'Failed to save setting' });
+  }
+});
+
 // ── Most recent in-progress learning path ────────────────────────────────────
 router.get('/learn/resume', async (req, res) => {
   const passportId = req.user?.passport_id;

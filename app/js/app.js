@@ -68,12 +68,22 @@ function nodeGradient(hex) {
   });
 })();
 
-fetch('/api/map')
-  .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-  .then(({ base, emergent }) => init(base, emergent))
-  .catch(() => {
-    document.body.innerHTML = '<div style="color:white;padding:20px">Could not load map — please refresh or log in again.</div>';
-  });
+const SIM_PRESETS = {
+  lively:   { alphaDecay: 0.015, velocityDecay: 0.4 },
+  moderate: { alphaDecay: 0.06,  velocityDecay: 0.6 },
+  static:   { alphaDecay: 0.2,   velocityDecay: 0.8 },
+};
+let simPreset = SIM_PRESETS.moderate;
+
+Promise.all([
+  fetch('/api/map').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }),
+  fetch('/api/settings').then(r => r.json()).catch(() => ({})),
+]).then(([{ base, emergent }, settings]) => {
+  simPreset = SIM_PRESETS[settings.map_animation] || SIM_PRESETS.moderate;
+  init(base, emergent);
+}).catch(() => {
+  document.body.innerHTML = '<div style="color:white;padding:20px">Could not load map — please refresh or log in again.</div>';
+});
 
 // Load user's knowledge progress and overlay on map
 let progressMap = {};
@@ -253,7 +263,8 @@ function init(data, emergentData) {
     .force("collide", d3.forceCollide().radius(d => nodeRadius(d) + 4).strength(0.8))
     .force("x",       d3.forceX(d => continentSeeds[d.continent] ? continentSeeds[d.continent].x : w/2).strength(d => d.level === 1 ? 0.3 : 0.06))
     .force("y",       d3.forceY(d => continentSeeds[d.continent] ? continentSeeds[d.continent].y : h/2).strength(d => d.level === 1 ? 0.3 : 0.06))
-    .alphaDecay(0.015)
+    .alphaDecay(simPreset.alphaDecay)
+    .velocityDecay(simPreset.velocityDecay)
     .on("tick", ticked);
 
   // ── Emergent force simulation ──────────────────────────────────────────────

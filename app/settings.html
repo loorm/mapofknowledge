@@ -90,6 +90,24 @@ body {
 .settings-save-btn:hover { opacity: 0.88; transform: translateY(-1px); }
 .settings-save-btn:active { transform: translateY(0); }
 
+/* ── animation picker ── */
+.st-picker {
+  display: flex; gap: 4px; flex-shrink: 0;
+}
+.st-picker-btn {
+  padding: 6px 13px; border-radius: 8px;
+  border: 1.5px solid rgba(58,48,40,0.12);
+  background: rgba(255,255,255,0.5);
+  font-size: 12px; font-weight: 550; font-family: inherit;
+  color: #8A7E72; cursor: pointer;
+  transition: background 0.13s, border-color 0.13s, color 0.13s;
+}
+.st-picker-btn:hover { background: rgba(255,255,255,0.8); color: #3A3028; }
+.st-picker-btn.active {
+  background: linear-gradient(135deg, #C4826A 0%, #B06850 100%);
+  border-color: transparent; color: #fff;
+}
+
 /* ── map filter rows ── */
 .sf-filter-row {
   background: rgba(255,255,255,0.65);
@@ -253,6 +271,18 @@ body {
         <div class="st-toggle-thumb"></div>
       </button>
     </div>
+
+    <div class="settings-row">
+      <div class="settings-row-text">
+        <div class="settings-row-label">Map animation</div>
+        <div class="settings-row-desc">How much the knowledge graph moves. Moderate is recommended.</div>
+      </div>
+      <div class="st-picker" id="animation-picker">
+        <button class="st-picker-btn" data-value="lively">Lively</button>
+        <button class="st-picker-btn active" data-value="moderate">Moderate</button>
+        <button class="st-picker-btn" data-value="static">Static</button>
+      </div>
+    </div>
   </div>
 
   <!-- MAP FILTERS -->
@@ -400,6 +430,31 @@ body {
     sfAddOpen.style.display = '';
     document.getElementById('sf-filter-name').value = '';
     document.getElementById('sf-filter-labels').value = '';
+  });
+
+  /* ── Animation picker ── */
+  const animPicker = document.getElementById('animation-picker');
+
+  fetch('/api/settings')
+    .then(r => r.json())
+    .then(s => {
+      const val = s.map_animation || 'moderate';
+      animPicker.querySelectorAll('.st-picker-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.value === val);
+      });
+    }).catch(() => {});
+
+  animPicker.addEventListener('click', function(e) {
+    const btn = e.target.closest('.st-picker-btn');
+    if (!btn) return;
+    animPicker.querySelectorAll('.st-picker-btn').forEach(function(b) {
+      b.classList.toggle('active', b === btn);
+    });
+    fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: 'map_animation', value: btn.dataset.value }),
+    });
   });
 
   /* ── Screensaver toggle ── */
