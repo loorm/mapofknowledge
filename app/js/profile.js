@@ -342,6 +342,137 @@
       .then(() => window.loadProfile()).catch(() => {});
   };
 
+  function renderRelationships(relationships) {
+    var individuals = (relationships || []).filter(function(r) { return r.type === 'individual'; });
+    var groups      = (relationships || []).filter(function(r) { return r.type === 'group'; });
+    var providers   = (relationships || []).filter(function(r) { return r.type === 'institution' || r.type === 'tool'; });
+
+    function delBtn(id) {
+      return `<button onclick="window.deleteRelationship(${id})" title="Remove"
+        style="background:none;border:none;cursor:pointer;color:#B0A496;font-size:15px;padding:0 0 0 6px;line-height:1;vertical-align:middle">×</button>`;
+    }
+
+    function addForm(type, fields, btnLabel) {
+      var inputs = fields.map(function(f) {
+        if (f.type === 'select') {
+          var opts = f.options.map(function(o) { return `<option value="${o.v}">${o.l}</option>`; }).join('');
+          return `<select id="rel-${f.id}" class="p-edit-input">${opts}</select>`;
+        }
+        return `<input id="rel-${f.id}" class="p-edit-input" placeholder="${esc(f.label)}">`;
+      }).join('');
+      return `
+        <button class="p-edit-btn" id="rel-add-btn-${type}" style="margin-top:10px"
+          onclick="document.getElementById('rel-form-${type}').style.display='';this.style.display='none';document.getElementById('rel-f0-${type}').focus()">
+          + Add
+        </button>
+        <div id="rel-form-${type}" style="display:none;margin-top:10px;display:none">
+          <div style="display:grid;gap:6px">${inputs}
+            <div style="display:flex;gap:6px">
+              <button class="p-edit-btn primary" onclick="window.saveRelationship('${type}')" style="margin-top:0">${btnLabel}</button>
+              <button class="p-edit-btn" onclick="document.getElementById('rel-form-${type}').style.display='none';document.getElementById('rel-add-btn-${type}').style.display=''" style="margin-top:0">Cancel</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // ── Profs, mentors, role models ──
+    var indCard = document.getElementById('individuals-card');
+    if (indCard) {
+      var indRows = !individuals.length
+        ? empty('Add professors, mentors, and role models who shaped your learning.')
+        : individuals.map(function(r) {
+            return `<div class="p-person" style="display:flex;align-items:center;gap:10px">
+              <div class="p-person-avatar">${esc(r.name.split(' ').map(function(w){return w[0];}).slice(0,2).join('').toUpperCase())}</div>
+              <div style="flex:1;min-width:0">
+                <div class="p-person-name">${esc(r.name)}${delBtn(r.id)}</div>
+                ${r.role_description ? `<div class="p-person-role">${esc(r.role_description)}</div>` : ''}
+              </div>
+            </div>`;
+          }).join('');
+      indCard.innerHTML = `<div class="p-card-title">Profs, mentors, role models</div>
+        <div style="max-height:340px;overflow-y:auto">${indRows}</div>` +
+        addForm('individual', [
+          {id:'f0-individual', label:'Full name'},
+          {id:'f1-individual', label:'Role or connection (e.g. PhD supervisor, Author)'},
+        ], 'Add');
+    }
+
+    // ── Study Groups ──
+    var grpCard = document.getElementById('groups-card');
+    if (grpCard) {
+      var grpRows = !groups.length
+        ? empty('Add study groups, reading circles, and communities.')
+        : groups.map(function(r) {
+            var badge = r.status === 'active'
+              ? `<span class="p-badge active">Active</span>`
+              : r.status === 'concluded' ? `<span class="p-badge done">Concluded</span>` : '';
+            return `<div class="p-entry">
+              <div class="p-entry-header">
+                <div class="p-entry-title">${esc(r.name)}${delBtn(r.id)}</div>
+                ${badge}
+              </div>
+              ${r.role_description ? `<div class="p-entry-sub">${esc(r.role_description)}</div>` : ''}
+            </div>`;
+          }).join('');
+      grpCard.innerHTML = `<div class="p-card-title">Study Groups</div>
+        <div style="max-height:340px;overflow-y:auto">${grpRows}</div>` +
+        addForm('group', [
+          {id:'f0-group', label:'Group name'},
+          {id:'f1-group', label:'Description (frequency, size, focus…)'},
+          {id:'f2-group', type:'select', options:[{v:'',l:'Status (optional)'},{v:'active',l:'Active'},{v:'concluded',l:'Concluded'}]},
+        ], 'Add');
+    }
+
+    // ── Learning providers ──
+    var provCard = document.getElementById('providers-card');
+    if (provCard) {
+      var provRows = !providers.length
+        ? empty('Add universities, courses, apps, and tools that shaped your learning.')
+        : providers.map(function(r) {
+            var catBadge = `<span style="font-size:10px;color:#9A8E86;margin-left:6px">${r.type === 'tool' ? 'Tool' : 'Institution'}</span>`;
+            return `<div class="p-entry">
+              <div class="p-entry-header">
+                <div class="p-entry-title">${esc(r.name)}${catBadge}${delBtn(r.id)}</div>
+              </div>
+              ${r.role_description ? `<div class="p-entry-sub">${esc(r.role_description)}</div>` : ''}
+            </div>`;
+          }).join('');
+      provCard.innerHTML = `<div class="p-card-title">Learning providers</div>
+        <div style="max-height:340px;overflow-y:auto">${provRows}</div>` +
+        addForm('provider', [
+          {id:'f0-provider', label:'Name'},
+          {id:'f1-provider', label:'Description (course, dates, how used…)'},
+          {id:'f2-provider', type:'select', options:[{v:'institution',l:'Institution'},{v:'tool',l:'Tool'}]},
+        ], 'Add');
+    }
+  }
+
+  window.saveRelationship = function(type) {
+    var name = document.getElementById('rel-f0-' + type);
+    if (!name || !name.value.trim()) { if (name) name.focus(); return; }
+    var roleEl   = document.getElementById('rel-f1-' + type);
+    var statusEl = document.getElementById('rel-f2-' + type);
+    var actualType = type === 'provider'
+      ? (statusEl ? statusEl.value : 'institution')
+      : type;
+    var status = type === 'group' && statusEl ? statusEl.value : null;
+    fetch('/api/profile/relationships', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: actualType,
+        name: name.value.trim(),
+        role_description: roleEl ? roleEl.value.trim() || null : null,
+        status: status || null,
+      }),
+    }).then(() => window.loadProfile()).catch(() => {});
+  };
+
+  window.deleteRelationship = function(id) {
+    fetch('/api/profile/relationships/' + id, { method: 'DELETE' })
+      .then(() => window.loadProfile()).catch(() => {});
+  };
+
   function renderCredentials(credentials, mapKnowledge) {
     // Platform credentials (auto-generated from learning)
     const platform = (credentials || []).filter(c => c.type === 'platform');
@@ -655,6 +786,7 @@
       .then(d => {
         renderIdentity(d.passport || {});
         renderInterests(d.tags);
+        renderRelationships(d.relationships);
         renderEvents(d.events);
         renderCredentials(d.credentials, d.mapKnowledge);
         renderCompetence(d.competence, d.mapKnowledge);

@@ -519,6 +519,11 @@ router.get('/profile', async (req, res) => {
       [passportId]
     );
 
+    const [relationships] = await db.execute(
+      `SELECT * FROM passport_relationships WHERE passport_id = ? ORDER BY type, sort_order, id`,
+      [passportId]
+    );
+
     const [reflections] = await db.execute(
       `SELECT r.id, r.text, r.created_at,
               e.id AS event_id, e.title AS event_title, e.event_date
@@ -556,6 +561,7 @@ router.get('/profile', async (req, res) => {
       mapKnowledge,
       events,
       tags,
+      relationships,
       reflections,
       learningStyle: learningStyle[0] || null,
       aspirations,
@@ -622,6 +628,40 @@ router.delete('/profile/events/:id', async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete event' });
+  }
+});
+
+// ── Relationships (individuals, groups, providers) ───────────────────────────
+router.post('/profile/relationships', async (req, res) => {
+  const passportId = req.user?.passport_id;
+  if (!passportId) return res.status(400).json({ error: 'No passport' });
+  const { type, name, role_description, status } = req.body;
+  if (!['individual','group','institution','tool'].includes(type) || !name?.trim()) {
+    return res.status(400).json({ error: 'type and name required' });
+  }
+  try {
+    const [result] = await db.execute(
+      `INSERT INTO passport_relationships (passport_id, type, name, role_description, status, sort_order)
+       VALUES (?, ?, ?, ?, ?, 0)`,
+      [passportId, type, name.trim(), role_description || null, status || null]
+    );
+    res.json({ id: result.insertId, ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to add relationship' });
+  }
+});
+
+router.delete('/profile/relationships/:id', async (req, res) => {
+  const passportId = req.user?.passport_id;
+  if (!passportId) return res.status(400).json({ error: 'No passport' });
+  try {
+    await db.execute(
+      'DELETE FROM passport_relationships WHERE id = ? AND passport_id = ?',
+      [req.params.id, passportId]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete relationship' });
   }
 });
 
