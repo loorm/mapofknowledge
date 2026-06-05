@@ -1,0 +1,136 @@
+/* ═══════════════════════════════════════════
+   ONBOARDING TOUR
+   Self-contained. Roll back by removing the
+   tour.css / tour.js includes from index.html.
+   ═══════════════════════════════════════════ */
+
+.tour-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: all;
+  cursor: default;
+}
+.tour-overlay.visible { display: block; }
+
+/* Spotlight: transparent box, box-shadow creates the dark surround */
+.tour-spotlight {
+  display: none;
+  position: fixed;
+  z-index: 9001;
+  border-radius: 10px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.62);
+  pointer-events: none;
+  transition: left 0.35s cubic-bezier(.4,0,.2,1),
+              top  0.35s cubic-bezier(.4,0,.2,1),
+              width  0.35s cubic-bezier(.4,0,.2,1),
+              height 0.35s cubic-bezier(.4,0,.2,1);
+}
+.tour-spotlight.visible { display: block; }
+
+/* Tooltip card */
+.tour-tooltip {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  width: 340px;
+  background: linear-gradient(145deg, rgba(248,242,236,0.98) 0%, rgba(237,232,246,0.98) 100%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(58,48,40,0.10);
+  border-radius: 18px;
+  padding: 22px 22px 18px;
+  box-shadow: 0 12px 48px rgba(58,48,40,0.20),
+              0 0 0 1px rgba(196,130,106,0.40),
+              0 0 32px rgba(196,130,106,0.18);
+  transition: left 0.35s cubic-bezier(.4,0,.2,1),
+              top  0.35s cubic-bezier(.4,0,.2,1);
+}
+.tour-tooltip.visible { display: block; }
+
+.tour-step-num {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  color: #C4826A;
+  margin-bottom: 7px;
+}
+
+.tour-title {
+  font-size: 17px;
+  font-weight: 720;
+  color: #2C2820;
+  letter-spacing: -0.3px;
+  line-height: 1.25;
+  margin-bottom: 10px;
+}
+
+.tour-text {
+  font-size: 13px;
+  color: #4A4038;
+  line-height: 1.72;
+  margin-bottom: 18px;
+}
+.tour-text strong { color: #2C2820; font-weight: 650; }
+.tour-text em     { font-style: italic; color: #6E6358; }
+
+.tour-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tour-skip {
+  font-size: 11px;
+  color: #B0A496;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  flex-shrink: 0;
+  transition: color 0.12s;
+}
+.tour-skip:hover { color: #6E6358; }
+
+.tour-btn {
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.tour-btn:hover  { opacity: 0.88; transform: translateY(-1px); }
+.tour-btn:active { transform: translateY(0); }
+
+.tour-btn-primary {
+  background: linear-gradient(135deg, #C4826A 0%, #B06850 100%);
+  color: #fff;
+  border: none;
+}
+.tour-btn-secondary {
+  background: rgba(255,255,255,0.65);
+  border: 1.5px solid rgba(58,48,40,0.14);
+  color: #6E6358;
+}
+
+/* Progress dots */
+.tour-dots {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+.tour-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(58,48,40,0.15);
+  transition: background 0.2s;
+}
+.tour-dot.active { background: #C4826A; }

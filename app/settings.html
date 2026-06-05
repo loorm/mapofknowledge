@@ -283,6 +283,17 @@ body {
         <button class="st-picker-btn" data-value="static">Static</button>
       </div>
     </div>
+    <div class="settings-row">
+      <div class="settings-row-text">
+        <div class="settings-row-label">Guided tour</div>
+        <div class="settings-row-desc">Replay the introduction to Map of Knowledge.</div>
+      </div>
+      <button class="settings-save-btn"
+        style="width:auto;margin-top:0;padding:9px 20px;font-size:13px;flex-shrink:0"
+        onclick="localStorage.setItem('kq_force_tour','1');window.location='index.html'">
+        Restart tour
+      </button>
+    </div>
   </div>
 
   <!-- MAP FILTERS -->
