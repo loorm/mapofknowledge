@@ -180,6 +180,7 @@ router.post('/nodes/:id/knowledge', async (req, res) => {
          updated_at = NOW()`,
       [passportId, id, percentage, source]
     );
+    updateAncestorKnowledge(passportId, id).catch(() => {});
     res.json({ ok: true, percentage, source });
   } catch (err) {
     console.error('[api/nodes/knowledge POST]', err.message);
@@ -345,6 +346,7 @@ router.post('/learn/knobit/:id/complete', async (req, res) => {
            percentage = VALUES(percentage), source = 'tested', updated_at = NOW()`,
         [passportId, nodeExtId, pct]
       );
+      updateAncestorKnowledge(passportId, nodeExtId).catch(() => {});
 
       if (pct === 100) {
         // Check if credential already exists
@@ -504,6 +506,64 @@ router.post('/profile/identity', async (req, res) => {
 });
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
+
+// Recompute and store estimated knowledge % for all ancestors of a node.
+// Called fire-and-forget after any knowledge write. Never overwrites
+// explicit self_reported or tested entries.
+async function updateAncestorKnowledge(passportId, nodeExtId) {
+  if (!passportId) return;
+  try {
+    const [ancestors] = await db.execute(
+      `WITH RECURSIVE anc AS (
+         SELECT id AS db_id, external_id, level, parent_id
+         FROM nodes WHERE external_id = ?
+         UNION ALL
+         SELECT n.id, n.external_id, n.level, n.parent_id
+         FROM nodes n JOIN anc a ON n.id = a.parent_id
+       )
+       SELECT db_id, external_id FROM anc
+       WHERE external_id != ? AND level >= 1
+       ORDER BY level DESC`,
+      [nodeExtId, nodeExtId]
+    );
+
+    for (const anc of ancestors) {
+      const [[{ total, sumPct }]] = await db.execute(
+        `WITH RECURSIVE desc_tree AS (
+           SELECT id, external_id, level FROM nodes WHERE id = ?
+           UNION ALL
+           SELECT n.id, n.external_id, n.level
+           FROM nodes n JOIN desc_tree d ON n.parent_id = d.id
+         )
+         SELECT COUNT(d.id) AS total,
+                COALESCE(SUM(unk.percentage), 0) AS sumPct
+         FROM desc_tree d
+         LEFT JOIN user_node_knowledge unk
+                ON unk.node_external_id = d.external_id
+               AND unk.passport_id = ?
+         WHERE d.level = 5`,
+        [anc.db_id, passportId]
+      );
+
+      if (total > 0) {
+        const estPct = Math.round(sumPct / total);
+        await db.execute(
+          `INSERT INTO user_node_knowledge
+             (passport_id, node_external_id, percentage, source, updated_at)
+           VALUES (?, ?, ?, 'estimated', NOW())
+           ON DUPLICATE KEY UPDATE
+             percentage = IF(source NOT IN ('self_reported','tested'), VALUES(percentage), percentage),
+             source     = IF(source NOT IN ('self_reported','tested'), 'estimated', source),
+             updated_at = IF(source NOT IN ('self_reported','tested'), NOW(), updated_at)`,
+          [passportId, anc.external_id, estPct]
+        );
+      }
+    }
+  } catch (err) {
+    console.error('[updateAncestorKnowledge]', err.message);
+  }
+}
+
 async function getNodeDomain(nodeDbId) {
   // Walk up to level-1 ancestor via recursive CTE
   const [rows] = await db.execute(
@@ -578,6 +638,7 @@ router.post('/test/evaluate', async (req, res) => {
            percentage = VALUES(percentage), source = 'tested', updated_at = NOW()`,
         [passportId, nodeId, evaluation.finalScore]
       );
+      updateAncestorKnowledge(passportId, nodeId).catch(() => {});
       await db.execute(
         `INSERT INTO passport_events
            (passport_id, event_date, title, institution, result, node_external_id, type, sort_order)
