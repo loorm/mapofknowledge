@@ -234,9 +234,9 @@ router.post('/nodes/:id/learn', async (req, res) => {
     if (passportId) {
       await db.execute(
         `INSERT INTO passport_events
-           (passport_id, event_date, title, institution, result, type, sort_order)
-         VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', NULL, 'assessment', 0)`,
-        [passportId, `Started learning: ${node.label}`]
+           (passport_id, event_date, title, institution, result, node_external_id, type, sort_order)
+         VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', NULL, ?, 'assessment', 0)`,
+        [passportId, `Started learning: ${node.label}`, id]
       ).catch(() => {});
     }
 
@@ -370,9 +370,9 @@ router.post('/learn/knobit/:id/complete', async (req, res) => {
           // Also add a learning event
           await db.execute(
             `INSERT INTO passport_events
-               (passport_id, event_date, title, institution, result, type, sort_order)
-             VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', 'Score: 100%', 'assessment', 0)`,
-            [passportId, `Completed: ${nodeLabel}`]
+               (passport_id, event_date, title, institution, result, node_external_id, type, sort_order)
+             VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', 'Score: 100%', ?, 'assessment', 0)`,
+            [passportId, `Completed: ${nodeLabel}`, nodeExtId]
           );
         }
       }
@@ -580,9 +580,9 @@ router.post('/test/evaluate', async (req, res) => {
       );
       await db.execute(
         `INSERT INTO passport_events
-           (passport_id, event_date, title, institution, result, type, sort_order)
-         VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', ?, 'assessment', 0)`,
-        [passportId, `Knowledge test: ${label}`, `Score: ${evaluation.finalScore}%`]
+           (passport_id, event_date, title, institution, result, node_external_id, type, sort_order)
+         VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', ?, ?, 'assessment', 0)`,
+        [passportId, `Knowledge test: ${label}`, `Score: ${evaluation.finalScore}%`, nodeId]
       );
     }
 

@@ -1090,6 +1090,40 @@ function init(data, emergentData) {
   // Keep legacy aliases so filters.js / tilt.js / HTML inline calls still work
   window.refreshProgress = window.MapView.refreshProgress;
 
+  // ── Deep-link navigation (?node=external_id) ──────────────────────────────
+  (function () {
+    const targetId = new URLSearchParams(window.location.search).get('node');
+    if (!targetId) return;
+    history.replaceState(null, '', window.location.pathname);
+
+    function navigateTo(nodeId) {
+      const target = allNodes[nodeId];
+      if (!target || !target.x) return;
+      const cw = window.innerWidth, ch = window.innerHeight - TOP_BAR_H;
+      const z  = 3.5;
+      const transform = d3.zoomIdentity
+        .translate(cw / 2 - target.x * z, ch / 2 - target.y * z)
+        .scale(z);
+      svg.transition().duration(800).ease(d3.easeCubicOut)
+        .call(zoomBehaviour.transform, transform)
+        .on('end', function () { highlightAndOpen(target); });
+    }
+
+    setTimeout(function () {
+      const target = allNodes[targetId];
+      if (!target) return;
+      if (target.level === 5) {
+        const parentId = parentOf[targetId];
+        if (parentId && allNodes[parentId] && !allNodes[parentId].expanded) {
+          toggleExpand(allNodes[parentId]);
+          setTimeout(function () { navigateTo(targetId); }, 150);
+          return;
+        }
+      }
+      navigateTo(targetId);
+    }, 1600);
+  }());
+
   // ── Continue chip ──────────────────────────────────────────────────────────
   (function () {
     const chip        = document.getElementById('continue-chip');
