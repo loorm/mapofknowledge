@@ -29,38 +29,13 @@ passport.use(new GoogleStrategy(
           'SELECT * FROM users WHERE email = ?', [email]
         );
 
-        let user;
-        if (users.length > 0) {
-          user = users[0];
-          await conn.execute('UPDATE users SET last_login = NOW() WHERE id = ?', [user.id]);
-        } else {
-          const role = ROLE_MAP[email] || 'learner';
-
-          // Create passport first
-          const publicId = require('crypto').randomUUID();
-          const [passportResult] = await conn.execute(
-            'INSERT INTO learner_passports (public_id, display_name) VALUES (?, ?)',
-            [publicId, profile.displayName || email.split('@')[0]]
-          );
-          const passportId = passportResult.insertId;
-
-          // Create user
-          const [userResult] = await conn.execute(
-            `INSERT INTO users (email, role, locale, passport_id, created_at, last_login)
-             VALUES (?, ?, 'et', ?, NOW(), NOW())`,
-            [email, role, passportId]
-          );
-          const userId = userResult.insertId;
-
-          // Create oauth_identity record
-          await conn.execute(
-            'INSERT INTO oauth_identities (user_id, provider, provider_id, provider_email) VALUES (?, "google", ?, ?)',
-            [userId, profile.id, email]
-          );
-
-          user = { id: userId, email, role, passport_id: passportId };
+        if (users.length === 0) {
+          // No pre-existing account — deny login
+          return done(null, false);
         }
 
+        const user = users[0];
+        await conn.execute('UPDATE users SET last_login = NOW() WHERE id = ?', [user.id]);
         done(null, user);
       } finally {
         conn.release();
