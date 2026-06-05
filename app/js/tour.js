@@ -29,10 +29,21 @@
       padding:  14,
     },
     {
-      target:   null,
-      position: 'center-right',
+      target:   '#sidebar',
+      position: 'left',
       title:    'Learn anything. In any order.',
-      text:     'Click any node to read its overview. From there you can <strong>mark it as known</strong>, run a <strong>4-question knowledge test</strong>, or open a <strong>guided learning session</strong>.<br><br>No curriculum. No prerequisites. No one telling you what to study next. Complete freedom.',
+      text:     'Click any node to open its sidebar. From here you can <strong>mark it as known</strong>, run a <strong>4-question knowledge test</strong>, or start a <strong>guided learning session</strong>.<br><br>No curriculum. No prerequisites. No one telling you what to study next. Complete freedom.',
+      before: function() {
+        if (window.MapView && window.MapView.openDemoNode) {
+          window.MapView.openDemoNode();
+        }
+      },
+      after: function() {
+        if (window.MapView && window.MapView.closeSidebar) {
+          window.MapView.closeSidebar();
+        }
+      },
+      padding: 0,
     },
     {
       target:   '#learning-mode',
@@ -152,11 +163,13 @@
     var targetEl = s.target ? document.querySelector(s.target) : null;
     var rect     = targetEl ? targetEl.getBoundingClientRect() : null;
 
-    // For learning-mode step, wait one frame for the overlay to open
-    if (s.position === 'overlay-center') {
+    // Re-position after transitions settle (sidebar slide-in, learning mode open)
+    if (s.target === '#sidebar' || s.position === 'overlay-center') {
       setTimeout(function () {
-        _positionSpot(null, 0);
-        _positionTip(null, 'overlay-center');
+        var el2   = s.target ? document.querySelector(s.target) : null;
+        var rect2 = el2 ? el2.getBoundingClientRect() : null;
+        _positionSpot(rect2, s.padding || 0);
+        _positionTip(rect2, s.position);
       }, 380);
     }
 
