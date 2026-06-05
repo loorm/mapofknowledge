@@ -29,7 +29,8 @@
   /* ─── Render functions ────────────────────────────────────────── */
 
   function renderIdentity(passport) {
-    const name = passport.display_name || 'Your Name';
+    const name  = passport.display_name || 'Your Name';
+    const about = passport.about || '';
 
     // Top-bar banner
     const banner = document.querySelector('.topbar-banner-inner');
