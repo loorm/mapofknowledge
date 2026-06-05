@@ -616,89 +616,53 @@
   };
 
   function renderCompetence(competence, mapKnowledge) {
-    // Knowledge domains from manual passport entries + map data
-    const knowledgeCard = document.getElementById('knowledge-card');
-    if (knowledgeCard) {
-      const mapItems = (mapKnowledge || []).map(k => ({
-        name: k.label,
-        description: k.parent_label ? `${k.parent_label}` : '',
-        level: Math.round(k.percentage / 20),  // 0-100% → 0-5 dots
-        source: k.source,
-        fromMap: true,
-      }));
+    // Hide Skills card — no longer shown
+    var skillsCard = document.getElementById('skills-card');
+    if (skillsCard) skillsCard.style.display = 'none';
 
-      const manualKnowledge = (competence || []).filter(c => c.type === 'knowledge');
+    var knowledgeCard = document.getElementById('knowledge-card');
+    if (!knowledgeCard) return;
 
-      // Merge: manual entries first, then map items not already in manual
-      const manualNames = new Set(manualKnowledge.map(k => k.name.toLowerCase()));
-      const merged = [
-        ...manualKnowledge,
-        ...mapItems.filter(k => !manualNames.has(k.name.toLowerCase())),
-      ];
-
-      if (!merged.length) {
-        knowledgeCard.innerHTML = empty('Knowledge domains will appear here as you learn and self-report.');
-      } else {
-        const legend = `<div style="font-size:11px;color:#9A8E86;margin-bottom:14px">
-          ● ● ● ● ● expert &nbsp;·&nbsp; ● ● ● ● ○ advanced &nbsp;·&nbsp;
-          ● ● ● ○ ○ working &nbsp;·&nbsp; ● ● ○ ○ ○ developing &nbsp;·&nbsp; ● ○ ○ ○ ○ introductory
-        </div>`;
-
-        const rows = merged.slice(0, 12).map(k => {
-          const lvl  = Math.min(5, Math.max(0, k.level || 1));
-          const dots = Array.from({length: 5}, (_, i) =>
-            `<div class="p-dot ${i < lvl ? 'on s5' : 'off'}"></div>`).join('');
-          const srcClass = k.source === 'tested' ? 'tested' : 'self-reported';
-          const srcLabel = k.source === 'tested' ? 'Tested' : 'Self-reported';
-          return `<div class="p-prof-row">
-            <div class="p-prof-info">
-              <div class="p-prof-name">${esc(k.name)}</div>
-              ${k.description ? `<div class="p-prof-sub">${esc(k.description)}</div>` : ''}
-              <span class="p-source ${srcClass}">${srcLabel}</span>
-            </div>
-            <div class="p-dots">${dots}</div>
-          </div>`;
-        }).join('');
-
-        knowledgeCard.innerHTML = legend + rows +
-          (merged.length > 12
-            ? `<div class="p-view-more"><span>+ ${merged.length - 12} more tracked</span></div>`
-            : '');
-
-        // Languages section
-        const langs = (competence || []).filter(c => c.type === 'language');
-        if (langs.length) {
-          knowledgeCard.innerHTML += `<div class="p-card-sub-label">Languages</div>` +
-            langs.map(l => `<div class="p-lang">
-              <div class="p-lang-pair"><span class="p-lang-name">${esc(l.name)}</span></div>
-              <span class="p-lang-level">${esc(l.proficiency_label || '')}</span>
-            </div>`).join('');
-        }
-      }
+    var items = mapKnowledge || [];
+    if (!items.length) {
+      knowledgeCard.innerHTML = `<div class="p-card-title">Knowledge</div>` +
+        empty('Your knowledge map will appear here as you learn and self-assess topics.');
+      return;
     }
 
-    // Skills
-    const skillsCard = document.getElementById('skills-card');
-    if (skillsCard) {
-      const skills = (competence || []).filter(c => c.type === 'skill');
-      if (!skills.length) {
-        skillsCard.innerHTML = empty('Add technical skills and learning practices here.');
-      } else {
-        skillsCard.innerHTML = skills.map(k => {
-          const lvl  = Math.min(5, Math.max(0, k.level || 1));
-          const dots = Array.from({length: 5}, (_, i) =>
-            `<div class="p-dot ${i < lvl ? 'on s5' : 'off'}"></div>`).join('');
-          return `<div class="p-prof-row">
-            <div class="p-prof-info">
-              <div class="p-prof-name">${esc(k.name)}</div>
-              ${k.description ? `<div class="p-prof-sub">${esc(k.description)}</div>` : ''}
-              <span class="p-source self-reported">Self-reported</span>
-            </div>
-            <div class="p-dots">${dots}</div>
-          </div>`;
-        }).join('');
-      }
-    }
+    var BAR_COLORS = {
+      tested:        '#8BAD7E',
+      self_reported: '#C4826A',
+      estimated:     '#B0A496',
+    };
+    var SRC_LABELS = {
+      tested:        'Tested',
+      self_reported: 'Self-reported',
+      estimated:     'Estimated',
+    };
+
+    var rows = items.map(function(k) {
+      var pct      = Math.round(k.percentage) || 0;
+      var barColor = BAR_COLORS[k.source] || BAR_COLORS.estimated;
+      var srcClass = k.source === 'tested' ? 'tested' : k.source === 'self_reported' ? 'self-reported' : 'self-reported';
+      var srcLabel = SRC_LABELS[k.source] || '';
+      return `<div class="p-prof-row">
+        <div class="p-prof-info" style="flex:1;min-width:0">
+          <div class="p-prof-name">${esc(k.label)}</div>
+          ${k.breadcrumb ? `<div class="p-prof-sub">${esc(k.breadcrumb)}</div>` : ''}
+          <span class="p-source ${srcClass}">${srcLabel}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <div style="width:72px;height:4px;background:rgba(58,48,40,0.09);border-radius:2px;overflow:hidden">
+            <div style="width:${pct}%;height:100%;background:${barColor};border-radius:2px"></div>
+          </div>
+          <span style="font-size:12px;font-weight:650;color:#2C2820;width:34px;text-align:right">${pct}%</span>
+        </div>
+      </div>`;
+    }).join('');
+
+    knowledgeCard.innerHTML = `<div class="p-card-title">Knowledge</div>
+      <div style="max-height:480px;overflow-y:auto">${rows}</div>`;
   }
 
   var _allReflections = [];

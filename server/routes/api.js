@@ -497,17 +497,28 @@ router.get('/profile', async (req, res) => {
       [passportId]
     );
 
-    // Top learned nodes as competence items derived from map progress
-    const [mapKnowledge] = await db.execute(
+    // L4/L5 knowledge nodes with full breadcrumb
+    const [mapKnowledgeRaw] = await db.execute(
       `SELECT n.label, n.level, u.percentage, u.source,
-              (SELECT n2.label FROM nodes n2 WHERE n2.id = n.parent_id) AS parent_label
+              p1.label AS p1, p2.label AS p2, p3.label AS p3, p4.label AS p4
        FROM user_node_knowledge u
        JOIN nodes n ON n.external_id = u.node_external_id
-       WHERE u.passport_id = ? AND u.percentage >= 50
-       ORDER BY u.percentage DESC, n.level ASC
-       LIMIT 20`,
+       LEFT JOIN nodes p1 ON p1.id = n.parent_id
+       LEFT JOIN nodes p2 ON p2.id = p1.parent_id
+       LEFT JOIN nodes p3 ON p3.id = p2.parent_id
+       LEFT JOIN nodes p4 ON p4.id = p3.parent_id
+       WHERE u.passport_id = ? AND n.level IN (4,5) AND u.percentage > 0
+       ORDER BY u.percentage DESC, n.level DESC
+       LIMIT 200`,
       [passportId]
     );
+    const mapKnowledge = mapKnowledgeRaw.map(r => ({
+      label:      r.label,
+      level:      r.level,
+      percentage: r.percentage,
+      source:     r.source,
+      breadcrumb: [r.p4, r.p3, r.p2, r.p1].filter(Boolean).join(' › '),
+    }));
 
     const [events] = await db.execute(
       `SELECT * FROM passport_events WHERE passport_id = ? ORDER BY event_date DESC, id DESC`,
