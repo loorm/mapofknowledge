@@ -48,6 +48,7 @@
     const idCard = document.getElementById('identity-card');
     if (idCard) {
       idCard.innerHTML = `
+        <div class="p-card-title">Identity</div>
         <div class="p-kv">
           <div class="p-kv-label">Full name</div>
           <div class="p-kv-value" data-field="display_name">${esc(passport.display_name || '')}</div>
@@ -60,7 +61,7 @@
           <div class="p-kv-label">ID number</div>
           <div class="p-kv-value" data-field="id_number">${esc(passport.id_number || '')}</div>
         </div>
-        <button class="p-edit-btn" onclick="window.editIdentity()">Edit identity</button>`;
+        <button class="p-edit-btn" onclick="window.editIdentity()">Edit</button>`;
     }
 
     // Learning needs and preferences card
@@ -192,33 +193,81 @@
   function renderEvents(events) {
     const ledger = document.getElementById('events-ledger');
     if (!ledger) return;
-    if (!events || !events.length) {
-      ledger.innerHTML = empty('Your learning events will appear here as you complete nodes and knobits.');
-      return;
-    }
-    ledger.innerHTML = events.slice(0, 10).map(ev => {
-      let titleHtml = esc(ev.title);
-      if (ev.node_external_id) {
-        const sep = ev.title.indexOf(': ');
-        if (sep !== -1) {
-          titleHtml = esc(ev.title.slice(0, sep + 2)) +
-            `<a class="p-event-node-link" href="/app/?node=${esc(ev.node_external_id)}">${esc(ev.title.slice(sep + 2))}</a>`;
-        }
-      }
-      return `<div class="p-ledger-row">
-        <div class="p-ledger-date">${fmtDate(ev.event_date)}</div>
-        <div class="p-ledger-info">
-          <div class="p-ledger-title">${titleHtml}</div>
-          ${ev.institution ? `<div class="p-ledger-sub">${esc(ev.institution)}</div>` : ''}
-          ${ev.result ? `<div class="p-ledger-result">${esc(ev.result)}</div>` : ''}
+
+    const evHtml = (!events || !events.length)
+      ? empty('Your learning events will appear here as you complete nodes and knobits.')
+      : events.slice(0, 10).map(ev => {
+          let titleHtml = esc(ev.title);
+          if (ev.node_external_id) {
+            const sep = ev.title.indexOf(': ');
+            if (sep !== -1) {
+              titleHtml = esc(ev.title.slice(0, sep + 2)) +
+                `<a class="p-event-node-link" href="/app/?node=${esc(ev.node_external_id)}">${esc(ev.title.slice(sep + 2))}</a>`;
+            }
+          }
+          const delBtn = ev.type === 'activity'
+            ? `<button onclick="window.deleteEvent(${ev.id})" title="Remove"
+                 style="background:none;border:none;cursor:pointer;color:#B0A496;font-size:15px;padding:0 0 0 6px;line-height:1;vertical-align:middle">×</button>`
+            : '';
+          return `<div class="p-ledger-row">
+            <div class="p-ledger-date">${fmtDate(ev.event_date)}</div>
+            <div class="p-ledger-info">
+              <div class="p-ledger-title">${titleHtml}${delBtn}</div>
+              ${ev.institution ? `<div class="p-ledger-sub">${esc(ev.institution)}</div>` : ''}
+              ${ev.result ? `<div class="p-ledger-result">${esc(ev.result)}</div>` : ''}
+            </div>
+            <span class="p-type ${esc(ev.type)}">${esc(ev.type.charAt(0).toUpperCase() + ev.type.slice(1))}</span>
+          </div>`;
+        }).join('') +
+        (events.length > 10 ? `<div class="p-view-more"><span>+ ${events.length - 10} more events</span></div>` : '');
+
+    const today = new Date().toISOString().split('T')[0];
+    const srcOpts = ['Book','YouTube video','Conference','Workshop','Self-study period','Other']
+      .map(s => `<option value="${s}">${s}</option>`).join('');
+
+    ledger.innerHTML = `<div class="p-card-title">Events</div>` + evHtml + `
+      <button class="p-edit-btn" id="ev-add-btn"
+        onclick="document.getElementById('ev-form').style.display='';this.style.display='none';document.getElementById('ev-title').focus()">
+        + Add activity
+      </button>
+      <div id="ev-form" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid rgba(58,48,40,0.07)">
+        <div style="display:grid;gap:8px">
+          <input id="ev-title" class="p-edit-input" placeholder="What you studied or attended (required)">
+          <div style="display:flex;gap:8px">
+            <select id="ev-source" class="p-edit-input" style="flex:1">${srcOpts}</select>
+            <input id="ev-provider" class="p-edit-input" style="flex:1.5" placeholder="Author / Channel / Organiser (optional)">
+          </div>
+          <div style="display:flex;gap:8px">
+            <input id="ev-date" type="date" class="p-edit-input" style="flex:1" value="${today}">
+            <input id="ev-notes" class="p-edit-input" style="flex:2" placeholder="Outcome or notes (optional)">
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="p-edit-btn primary" onclick="window.saveManualEvent()" style="margin-top:0">Add</button>
+            <button class="p-edit-btn" onclick="document.getElementById('ev-form').style.display='none';document.getElementById('ev-add-btn').style.display=''" style="margin-top:0">Cancel</button>
+          </div>
         </div>
-        <span class="p-type ${esc(ev.type)}">${esc(ev.type.charAt(0).toUpperCase() + ev.type.slice(1))}</span>
       </div>`;
-    }).join('') +
-      (events.length > 10
-        ? `<div class="p-view-more"><span>+ ${events.length - 10} more events</span></div>`
-        : '');
   }
+
+  window.saveManualEvent = function () {
+    const title    = document.getElementById('ev-title').value.trim();
+    if (!title) { document.getElementById('ev-title').focus(); return; }
+    const source   = document.getElementById('ev-source').value;
+    const provider = document.getElementById('ev-provider').value.trim();
+    const date     = document.getElementById('ev-date').value;
+    const notes    = document.getElementById('ev-notes').value.trim();
+    const institution = source + (provider ? ' — ' + provider : '');
+    fetch('/api/profile/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, institution, result: notes || null, event_date: date }),
+    }).then(() => window.loadProfile()).catch(() => {});
+  };
+
+  window.deleteEvent = function (id) {
+    fetch('/api/profile/events/' + id, { method: 'DELETE' })
+      .then(() => window.loadProfile()).catch(() => {});
+  };
 
   function renderCredentials(credentials, mapKnowledge) {
     // Platform credentials (auto-generated from learning)
