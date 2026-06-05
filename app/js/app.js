@@ -1179,8 +1179,14 @@ function init(data, emergentData) {
     refreshProgress:      function()         { loadProgress(); },
     setTilt:              function(angle)    { window.setTilt(angle); },
     openDemoNode:         function()         {
-      var target = simNodes.find(function(n) { return n.level === 4; });
-      if (target) highlightAndOpen(target);
+      var target = simNodes.find(function(n) { return n.level === 4 && n.x; });
+      if (!target) return;
+      var cw = window.innerWidth, ch = window.innerHeight - TOP_BAR_H;
+      var z  = 2.2;
+      svg.transition().duration(600).ease(d3.easeCubicOut)
+        .call(zoomBehaviour.transform,
+          d3.zoomIdentity.translate(cw/2 - target.x*z, ch/2 - target.y*z).scale(z));
+      highlightAndOpen(target);
     },
     closeSidebar:         function()         { closeSidebar(); resetHighlight(); },
   };
