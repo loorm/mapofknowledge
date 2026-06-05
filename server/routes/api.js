@@ -576,8 +576,8 @@ router.post('/profile/events', async (req, res) => {
   if (!title?.trim()) return res.status(400).json({ error: 'title required' });
   try {
     const [evResult] = await db.execute(
-      `INSERT INTO passport_events (passport_id, event_date, title, institution, result, type, sort_order)
-       VALUES (?, ?, ?, ?, ?, 'activity', 0)`,
+      `INSERT INTO passport_events (passport_id, event_date, title, institution, result, type, user_created, sort_order)
+       VALUES (?, ?, ?, ?, ?, 'activity', 1, 0)`,
       [passportId, event_date || new Date().toISOString().split('T')[0], title.trim(), institution || null, result || null]
     );
     if (reflection?.trim()) {
@@ -616,7 +616,7 @@ router.delete('/profile/events/:id', async (req, res) => {
   if (!passportId) return res.status(400).json({ error: 'No passport' });
   try {
     await db.execute(
-      `DELETE FROM passport_events WHERE id = ? AND passport_id = ? AND type = 'activity'`,
+      `DELETE FROM passport_events WHERE id = ? AND passport_id = ? AND user_created = 1`,
       [req.params.id, passportId]
     );
     res.json({ ok: true });
