@@ -29,10 +29,7 @@
   /* ─── Render functions ────────────────────────────────────────── */
 
   function renderIdentity(passport) {
-    const name     = passport.display_name || 'Your Name';
-    const about    = passport.about || '';
-    const location = passport.location || '';
-    const tagline  = [passport.tagline, location].filter(Boolean).join(' · ');
+    const name = passport.display_name || 'Your Name';
 
     // Top-bar banner
     const banner = document.querySelector('.topbar-banner-inner');
@@ -44,7 +41,7 @@
     const navName = document.querySelector('.pnav-name');
     if (navName) navName.textContent = name;
     const navTagline = document.querySelector('.pnav-tagline');
-    if (navTagline) navTagline.innerHTML = esc(tagline || 'Learner on Map of Knowledge');
+    if (navTagline) navTagline.textContent = passport.location || '';
 
     // Identity card
     const idCard = document.getElementById('identity-card');
@@ -53,16 +50,12 @@
         <div class="p-kv">
           <div class="p-kv-label">Full name</div>
           <div class="p-kv-value" data-field="display_name">${esc(passport.display_name || '')}</div>
-          <div class="p-kv-label">Pronouns</div>
-          <div class="p-kv-value" data-field="pronouns">${esc(passport.pronouns || '')}</div>
           <div class="p-kv-label">Year of birth</div>
           <div class="p-kv-value" data-field="birth_year">${esc(passport.birth_year || '')}</div>
-          <div class="p-kv-label">Location</div>
+          <div class="p-kv-label">Language</div>
           <div class="p-kv-value" data-field="location">${esc(passport.location || '')}</div>
           <div class="p-kv-label">Cultural background</div>
           <div class="p-kv-value" data-field="cultural_background">${esc(passport.cultural_background || '')}</div>
-          <div class="p-kv-label">Tagline</div>
-          <div class="p-kv-value" data-field="tagline">${esc(passport.tagline || '')}</div>
         </div>
         <button class="p-edit-btn" onclick="window.editIdentity()">Edit identity</button>`;
     }
@@ -339,15 +332,44 @@
     if (!card) return;
     const vals = {};
     card.querySelectorAll('[data-field]').forEach(el => { vals[el.dataset.field] = el.textContent.trim(); });
+
+    // Year of birth dropdown
+    const curYear = new Date().getFullYear();
+    var yearOpts = '<option value="">—</option>';
+    for (var y = curYear - 14; y >= 1930; y--) {
+      yearOpts += '<option value="' + y + '"' + (String(vals.birth_year) === String(y) ? ' selected' : '') + '>' + y + '</option>';
+    }
+
+    // Language dropdown
+    var LANGUAGES = ['English','Estonian','Finnish','Latvian','Lithuanian','Russian',
+      'German','French','Spanish','Portuguese','Italian','Swedish','Norwegian',
+      'Danish','Polish','Dutch','Hungarian','Czech','Ukrainian','Arabic',
+      'Chinese (Mandarin)','Japanese','Korean','Hindi','Other'];
+    var langOpts = '<option value="">—</option>' + LANGUAGES.map(function(l) {
+      return '<option value="' + l + '"' + (vals.location === l ? ' selected' : '') + '>' + l + '</option>';
+    }).join('');
+
     card.innerHTML = `
       <div class="p-kv">
-        ${[['display_name','Full name'],['pronouns','Pronouns'],['birth_year','Year of birth'],
-           ['location','Location'],['cultural_background','Cultural background'],['tagline','Tagline']]
-          .map(([f, label]) => `
-            <div class="p-kv-label">${esc(label)}</div>
-            <div class="p-kv-value">
-              <input class="p-edit-input" data-field="${f}" value="${esc(vals[f] || '')}" placeholder="${esc(label)}">
-            </div>`).join('')}
+        <div class="p-kv-label">Full name</div>
+        <div class="p-kv-value">
+          <input class="p-edit-input" data-field="display_name" value="${esc(vals.display_name || '')}" placeholder="Full name">
+        </div>
+        <div class="p-kv-label">Year of birth</div>
+        <div class="p-kv-value">
+          <select class="p-edit-input" data-field="birth_year">${yearOpts}</select>
+        </div>
+        <div class="p-kv-label">Language</div>
+        <div class="p-kv-value">
+          <select class="p-edit-input" data-field="location">${langOpts}</select>
+        </div>
+        <div class="p-kv-label">
+          Cultural background
+          <span class="p-tip" data-tip="We use this to personalise your learning content. It can indicate your nationality, geographic region, religion, or other cultural context — leave blank if you prefer not to share.">ⓘ</span>
+        </div>
+        <div class="p-kv-value">
+          <input class="p-edit-input" data-field="cultural_background" value="${esc(vals.cultural_background || '')}" placeholder="Optional">
+        </div>
       </div>
       <button class="p-edit-btn primary" onclick="window.saveIdentity()">Save</button>
       <button class="p-edit-btn" onclick="window.loadProfile()">Cancel</button>`;
