@@ -82,6 +82,39 @@ router.get('/nodes/:id/overview', async (req, res) => {
   }
 });
 
+// ── Knobit progress for current user ─────────────────────────────────────────
+router.get('/nodes/:id/learn-progress', async (req, res) => {
+  const { id }      = req.params;
+  const passportId  = req.user?.passport_id;
+  if (!passportId) return res.json({ done: 0, total: 0 });
+
+  try {
+    const [nodes] = await db.execute(
+      'SELECT id AS db_id FROM nodes WHERE external_id = ?', [id]
+    );
+    if (!nodes.length) return res.json({ done: 0, total: 0 });
+    const locale = req.user?.locale || 'en';
+
+    const [[{ total }]] = await db.execute(
+      'SELECT COUNT(*) AS total FROM knobits WHERE node_id = ? AND locale = ?',
+      [nodes[0].db_id, locale]
+    );
+    if (!total) return res.json({ done: 0, total: 0 });
+
+    const [[{ done }]] = await db.execute(
+      `SELECT COUNT(*) AS done
+       FROM knobit_progress kp
+       JOIN knobits k ON kp.knobit_id = k.id
+       WHERE kp.passport_id = ? AND k.node_id = ? AND k.locale = ? AND kp.phase_reached = 'done'`,
+      [passportId, nodes[0].db_id, locale]
+    );
+
+    res.json({ done, total });
+  } catch (err) {
+    res.json({ done: 0, total: 0 });
+  }
+});
+
 // ── User knowledge percentage ────────────────────────────────────────────────
 router.get('/nodes/:id/knowledge', async (req, res) => {
   const { id }      = req.params;
@@ -165,6 +198,18 @@ router.post('/nodes/:id/learn', async (req, res) => {
        FROM knobits WHERE node_id = ? AND locale = ? ORDER BY sequence`,
       [node.db_id, locale]
     );
+
+    // Log learning start event
+    const passportId = req.user?.passport_id;
+    if (passportId) {
+      await db.execute(
+        `INSERT INTO passport_events
+           (passport_id, event_date, title, institution, result, type, sort_order)
+         VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', NULL, 'assessment', 0)`,
+        [passportId, `Started learning: ${node.label}`]
+      ).catch(() => {});
+    }
+
     res.json({ knobits });
   } catch (err) {
     console.error('[api/nodes/learn]', err.message);
