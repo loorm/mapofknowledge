@@ -1178,6 +1178,11 @@ function init(data, emergentData) {
     resetZoom:            function()         { window.resetMapZoom(); },
     refreshProgress:      function()         { loadProgress(); },
     setTilt:              function(angle)    { window.setTilt(angle); },
+    openDemoNode:         function()         {
+      var target = simNodes.find(function(n) { return n.level === 4; });
+      if (target) highlightAndOpen(target);
+    },
+    closeSidebar:         function()         { closeSidebar(); resetHighlight(); },
   };
   // Keep legacy aliases so filters.js / tilt.js / HTML inline calls still work
   window.refreshProgress = window.MapView.refreshProgress;
