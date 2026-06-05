@@ -63,14 +63,14 @@
         <button class="p-edit-btn" onclick="window.editIdentity()">Edit identity</button>`;
     }
 
-    // About card
+    // Learning needs and preferences card
     const aboutCard = document.getElementById('about-card');
     if (aboutCard) {
       aboutCard.innerHTML = about
-        ? `<div class="p-kv-value" style="font-size:13px;color:#4A4038;line-height:1.75">${esc(about)}</div>
+        ? `<div class="p-kv-value" style="font-size:13px;color:#4A4038;line-height:1.75;white-space:pre-wrap">${esc(about)}</div>
            <button class="p-edit-btn" onclick="window.editAbout()">Edit</button>`
-        : `${empty('Tell your story — who you are as a learner, what drives you.')}
-           <button class="p-edit-btn" onclick="window.editAbout()">Add about text</button>`;
+        : `${empty('Describe how and when and where you learn best, and any special needs that impact your learning.')}
+           <button class="p-edit-btn" onclick="window.editAbout()">Add</button>`;
     }
   }
 
@@ -467,7 +467,7 @@
     if (!card) return;
     const current = card.querySelector('[style]')?.textContent.trim() || '';
     card.innerHTML = `
-      <textarea class="p-edit-input" style="width:100%;min-height:120px;resize:vertical" placeholder="Tell your story…">${esc(current)}</textarea>
+      <textarea class="p-edit-input" style="width:100%;min-height:140px;resize:vertical" placeholder="Describe how and when and where you learn best, and any special needs that impact your learning…">${esc(current)}</textarea>
       <button class="p-edit-btn primary" onclick="window.saveAbout(this)">Save</button>
       <button class="p-edit-btn" onclick="window.loadProfile()">Cancel</button>`;
   };
@@ -489,7 +489,6 @@
       .then(d => {
         renderIdentity(d.passport || {});
         renderInterests(d.tags);
-        renderLearningStyle(d.learningStyle);
         renderEvents(d.events);
         renderCredentials(d.credentials, d.mapKnowledge);
         renderCompetence(d.competence, d.mapKnowledge);
