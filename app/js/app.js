@@ -462,10 +462,19 @@ function init(data, emergentData) {
 
     // Learn this — only active for L5 nodes
     if (learnBtnEl) {
+      const learnLabel = learnBtnEl.querySelector('.sb-learn-label');
+      if (learnLabel) learnLabel.textContent = 'Learn this';
       if (d.level === 5) {
         learnBtnEl.disabled = false;
         learnBtnEl.style.opacity = '';
         learnBtnEl.style.cursor = '';
+        fetch(`/api/nodes/${nodeExtId}/learn-progress`)
+          .then(r => r.json())
+          .then(({ done, total }) => {
+            if (done > 0 && done < total && learnLabel) {
+              learnLabel.textContent = `Continue (${done}/${total})`;
+            }
+          }).catch(() => {});
       } else {
         learnBtnEl.disabled = true;
         learnBtnEl.style.opacity = '0.4';
