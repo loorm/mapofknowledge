@@ -205,10 +205,10 @@ router.post('/nodes/:id/knowledge', async (req, res) => {
 
   try {
     const [nodes] = await db.execute(
-      'SELECT id AS db_id, level FROM nodes WHERE external_id = ?', [id]
+      'SELECT id AS db_id, level, label FROM nodes WHERE external_id = ?', [id]
     );
     if (!nodes.length) return res.status(404).json({ error: 'Node not found' });
-    const { db_id, level } = nodes[0];
+    const { db_id, level, label } = nodes[0];
 
     await db.execute(
       `INSERT INTO user_node_knowledge
@@ -241,6 +241,18 @@ router.post('/nodes/:id/knowledge', async (req, res) => {
 
     // Single ancestor update after all writes are done
     updateAncestorKnowledge(passportId, id).catch(() => {});
+
+    // Log mark / unmark as known events
+    if (source === 'self_reported' && passportId) {
+      const pct = parseInt(percentage);
+      const eventTitle = pct >= 100 ? `Marked as known: ${label}` : `Unmarked as known: ${label}`;
+      db.execute(
+        `INSERT INTO passport_events (passport_id, event_date, title, institution, node_external_id, type, sort_order)
+         VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', ?, 'activity', 0)`,
+        [passportId, eventTitle, id]
+      ).catch(() => {});
+    }
+
     res.json({ ok: true, percentage, source });
   } catch (err) {
     console.error('[api/nodes/knowledge POST]', err.message);
@@ -542,6 +554,38 @@ router.get('/profile', async (req, res) => {
   } catch (err) {
     console.error('[api/profile]', err.message);
     res.status(500).json({ error: 'Failed to load profile' });
+  }
+});
+
+// ── Manual learning events ───────────────────────────────────────────────────
+router.post('/profile/events', async (req, res) => {
+  const passportId = req.user?.passport_id;
+  if (!passportId) return res.status(400).json({ error: 'No passport' });
+  const { title, institution, result, event_date } = req.body;
+  if (!title?.trim()) return res.status(400).json({ error: 'title required' });
+  try {
+    await db.execute(
+      `INSERT INTO passport_events (passport_id, event_date, title, institution, result, type, sort_order)
+       VALUES (?, ?, ?, ?, ?, 'activity', 0)`,
+      [passportId, event_date || new Date().toISOString().split('T')[0], title.trim(), institution || null, result || null]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to add event' });
+  }
+});
+
+router.delete('/profile/events/:id', async (req, res) => {
+  const passportId = req.user?.passport_id;
+  if (!passportId) return res.status(400).json({ error: 'No passport' });
+  try {
+    await db.execute(
+      `DELETE FROM passport_events WHERE id = ? AND passport_id = ? AND type = 'activity'`,
+      [req.params.id, passportId]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete event' });
   }
 });
 
