@@ -704,13 +704,47 @@ function init(data, emergentData) {
     });
   }
 
-  // Enter key → navigate on exact match
+  // Keyboard navigation in dropdown + Enter on exact match
+  let _dropdownIdx = -1;
+
+  function _dropdownItems() {
+    return searchDropdown ? Array.from(searchDropdown.querySelectorAll('.search-dropdown-item')) : [];
+  }
+
+  function _setDropdownActive(idx) {
+    _dropdownItems().forEach(function(el, i) {
+      el.classList.toggle('active', i === idx);
+    });
+    _dropdownIdx = idx;
+  }
+
   searchBox.addEventListener("keydown", function(e) {
+    const items = _dropdownItems();
+    if (items.length && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      e.preventDefault();
+      const next = e.key === 'ArrowDown'
+        ? Math.min(_dropdownIdx + 1, items.length - 1)
+        : Math.max(_dropdownIdx - 1, 0);
+      _setDropdownActive(next);
+      return;
+    }
+    if (e.key === 'Escape') { closeDropdown(); _dropdownIdx = -1; return; }
     if (e.key !== 'Enter') return;
+
+    // Enter on highlighted dropdown item
+    if (_dropdownIdx >= 0 && items[_dropdownIdx]) {
+      clearSearch(); _dropdownIdx = -1;
+      navigateToNode(items[_dropdownIdx].dataset.nodeId);
+      return;
+    }
+    // Enter on exact text match
     const q = this.value.trim().toLowerCase();
     const exact = Object.values(allNodes).find(n => n.label.toLowerCase() === q);
     if (exact) { clearSearch(); navigateToNode(exact.id); }
   });
+
+  // Reset active index when dropdown content changes
+  searchBox.addEventListener("input", function() { _dropdownIdx = -1; });
 
   // Close dropdown when clicking outside
   document.addEventListener('click', function(e) {
