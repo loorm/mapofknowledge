@@ -170,6 +170,12 @@ router.post('/nodes/:id/knowledge', async (req, res) => {
   if (!passportId) return res.status(400).json({ error: 'No passport linked to account' });
 
   try {
+    const [nodes] = await db.execute(
+      'SELECT id AS db_id, level FROM nodes WHERE external_id = ?', [id]
+    );
+    if (!nodes.length) return res.status(404).json({ error: 'Node not found' });
+    const { db_id, level } = nodes[0];
+
     await db.execute(
       `INSERT INTO user_node_knowledge
          (passport_id, node_external_id, percentage, source, updated_at)
@@ -180,6 +186,26 @@ router.post('/nodes/:id/knowledge', async (req, res) => {
          updated_at = NOW()`,
       [passportId, id, percentage, source]
     );
+
+    // Cascade to L5 children server-side to avoid client race condition
+    if (level === 4) {
+      const [children] = await db.execute(
+        'SELECT external_id FROM nodes WHERE parent_id = ? AND level = 5',
+        [db_id]
+      );
+      for (const child of children) {
+        await db.execute(
+          `INSERT INTO user_node_knowledge
+             (passport_id, node_external_id, percentage, source, updated_at)
+           VALUES (?, ?, ?, ?, NOW())
+           ON DUPLICATE KEY UPDATE
+             percentage = VALUES(percentage), source = VALUES(source), updated_at = NOW()`,
+          [passportId, child.external_id, percentage, source]
+        );
+      }
+    }
+
+    // Single ancestor update after all writes are done
     updateAncestorKnowledge(passportId, id).catch(() => {});
     res.json({ ok: true, percentage, source });
   } catch (err) {
