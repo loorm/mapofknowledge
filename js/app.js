@@ -223,8 +223,8 @@ function init(data, emergentData) {
     .force("collide", d3.forceCollide().radius(d => nodeRadius(d) + 4).strength(0.8))
     .force("x",       d3.forceX(d => continentSeeds[d.continent] ? continentSeeds[d.continent].x : w/2).strength(d => d.level === 1 ? 0.3 : 0.06))
     .force("y",       d3.forceY(d => continentSeeds[d.continent] ? continentSeeds[d.continent].y : h/2).strength(d => d.level === 1 ? 0.3 : 0.06))
-    .alphaDecay(0.06)
-    .velocityDecay(0.6)
+    .alphaDecay(0.2)
+    .velocityDecay(0.8)
     .on("tick", ticked);
 
   // ── Emergent force simulation ──────────────────────────────────────────────
