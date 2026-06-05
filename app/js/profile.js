@@ -224,20 +224,23 @@
     }).join('');
 
     const hasDates  = _evFilter.dateFrom || _evFilter.dateTo;
-    const clearLink = hasDates
-      ? `<button onclick="window.clearEvDates()" style="background:none;border:none;cursor:pointer;font-size:11px;color:#C4826A;padding:0;font-family:inherit">Clear dates</button>`
+    const clearBtn  = hasDates
+      ? `<button onclick="window.clearEvDates()" title="Clear date filter"
+           style="width:18px;height:18px;border-radius:50%;background:rgba(58,48,40,0.10);
+           border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+           color:#8A7E72;font-size:10px;line-height:1;flex-shrink:0;transition:background 0.12s">✕</button>`
       : '';
 
     const filterRow = `
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap">
         <div style="display:flex;gap:4px">${typePills}</div>
         <div style="display:flex;gap:4px;margin-left:auto;align-items:center">
-          <input type="date" class="p-edit-input" style="padding:3px 8px;font-size:11px;width:118px"
+          <input type="date" class="p-edit-input" style="padding:3px 6px;font-size:11px;width:100px"
             value="${_evFilter.dateFrom}" onblur="window.setEvDateFilter('from',this.value)">
           <span style="font-size:11px;color:#9A8E86">–</span>
-          <input type="date" class="p-edit-input" style="padding:3px 8px;font-size:11px;width:118px"
+          <input type="date" class="p-edit-input" style="padding:3px 6px;font-size:11px;width:100px"
             value="${_evFilter.dateTo}" onblur="window.setEvDateFilter('to',this.value)">
-          ${clearLink}
+          ${clearBtn}
         </div>
       </div>`;
 
@@ -252,7 +255,7 @@
                 `<a class="p-event-node-link" href="/app/?node=${esc(ev.node_external_id)}">${esc(ev.title.slice(sep + 2))}</a>`;
             }
           }
-          var delBtn = ev.type === 'activity'
+          var delBtn = ev.user_created
             ? `<button onclick="window.deleteEvent(${ev.id})" title="Remove"
                  style="background:none;border:none;cursor:pointer;color:#B0A496;font-size:15px;padding:0 0 0 6px;line-height:1;vertical-align:middle">×</button>`
             : '';
