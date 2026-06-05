@@ -512,7 +512,8 @@
          </button>`
       : '';
 
-    card.innerHTML = `<div class="p-card-title">Reflections</div>` + rowsHtml + moreBtn;
+    card.innerHTML = `<div class="p-card-title">Reflections</div>
+      <div style="max-height:380px;overflow-y:auto">${rowsHtml}</div>` + moreBtn;
   }
 
   function renderReflections(reflections) {
