@@ -68,7 +68,7 @@
       target:   '.topbar-burger-wrap',
       position: 'bottom-left',
       title:    'Your Learner Passport',
-      text:     'Everything you learn is recorded in your <strong>Learner Passport</strong>. Open it from the menu — it stores your credentials, knowledge map, reflections, and goals.<br><br>Exportable in internationally recognised formats and verifiable via blockchain.',
+      text:     'Tap the menu icon above, then click <strong>Account</strong> to open your Learner Passport — a living record of everything you learn. It stores credentials, your knowledge map, reflections, and goals.<br><br>Exportable in internationally recognised formats and verifiable via blockchain.',
       padding:  10,
     },
   ];
@@ -91,23 +91,31 @@
 
   /* ─── Positioning ──────────────────────────────────────────── */
   function _positionSpot(rect, padding) {
+    // Use class only — no inline style.display, so _hide() always works cleanly
+    if (!rect) { _spot.classList.remove('visible'); return; }
     var p = padding || 0;
-    if (!rect) { _spot.style.display = 'none'; return; }
-    _spot.style.display = 'block';
-    _spot.style.left    = (rect.left   - p) + 'px';
-    _spot.style.top     = (rect.top    - p) + 'px';
-    _spot.style.width   = (rect.width  + p * 2) + 'px';
-    _spot.style.height  = (rect.height + p * 2) + 'px';
+    _spot.style.left   = (rect.left   - p) + 'px';
+    _spot.style.top    = (rect.top    - p) + 'px';
+    _spot.style.width  = (rect.width  + p * 2) + 'px';
+    _spot.style.height = (rect.height + p * 2) + 'px';
+    _spot.classList.add('visible');
   }
 
   function _positionTip(rect, position) {
     var TW = 340, M = 18;
     var vw = window.innerWidth, vh = window.innerHeight;
+    var TH = 340; // conservative tooltip height estimate
     var left, top;
 
-    if (position === 'bottom-center' || !rect) {
+    if (position === 'bottom-center') {
       left = (vw - TW) / 2;
-      top  = vh - 280;
+      top  = vh - TH - 20;
+    } else if (!rect || position === 'center-right') {
+      left = Math.min(vw * 0.52, vw - TW - M);
+      top  = 90;
+    } else if (position === 'overlay-center') {
+      left = (vw - TW) / 2;
+      top  = 90;
     } else if (position === 'right') {
       left = rect.right + M;
       top  = Math.max(70, rect.top);
@@ -117,23 +125,17 @@
     } else if (position === 'bottom-left') {
       left = Math.max(M, rect.left);
       top  = rect.bottom + M;
-    } else if (position === 'center-right') {
-      left = vw * 0.54;
-      top  = vh * 0.22;
-    } else if (position === 'overlay-center') {
-      // Tooltip floats over the learning mode
-      left = (vw - TW) / 2;
-      top  = vh * 0.28;
     } else {
       left = (vw - TW) / 2;
-      top  = (rect ? rect.bottom + M : vh - 280);
+      top  = rect.bottom + M;
     }
 
+    // Clamp so tooltip never runs off bottom
     left = Math.max(M, Math.min(left, vw - TW - M));
-    top  = Math.max(70, Math.min(top, vh - 260));
+    top  = Math.max(70, Math.min(top, vh - TH - M));
 
-    _tip.style.left  = left + 'px';
-    _tip.style.top   = top  + 'px';
+    _tip.style.left = left + 'px';
+    _tip.style.top  = top  + 'px';
   }
 
   /* ─── Render a step ────────────────────────────────────────── */
@@ -195,7 +197,7 @@
 
   function _hide() {
     if (_overlay) _overlay.classList.remove('visible');
-    if (_spot)    _spot.classList.remove('visible');
+    if (_spot)    { _spot.classList.remove('visible'); _spot.style.cssText = ''; }
     if (_tip)     _tip.classList.remove('visible');
   }
 
