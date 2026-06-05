@@ -132,16 +132,25 @@
       ledger.innerHTML = empty('Your learning events will appear here as you complete nodes and knobits.');
       return;
     }
-    ledger.innerHTML = events.slice(0, 10).map(ev => `
-      <div class="p-ledger-row">
+    ledger.innerHTML = events.slice(0, 10).map(ev => {
+      let titleHtml = esc(ev.title);
+      if (ev.node_external_id) {
+        const sep = ev.title.indexOf(': ');
+        if (sep !== -1) {
+          titleHtml = esc(ev.title.slice(0, sep + 2)) +
+            `<a class="p-event-node-link" href="/?node=${esc(ev.node_external_id)}">${esc(ev.title.slice(sep + 2))}</a>`;
+        }
+      }
+      return `<div class="p-ledger-row">
         <div class="p-ledger-date">${fmtDate(ev.event_date)}</div>
         <div class="p-ledger-info">
-          <div class="p-ledger-title">${esc(ev.title)}</div>
+          <div class="p-ledger-title">${titleHtml}</div>
           ${ev.institution ? `<div class="p-ledger-sub">${esc(ev.institution)}</div>` : ''}
           ${ev.result ? `<div class="p-ledger-result">${esc(ev.result)}</div>` : ''}
         </div>
         <span class="p-type ${esc(ev.type)}">${esc(ev.type.charAt(0).toUpperCase() + ev.type.slice(1))}</span>
-      </div>`).join('') +
+      </div>`;
+    }).join('') +
       (events.length > 10
         ? `<div class="p-view-more"><span>+ ${events.length - 10} more events</span></div>`
         : '');
