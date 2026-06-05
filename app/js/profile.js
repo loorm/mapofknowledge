@@ -138,7 +138,7 @@
         const sep = ev.title.indexOf(': ');
         if (sep !== -1) {
           titleHtml = esc(ev.title.slice(0, sep + 2)) +
-            `<a class="p-event-node-link" href="/?node=${esc(ev.node_external_id)}">${esc(ev.title.slice(sep + 2))}</a>`;
+            `<a class="p-event-node-link" href="/app/?node=${esc(ev.node_external_id)}">${esc(ev.title.slice(sep + 2))}</a>`;
         }
       }
       return `<div class="p-ledger-row">
