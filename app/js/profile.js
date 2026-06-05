@@ -229,10 +229,10 @@
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap">
         <div style="display:flex;gap:4px">${typePills}</div>
         <div style="display:flex;gap:4px;margin-left:auto;align-items:center">
-          <input type="date" class="p-edit-input" style="padding:3px 8px;font-size:11px;width:118px"
+          <input type="date" class="p-edit-input" style="padding:3px 8px;font-size:11px;min-width:130px"
             value="${_evFilter.dateFrom}" onchange="window.setEvDateFilter('from',this.value)">
           <span style="font-size:11px;color:#9A8E86">–</span>
-          <input type="date" class="p-edit-input" style="padding:3px 8px;font-size:11px;width:118px"
+          <input type="date" class="p-edit-input" style="padding:3px 8px;font-size:11px;min-width:130px"
             value="${_evFilter.dateTo}" onchange="window.setEvDateFilter('to',this.value)">
         </div>
       </div>`;
