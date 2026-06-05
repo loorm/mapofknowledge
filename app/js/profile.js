@@ -239,8 +239,9 @@
           </div>
           <div style="display:flex;gap:8px">
             <input id="ev-date" type="date" class="p-edit-input" style="flex:1" value="${today}">
-            <input id="ev-notes" class="p-edit-input" style="flex:2" placeholder="Outcome or notes (optional)">
+            <input id="ev-notes" class="p-edit-input" style="flex:2" placeholder="Test score or other outcome (optional)">
           </div>
+          <textarea id="ev-reflection" class="p-edit-input" style="width:100%;min-height:80px;resize:vertical;box-sizing:border-box" placeholder="Reflection — what did you learn, what surprised you, what would you do differently? (optional)"></textarea>
           <div style="display:flex;gap:8px">
             <button class="p-edit-btn primary" onclick="window.saveManualEvent()" style="margin-top:0">Add</button>
             <button class="p-edit-btn" onclick="document.getElementById('ev-form').style.display='none';document.getElementById('ev-add-btn').style.display=''" style="margin-top:0">Cancel</button>
@@ -250,17 +251,18 @@
   }
 
   window.saveManualEvent = function () {
-    const title    = document.getElementById('ev-title').value.trim();
+    const title      = document.getElementById('ev-title').value.trim();
     if (!title) { document.getElementById('ev-title').focus(); return; }
-    const source   = document.getElementById('ev-source').value;
-    const provider = document.getElementById('ev-provider').value.trim();
-    const date     = document.getElementById('ev-date').value;
-    const notes    = document.getElementById('ev-notes').value.trim();
+    const source     = document.getElementById('ev-source').value;
+    const provider   = document.getElementById('ev-provider').value.trim();
+    const date       = document.getElementById('ev-date').value;
+    const notes      = document.getElementById('ev-notes').value.trim();
+    const reflection = document.getElementById('ev-reflection').value.trim();
     const institution = source + (provider ? ' — ' + provider : '');
     fetch('/api/profile/events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, institution, result: notes || null, event_date: date }),
+      body: JSON.stringify({ title, institution, result: notes || null, event_date: date, reflection: reflection || null }),
     }).then(() => window.loadProfile()).catch(() => {});
   };
 
@@ -409,6 +411,29 @@
     }
   }
 
+  function renderReflections(reflections) {
+    const card = document.getElementById('reflections-card');
+    if (!card) return;
+    if (!reflections || !reflections.length) {
+      card.innerHTML = `<div class="p-card-title">Reflections</div>` +
+        empty('Reflections on your learning will appear here. You can add one when logging an activity.');
+      return;
+    }
+    card.innerHTML = `<div class="p-card-title">Reflections</div>` +
+      reflections.map(r => {
+        const eventLine = r.event_title
+          ? `<div style="font-size:11px;color:#9A8E86;margin-top:8px">
+               On: <em>${esc(r.event_title)}</em>${r.event_date ? ' · ' + fmtDate(r.event_date) : ''}
+             </div>`
+          : '';
+        return `<div class="p-quote" style="margin-bottom:14px">
+          <div style="font-size:10px;color:#B0A496;margin-bottom:6px">${fmtDate(r.created_at)}</div>
+          "${esc(r.text)}"
+          ${eventLine}
+        </div>`;
+      }).join('');
+  }
+
   function renderGoals(aspirations, objectives, plans) {
     const aspCard = document.getElementById('aspirations-card');
     if (aspCard) {
@@ -541,6 +566,7 @@
         renderEvents(d.events);
         renderCredentials(d.credentials, d.mapKnowledge);
         renderCompetence(d.competence, d.mapKnowledge);
+        renderReflections(d.reflections);
         renderGoals(d.aspirations, d.objectives, d.plans);
       })
       .catch(err => {

@@ -519,6 +519,16 @@ router.get('/profile', async (req, res) => {
       [passportId]
     );
 
+    const [reflections] = await db.execute(
+      `SELECT r.id, r.text, r.created_at,
+              e.id AS event_id, e.title AS event_title, e.event_date
+       FROM passport_reflections r
+       LEFT JOIN passport_events e ON r.event_id = e.id
+       WHERE r.passport_id = ?
+       ORDER BY r.created_at DESC`,
+      [passportId]
+    );
+
     const [learningStyle] = await db.execute(
       'SELECT * FROM passport_learning_style WHERE passport_id = ?',
       [passportId]
@@ -546,6 +556,7 @@ router.get('/profile', async (req, res) => {
       mapKnowledge,
       events,
       tags,
+      reflections,
       learningStyle: learningStyle[0] || null,
       aspirations,
       objectives,
@@ -561,17 +572,42 @@ router.get('/profile', async (req, res) => {
 router.post('/profile/events', async (req, res) => {
   const passportId = req.user?.passport_id;
   if (!passportId) return res.status(400).json({ error: 'No passport' });
-  const { title, institution, result, event_date } = req.body;
+  const { title, institution, result, event_date, reflection } = req.body;
   if (!title?.trim()) return res.status(400).json({ error: 'title required' });
   try {
-    await db.execute(
+    const [evResult] = await db.execute(
       `INSERT INTO passport_events (passport_id, event_date, title, institution, result, type, sort_order)
        VALUES (?, ?, ?, ?, ?, 'activity', 0)`,
       [passportId, event_date || new Date().toISOString().split('T')[0], title.trim(), institution || null, result || null]
     );
+    if (reflection?.trim()) {
+      await db.execute(
+        `INSERT INTO passport_reflections (passport_id, event_id, text, created_at)
+         VALUES (?, ?, ?, NOW())`,
+        [passportId, evResult.insertId, reflection.trim()]
+      );
+    }
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: 'Failed to add event' });
+  }
+});
+
+// ── Reflections ───────────────────────────────────────────────────────────────
+router.post('/profile/reflections', async (req, res) => {
+  const passportId = req.user?.passport_id;
+  if (!passportId) return res.status(400).json({ error: 'No passport' });
+  const { text, event_id } = req.body;
+  if (!text?.trim()) return res.status(400).json({ error: 'text required' });
+  try {
+    const [result] = await db.execute(
+      `INSERT INTO passport_reflections (passport_id, event_id, text, created_at)
+       VALUES (?, ?, ?, NOW())`,
+      [passportId, event_id || null, text.trim()]
+    );
+    res.json({ id: result.insertId, ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to save reflection' });
   }
 });
 
