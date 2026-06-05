@@ -543,15 +543,12 @@ function init(data, emergentData) {
         .catch(() => {});
     }
 
-    // I know this toggle — only active for L4/L5
+    // I know this toggle — L4/L5 only, hidden entirely for L1–L3
+    const toggleRow = document.querySelector('.sb-toggle-row');
+    if (toggleRow) toggleRow.style.display = d.level >= 4 ? '' : 'none';
     if (sbToggle) {
-      if (d.level >= 4) {
-        sbToggle.style.opacity = '';
-        sbToggle.style.pointerEvents = '';
-      } else {
-        sbToggle.style.opacity = '0.3';
-        sbToggle.style.pointerEvents = 'none';
-      }
+      sbToggle.style.opacity = '';
+      sbToggle.style.pointerEvents = '';
     }
     if (sbToggle && !sbToggle._wired) {
       sbToggle._wired = true;
