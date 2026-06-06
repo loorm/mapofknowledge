@@ -47,9 +47,14 @@ function nodeGradient(hex) {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
   const b = parseInt(hex.slice(5, 7), 16);
-  const tint = (ch, p) => Math.round(255 * (1 - p) + ch * p);
-  const light = `rgb(${tint(r,.18)},${tint(g,.18)},${tint(b,.18)})`;
-  const deep  = `rgb(${tint(r,.42)},${tint(g,.42)},${tint(b,.42)})`;
+  // Blend toward palette background colour, not always white
+  const cls = document.documentElement.className;
+  let bgR = 255, bgG = 255, bgB = 255;
+  if      (cls.includes('palette-vampire')) { bgR = 17;  bgG = 20;  bgB = 32;  }
+  else if (cls.includes('palette-nordic'))  { bgR = 248; bgG = 250; bgB = 252; }
+  const tint = (ch, bg, p) => Math.round(bg * (1 - p) + ch * p);
+  const light = `rgb(${tint(r,bgR,.18)},${tint(g,bgG,.18)},${tint(b,bgB,.18)})`;
+  const deep  = `rgb(${tint(r,bgR,.42)},${tint(g,bgG,.42)},${tint(b,bgB,.42)})`;
   return `linear-gradient(to bottom, ${light} 0%, ${deep} 100%)`;
 }
 
@@ -85,8 +90,8 @@ Promise.all([
   document.documentElement.classList.remove('fs-medium', 'fs-large');
   if (fs === 'medium') { document.documentElement.classList.add('fs-medium'); FONT_SIZE = { 1: 15, 2: 13, 3: 11, 4: 10, 5: 9 }; }
   if (fs === 'large')  { document.documentElement.classList.add('fs-large');  FONT_SIZE = { 1: 17, 2: 14, 3: 12, 4: 11, 5: 10 }; }
-  const palette = settings.palette || 'sunset';
-  document.documentElement.classList.remove('palette-nordic', 'palette-midnight', 'palette-candystore');
+  const palette = (settings.palette === 'midnight' ? 'vampire' : settings.palette) || 'sunset';
+  document.documentElement.classList.remove('palette-nordic', 'palette-vampire', 'palette-candystore');
   if (palette !== 'sunset') document.documentElement.classList.add('palette-' + palette);
   init(base, emergent);
   if (window._tourCheckAutoStart) window._tourCheckAutoStart(settings);

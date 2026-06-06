@@ -2,7 +2,7 @@
    COLOUR PALETTES  —  palette.css
    ─────────────────────────────────────────
    :root defines Sunset (default).
-   Apply html.palette-nordic / html.palette-midnight /
+   Apply html.palette-nordic / html.palette-vampire /
    html.palette-candystore for other themes.
    Set from /api/settings key "palette".
    ═══════════════════════════════════════════ */
@@ -113,10 +113,10 @@ html.palette-nordic {
 
 
 /* ═══════════════════════════════════════════
-   MIDNIGHT
+   VAMPIRE
    Deep charcoal/navy, light text, warm glow
    ═══════════════════════════════════════════ */
-html.palette-midnight {
+html.palette-vampire {
   --map-bg:   #040608;
   --bg:       #111420;
   --panel-a:  #151828;
@@ -163,119 +163,119 @@ html.palette-midnight {
 }
 
 /* Midnight: white/near-white card backgrounds → dark surfaces */
-html.palette-midnight .sb-knowledge-card,
-html.palette-midnight .lm-complete-stat {
+html.palette-vampire .sb-knowledge-card,
+html.palette-vampire .lm-complete-stat {
   background: linear-gradient(135deg, var(--i07) 0%, var(--i09) 100%);
   border-color: var(--i14);
 }
-html.palette-midnight .sb-toggle-row {
+html.palette-vampire .sb-toggle-row {
   background: linear-gradient(135deg, var(--i06) 0%, var(--i08) 100%);
   border-color: var(--i14);
 }
-html.palette-midnight .block-byte,
-html.palette-midnight .block-practice,
-html.palette-midnight .block-diagram {
+html.palette-vampire .block-byte,
+html.palette-vampire .block-practice,
+html.palette-vampire .block-diagram {
   background: var(--i07);
   border-color: var(--i14);
   box-shadow: none;
 }
-html.palette-midnight .block-example {
+html.palette-vampire .block-example {
   background: linear-gradient(135deg, var(--i06) 0%, var(--i09) 100%);
   border-color: var(--i14);
 }
-html.palette-midnight .block-meaning {
+html.palette-vampire .block-meaning {
   background: linear-gradient(135deg, var(--i07) 0%, var(--i10) 100%);
 }
-html.palette-midnight .block-loading {
+html.palette-vampire .block-loading {
   background: var(--i05);
   border-color: var(--i12);
 }
-html.palette-midnight .lm-knobit-item.current {
+html.palette-vampire .lm-knobit-item.current {
   background: linear-gradient(135deg, var(--i09) 0%, var(--i12) 100%);
 }
-html.palette-midnight .btn {
+html.palette-vampire .btn {
   background: var(--i09);
   border-color: var(--i18);
   color: var(--c2);
 }
-html.palette-midnight .btn:hover {
+html.palette-vampire .btn:hover {
   background: var(--i13);
   border-color: var(--accent);
 }
-html.palette-midnight .kn-option-btn {
+html.palette-vampire .kn-option-btn {
   background: var(--i08);
   border-color: var(--i18);
   color: var(--c2);
 }
-html.palette-midnight .kn-option-btn:hover:not(:disabled) {
+html.palette-vampire .kn-option-btn:hover:not(:disabled) {
   background: var(--i13);
   border-color: var(--accent);
 }
-html.palette-midnight .practice-input,
-html.palette-midnight .ask-input,
-html.palette-midnight .kn-answer-input,
-html.palette-midnight #search-box {
+html.palette-vampire .practice-input,
+html.palette-vampire .ask-input,
+html.palette-vampire .kn-answer-input,
+html.palette-vampire #search-box {
   background: var(--i07);
   color: var(--c1);
   border-color: var(--i14);
 }
-html.palette-midnight #search-box:focus {
+html.palette-vampire #search-box:focus {
   background: var(--i10);
 }
-html.palette-midnight .search-dropdown {
+html.palette-vampire .search-dropdown {
   background: linear-gradient(145deg, var(--glass) 0%, var(--glass-b) 100%);
 }
-html.palette-midnight .search-dropdown-name { color: var(--c1); }
-html.palette-midnight .search-dropdown-domain { color: var(--c6); }
-html.palette-midnight .quit-modal-box {
+html.palette-vampire .search-dropdown-name { color: var(--c1); }
+html.palette-vampire .search-dropdown-domain { color: var(--c6); }
+html.palette-vampire .quit-modal-box {
   box-shadow: 0 8px 32px rgba(0,0,0,0.45);
 }
-html.palette-midnight .sf-input {
+html.palette-vampire .sf-input {
   background: var(--i07);
   color: var(--c1);
 }
-html.palette-midnight .settings-row,
-html.palette-midnight .sf-filter-row,
-html.palette-midnight .sf-add-form {
+html.palette-vampire .settings-row,
+html.palette-vampire .sf-filter-row,
+html.palette-vampire .sf-add-form {
   background: var(--i07);
 }
-html.palette-midnight .st-picker-btn {
+html.palette-vampire .st-picker-btn {
   background: var(--i07);
   color: var(--c3);
 }
-html.palette-midnight .st-picker-btn:hover {
+html.palette-vampire .st-picker-btn:hover {
   background: var(--i12);
   color: var(--c1);
 }
-html.palette-midnight .st-palette-card {
+html.palette-vampire .st-palette-card {
   background: var(--i07);
 }
-html.palette-midnight .st-palette-card:hover {
+html.palette-vampire .st-palette-card:hover {
   background: var(--i12);
 }
-html.palette-midnight .nav-dropdown {
+html.palette-vampire .nav-dropdown {
   background: linear-gradient(to bottom, #151828 0%, #1A1D30 60%, #1E2238 100%);
   border-color: var(--i14);
 }
 /* Explicit hardcoded bg for sidebar + top-bar to guarantee dark rendering */
-html.palette-midnight #top-bar {
+html.palette-vampire #top-bar {
   background: linear-gradient(to right, #151828 0%, #1A1D30 55%, #1E2238 100%);
   border-bottom-color: var(--i09);
 }
-html.palette-midnight #sidebar {
+html.palette-vampire #sidebar {
   background: linear-gradient(to bottom, #151828 0%, #1A1D30 55%, #1E2238 100%);
   border-left-color: var(--i14);
   box-shadow: -6px 0 32px rgba(0,0,8,0.40);
 }
-html.palette-midnight .ctrl-card {
+html.palette-vampire .ctrl-card {
   background: linear-gradient(145deg, #1A1D30 0%, #1E2238 100%);
   border-color: var(--i14);
   box-shadow: 0 4px 20px rgba(0,0,0,0.28), 0 0 0 1px var(--accent-ring), 0 0 28px var(--accent-glow);
 }
-html.palette-midnight #tooltip {
+html.palette-vampire #tooltip {
   background: rgba(0,4,16,0.96);
 }
-html.palette-midnight {
+html.palette-vampire {
   --notif-card-bg:       rgba(200,210,240,0.07);
   --notif-card-bg-hover: rgba(200,210,240,0.12);
 }
