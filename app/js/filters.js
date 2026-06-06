@@ -221,23 +221,28 @@
 
   };
 
-  /* ─── Custom filters from localStorage ──────────────────────────── */
-  (function loadCustomFilters() {
-    var customs;
-    try { customs = JSON.parse(localStorage.getItem('kq_filter_custom') || '[]'); }
-    catch(e) { customs = []; }
+  /* ─── DB-backed subsets (personal + public) ─────────────────────── */
+  var COLOR_HEX = { terra: '#C4826A', sage: '#8BAD7E', amber: '#C4A55A', lavender: '#9B8FB5' };
 
-    var list = document.querySelector('#filter-panel .fp-list');
-    customs.forEach(function(cf) {
-      FILTERS[cf.id] = { label: cf.label, color: cf.color, labels: new Set(cf.labels) };
-      var div = document.createElement('div');
-      div.className = 'fp-item';
-      div.dataset.filterId = cf.id;
-      div.style.setProperty('--fi-color', cf.color);
-      div.innerHTML = '<div class="fp-radio"></div><div class="fp-dot"></div>'
-                    + '<span class="fp-label">' + cf.label + '</span>';
-      list.appendChild(div);
-    });
+  (function loadDBSubsets() {
+    fetch('/api/subsets')
+      .then(function(r) { return r.json(); })
+      .then(function(subsets) {
+        var list = document.querySelector('#filter-panel .fp-list');
+        subsets.forEach(function(s) {
+          var filterId = 'db-' + s.id;
+          var color = COLOR_HEX[s.icon_color] || COLOR_HEX.terra;
+          FILTERS[filterId] = { label: s.name, color: color, dbId: s.id, labels: null };
+          var div = document.createElement('div');
+          div.className = 'fp-item';
+          div.dataset.filterId = filterId;
+          div.style.setProperty('--fi-color', color);
+          div.innerHTML = '<div class="fp-radio"></div><div class="fp-dot"></div>'
+                        + '<span class="fp-label">' + s.name + '</span>';
+          list.appendChild(div);
+        });
+      })
+      .catch(function() {});
   })();
 
   /* ─── Apply visibility from localStorage ────────────────────────── */
@@ -308,6 +313,19 @@
             }
           })
           .catch(function () {});
+      } else if (filter && filter.dbId) {
+        // DB-backed subset — fetch node labels on first activation
+        if (filter.labels) {
+          applyToMap(filter.labels);
+        } else {
+          fetch('/api/subsets/' + filter.dbId + '/nodes')
+            .then(function (r) { return r.json(); })
+            .then(function (labels) {
+              filter.labels = new Set(labels);
+              applyToMap(filter.labels);
+            })
+            .catch(function () {});
+        }
       } else {
         applyToMap(filter ? filter.labels : null);
       }
