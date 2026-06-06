@@ -166,10 +166,10 @@
       top  = 90;
     } else if (position === 'right') {
       left = rect.right + M;
-      top  = Math.max(70, rect.top);
+      top  = rect.top > vh / 2 ? Math.max(70, rect.bottom - TH) : Math.max(70, rect.top);
     } else if (position === 'left') {
       left = rect.left - TW - M;
-      top  = Math.max(70, rect.top);
+      top  = rect.top > vh / 2 ? Math.max(70, rect.bottom - TH) : Math.max(70, rect.top);
     } else if (position === 'bottom-left') {
       left = Math.max(M, rect.left);
       top  = rect.bottom + M;
