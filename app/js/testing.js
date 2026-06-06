@@ -64,12 +64,14 @@
     _node  = node;
     _crumb = crumb || '';
 
-    var hex = (node && node.color) ? node.color : '#C4826A';
-    var r   = parseInt(hex.slice(1, 3), 16);
-    var g   = parseInt(hex.slice(3, 5), 16);
-    var b   = parseInt(hex.slice(5, 7), 16);
-    document.documentElement.style.setProperty('--lm-accent', hex);
-    document.documentElement.style.setProperty('--lm-accent-soft', 'rgba(' + r + ',' + g + ',' + b + ',0.13)');
+    var hex   = (node && node.color) ? node.color : '#C4826A';
+    var r     = parseInt(hex.slice(1, 3), 16);
+    var g     = parseInt(hex.slice(3, 5), 16);
+    var b     = parseInt(hex.slice(5, 7), 16);
+    var alpha = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--node-alpha').trim()) || 0.13;
+    var tm    = document.getElementById('testing-mode');
+    tm.style.setProperty('--lm-accent', hex);
+    tm.style.setProperty('--lm-accent-soft', 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')');
 
     _buildPathView();
     showTmView('tm-path');

@@ -1,0 +1,311 @@
+/* ═══════════════════════════════════════════
+   COLOUR PALETTES  —  palette.css
+   ─────────────────────────────────────────
+   :root defines Sunset (default).
+   Apply html.palette-nordic / html.palette-midnight /
+   html.palette-candystore for other themes.
+   Set from /api/settings key "palette".
+   ═══════════════════════════════════════════ */
+
+:root {
+  /* ── Canvas (D3 map background) ── */
+  --map-bg:   #080810;
+
+  /* ── Page / panel backgrounds ── */
+  --bg:       #F5EEE8;
+  --panel-a:  #F5EAE3;
+  --panel-b:  #EDE6F0;
+  --panel-c:  #E4EBF5;
+  --glass:    rgba(248,242,236,0.95);
+  --glass-b:  rgba(237,232,246,0.95);
+  --glass-lm: rgba(245,238,232,0.96);
+
+  /* ── Text hierarchy ── */
+  --c1: #2C2820;
+  --c2: #3A3028;
+  --c3: #6E6358;
+  --c4: #7A6E65;
+  --c5: #8A7E72;
+  --c6: #9A8E86;
+  --c7: #B0A496;
+
+  /* ── Primary accent ── */
+  --accent:       #C4826A;
+  --accent-dark:  #B06848;
+  --accent-s:     rgba(196,130,106,0.10);
+  --accent-m:     rgba(196,130,106,0.14);
+  --accent-focus: rgba(196,130,106,0.45);
+  --accent-ring:  rgba(196,130,106,0.55);
+  --accent-glow:  rgba(196,130,106,0.60);
+
+  /* ── Ink — border / hover / shadow base ── */
+  --i04: rgba(58,48,40,0.04);
+  --i05: rgba(58,48,40,0.05);
+  --i06: rgba(58,48,40,0.06);
+  --i07: rgba(58,48,40,0.07);
+  --i08: rgba(58,48,40,0.08);
+  --i09: rgba(58,48,40,0.09);
+  --i10: rgba(58,48,40,0.10);
+  --i11: rgba(58,48,40,0.11);
+  --i12: rgba(58,48,40,0.12);
+  --i13: rgba(58,48,40,0.13);
+  --i14: rgba(58,48,40,0.14);
+  --i15: rgba(58,48,40,0.15);
+  --i18: rgba(58,48,40,0.18);
+  --i25: rgba(58,48,40,0.25);
+
+  /* ── Overlay / backdrop ── */
+  --overlay: rgba(44,40,32,0.55);
+
+  /* ── Node-color blend alpha (per palette) ── */
+  --node-alpha: 0.13;
+}
+
+
+/* ═══════════════════════════════════════════
+   NORDIC
+   Cool blue-greys, slate, muted teal accent
+   ═══════════════════════════════════════════ */
+html.palette-nordic {
+  --map-bg:   #0D1B2A;
+  --bg:       #F2F6FA;
+  --panel-a:  #EBF1F7;
+  --panel-b:  #E4EDF6;
+  --panel-c:  #DCE8F4;
+  --glass:    rgba(235,241,247,0.95);
+  --glass-b:  rgba(225,235,248,0.95);
+  --glass-lm: rgba(235,241,247,0.96);
+
+  --c1: #1A2D40;
+  --c2: #243850;
+  --c3: #3D5A70;
+  --c4: #526B7E;
+  --c5: #6A808E;
+  --c6: #8898A4;
+  --c7: #A4B4BE;
+
+  --accent:       #3E8FA8;
+  --accent-dark:  #2E7898;
+  --accent-s:     rgba(62,143,168,0.10);
+  --accent-m:     rgba(62,143,168,0.14);
+  --accent-focus: rgba(62,143,168,0.45);
+  --accent-ring:  rgba(62,143,168,0.50);
+  --accent-glow:  rgba(62,143,168,0.55);
+
+  --i04: rgba(26,45,64,0.04);
+  --i05: rgba(26,45,64,0.05);
+  --i06: rgba(26,45,64,0.06);
+  --i07: rgba(26,45,64,0.07);
+  --i08: rgba(26,45,64,0.08);
+  --i09: rgba(26,45,64,0.09);
+  --i10: rgba(26,45,64,0.10);
+  --i11: rgba(26,45,64,0.11);
+  --i12: rgba(26,45,64,0.12);
+  --i13: rgba(26,45,64,0.13);
+  --i14: rgba(26,45,64,0.14);
+  --i15: rgba(26,45,64,0.15);
+  --i18: rgba(26,45,64,0.18);
+  --i25: rgba(26,45,64,0.25);
+
+  --overlay:    rgba(20,36,52,0.60);
+  --node-alpha: 0.08;
+}
+
+
+/* ═══════════════════════════════════════════
+   MIDNIGHT
+   Deep charcoal/navy, light text, warm glow
+   ═══════════════════════════════════════════ */
+html.palette-midnight {
+  --map-bg:   #040608;
+  --bg:       #111420;
+  --panel-a:  #151828;
+  --panel-b:  #1A1D30;
+  --panel-c:  #1E2238;
+  --glass:    rgba(20,24,40,0.95);
+  --glass-b:  rgba(25,28,46,0.95);
+  --glass-lm: rgba(18,22,36,0.96);
+
+  --c1: #E8ECF8;
+  --c2: #CDD4EC;
+  --c3: #8A94B8;
+  --c4: #747EA0;
+  --c5: #5E6888;
+  --c6: #4A5270;
+  --c7: #343C58;
+
+  --accent:       #E8906A;
+  --accent-dark:  #C87050;
+  --accent-s:     rgba(232,144,106,0.12);
+  --accent-m:     rgba(232,144,106,0.18);
+  --accent-focus: rgba(232,144,106,0.50);
+  --accent-ring:  rgba(232,144,106,0.45);
+  --accent-glow:  rgba(232,144,106,0.35);
+
+  /* Light-on-dark needs boosted opacity to stay visible */
+  --i04: rgba(200,210,240,0.04);
+  --i05: rgba(200,210,240,0.06);
+  --i06: rgba(200,210,240,0.08);
+  --i07: rgba(200,210,240,0.10);
+  --i08: rgba(200,210,240,0.12);
+  --i09: rgba(200,210,240,0.14);
+  --i10: rgba(200,210,240,0.16);
+  --i11: rgba(200,210,240,0.18);
+  --i12: rgba(200,210,240,0.20);
+  --i13: rgba(200,210,240,0.22);
+  --i14: rgba(200,210,240,0.26);
+  --i15: rgba(200,210,240,0.30);
+  --i18: rgba(200,210,240,0.36);
+  --i25: rgba(200,210,240,0.48);
+
+  --overlay:    rgba(0,0,8,0.75);
+  --node-alpha: 0.18;
+}
+
+/* Midnight: white/near-white card backgrounds → dark surfaces */
+html.palette-midnight .sb-knowledge-card,
+html.palette-midnight .lm-complete-stat {
+  background: linear-gradient(135deg, var(--i07) 0%, var(--i09) 100%);
+  border-color: var(--i14);
+}
+html.palette-midnight .sb-toggle-row {
+  background: linear-gradient(135deg, var(--i06) 0%, var(--i08) 100%);
+  border-color: var(--i14);
+}
+html.palette-midnight .block-byte,
+html.palette-midnight .block-practice,
+html.palette-midnight .block-diagram {
+  background: var(--i07);
+  border-color: var(--i14);
+  box-shadow: none;
+}
+html.palette-midnight .block-example {
+  background: linear-gradient(135deg, var(--i06) 0%, var(--i09) 100%);
+  border-color: var(--i14);
+}
+html.palette-midnight .block-meaning {
+  background: linear-gradient(135deg, var(--i07) 0%, var(--i10) 100%);
+}
+html.palette-midnight .block-loading {
+  background: var(--i05);
+  border-color: var(--i12);
+}
+html.palette-midnight .lm-knobit-item.current {
+  background: linear-gradient(135deg, var(--i09) 0%, var(--i12) 100%);
+}
+html.palette-midnight .btn {
+  background: var(--i09);
+  border-color: var(--i18);
+  color: var(--c2);
+}
+html.palette-midnight .btn:hover {
+  background: var(--i13);
+  border-color: var(--accent);
+}
+html.palette-midnight .kn-option-btn {
+  background: var(--i08);
+  border-color: var(--i18);
+  color: var(--c2);
+}
+html.palette-midnight .kn-option-btn:hover:not(:disabled) {
+  background: var(--i13);
+  border-color: var(--accent);
+}
+html.palette-midnight .practice-input,
+html.palette-midnight .ask-input,
+html.palette-midnight .kn-answer-input,
+html.palette-midnight #search-box {
+  background: var(--i07);
+  color: var(--c1);
+  border-color: var(--i14);
+}
+html.palette-midnight #search-box:focus {
+  background: var(--i10);
+}
+html.palette-midnight .search-dropdown {
+  background: linear-gradient(145deg, var(--glass) 0%, var(--glass-b) 100%);
+}
+html.palette-midnight .search-dropdown-name { color: var(--c1); }
+html.palette-midnight .search-dropdown-domain { color: var(--c6); }
+html.palette-midnight .quit-modal-box {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+}
+html.palette-midnight .sf-input {
+  background: var(--i07);
+  color: var(--c1);
+}
+html.palette-midnight .settings-row,
+html.palette-midnight .sf-filter-row,
+html.palette-midnight .sf-add-form {
+  background: var(--i07);
+}
+html.palette-midnight .st-picker-btn {
+  background: var(--i07);
+  color: var(--c3);
+}
+html.palette-midnight .st-picker-btn:hover {
+  background: var(--i12);
+  color: var(--c1);
+}
+html.palette-midnight .st-palette-card {
+  background: var(--i07);
+}
+html.palette-midnight .st-palette-card:hover {
+  background: var(--i12);
+}
+html.palette-midnight .nav-dropdown {
+  background: linear-gradient(to bottom, var(--panel-a) 0%, var(--panel-b) 60%, var(--panel-c) 100%);
+}
+html.palette-midnight #tooltip {
+  background: rgba(0,4,16,0.96);
+}
+
+
+/* ═══════════════════════════════════════════
+   CANDYSTORE
+   Clean white, bold contrast, bright accent
+   ═══════════════════════════════════════════ */
+html.palette-candystore {
+  --map-bg:   #1A1A2E;
+  --bg:       #FFFFFF;
+  --panel-a:  #F8F8F8;
+  --panel-b:  #F3F3F3;
+  --panel-c:  #EEEEEE;
+  --glass:    rgba(252,252,252,0.96);
+  --glass-b:  rgba(245,245,245,0.96);
+  --glass-lm: rgba(250,250,250,0.97);
+
+  --c1: #111111;
+  --c2: #222222;
+  --c3: #555555;
+  --c4: #666666;
+  --c5: #777777;
+  --c6: #909090;
+  --c7: #AAAAAA;
+
+  --accent:       #F04E1A;
+  --accent-dark:  #C83A08;
+  --accent-s:     rgba(240,78,26,0.10);
+  --accent-m:     rgba(240,78,26,0.14);
+  --accent-focus: rgba(240,78,26,0.45);
+  --accent-ring:  rgba(240,78,26,0.50);
+  --accent-glow:  rgba(240,78,26,0.55);
+
+  --i04: rgba(0,0,0,0.04);
+  --i05: rgba(0,0,0,0.05);
+  --i06: rgba(0,0,0,0.06);
+  --i07: rgba(0,0,0,0.07);
+  --i08: rgba(0,0,0,0.08);
+  --i09: rgba(0,0,0,0.09);
+  --i10: rgba(0,0,0,0.10);
+  --i11: rgba(0,0,0,0.11);
+  --i12: rgba(0,0,0,0.12);
+  --i13: rgba(0,0,0,0.13);
+  --i14: rgba(0,0,0,0.14);
+  --i15: rgba(0,0,0,0.15);
+  --i18: rgba(0,0,0,0.18);
+  --i25: rgba(0,0,0,0.25);
+
+  --overlay:    rgba(0,0,0,0.55);
+  --node-alpha: 0.12;
+}

@@ -8,9 +8,9 @@
   top: 52px; left: 0; right: 0; bottom: 0;
   z-index: 320;
   display: none;
-  background: #F5EEE8;
-  --lm-accent: #C4826A;
-  --lm-accent-soft: rgba(196,130,106,0.12);
+  background: var(--bg);
+  --lm-accent: var(--accent);
+  --lm-accent-soft: var(--accent-s);
 }
 #testing-mode.active { display: flex; }
 

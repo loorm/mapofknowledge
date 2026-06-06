@@ -71,13 +71,15 @@
     KNOBIT_DONE_COUNT = 0;
     CURRENT_KNOBIT_IDX = 0;
 
-    // Accent colours from node
-    var hex = (node && node.color) ? node.color : '#C4826A';
-    var r   = parseInt(hex.slice(1,3), 16);
-    var g   = parseInt(hex.slice(3,5), 16);
-    var b   = parseInt(hex.slice(5,7), 16);
-    document.documentElement.style.setProperty('--lm-accent', hex);
-    document.documentElement.style.setProperty('--lm-accent-soft', 'rgba('+r+','+g+','+b+',0.13)');
+    // Accent colours from node — set on #learning-mode so CSS palette default wins before a node is chosen
+    var hex   = (node && node.color) ? node.color : '#C4826A';
+    var r     = parseInt(hex.slice(1,3), 16);
+    var g     = parseInt(hex.slice(3,5), 16);
+    var b     = parseInt(hex.slice(5,7), 16);
+    var alpha = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--node-alpha').trim()) || 0.13;
+    var lm    = document.getElementById('learning-mode');
+    lm.style.setProperty('--lm-accent', hex);
+    lm.style.setProperty('--lm-accent-soft', 'rgba('+r+','+g+','+b+','+alpha+')');
 
     _buildPathView();
     showLmView('lm-path');
