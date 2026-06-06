@@ -316,13 +316,17 @@ body {
   <div class="settings-section" id="filters">
     <div class="settings-section-label">Map filters</div>
 
-    <div id="sf-custom-section" style="display:none">
-      <div class="sf-custom-label">Your custom maps</div>
-      <div id="sf-custom-list"></div>
+    <div id="sf-public-section" style="display:none">
+      <div class="sf-custom-label">Public map filters</div>
+      <div id="sf-public-list"></div>
     </div>
 
-    <button class="sf-add-btn" id="sf-add-open"
-            onclick="window.location.href='custom-map.html'">+ Add custom map</button>
+    <div id="sf-personal-section" style="display:none">
+      <div class="sf-custom-label">My map filters</div>
+      <div id="sf-personal-list"></div>
+    </div>
+
+    <button class="sf-add-btn" onclick="window.location.href='custom-map.html'">+ Add custom map</button>
 
   </div>
 
@@ -344,66 +348,102 @@ body {
   });
 
   /* ── Filter settings ── */
-  /* Render custom maps from API */
-  var COLOR_MAP = { terra: 'rgba(196,130,106,0.70)', sage: 'rgba(139,173,126,0.70)', amber: 'rgba(196,165,90,0.70)', lavender: 'rgba(155,143,181,0.70)' };
+  var COLOR_DOT = { terra: 'rgba(196,130,106,0.70)', sage: 'rgba(139,173,126,0.70)', amber: 'rgba(196,165,90,0.70)', lavender: 'rgba(155,143,181,0.70)' };
   var _isAdmin = false;
 
-  function sfRenderCustom(subsets) {
-    var section = document.getElementById('sf-custom-section');
-    var list    = document.getElementById('sf-custom-list');
+  function sfGetHidden() { try { return JSON.parse(localStorage.getItem('kq_filter_hidden') || '[]'); } catch(e) { return []; } }
+  function sfSetHidden(a) { localStorage.setItem('kq_filter_hidden', JSON.stringify(a)); }
+
+  function _adminBtn(sid, isPublic) {
+    var bg = isPublic ? 'rgba(94,154,94,0.12)' : 'rgba(58,48,40,0.06)';
+    var col = isPublic ? '#2E7A2E' : '#6E6358';
+    return '<button class="sf-publish-btn" data-subset-id="' + sid + '" data-public="' + isPublic + '" style="font-size:11px;padding:2px 9px;border-radius:6px;border:1px solid rgba(58,48,40,0.14);background:' + bg + ';color:' + col + ';cursor:pointer;margin-right:6px;font-family:inherit">' + (isPublic ? 'Public' : 'Private') + '</button>';
+  }
+
+  function renderPublicMaps(maps) {
+    var section = document.getElementById('sf-public-section');
+    var list    = document.getElementById('sf-public-list');
     list.innerHTML = '';
-    // Show all maps the user owns (personal) plus public ones they can manage (admins)
-    var shown = subsets.filter(function(s) { return s.type === 'personal' || (_isAdmin && s.type === 'public'); });
-    section.style.display = shown.length ? '' : 'none';
-    shown.forEach(function(s) {
-      var dot = COLOR_MAP[s.icon_color] || COLOR_MAP.terra;
-      var isPublic = s.type === 'public';
+    section.style.display = maps.length ? '' : 'none';
+    var hidden = sfGetHidden();
+    maps.forEach(function(s) {
+      var fid  = 'db-' + s.id;
+      var isOn = hidden.indexOf(fid) === -1;
+      var row  = document.createElement('div');
+      row.className = 'sf-filter-row';
+      row.innerHTML =
+        '<span class="sf-color-dot" style="background:' + (COLOR_DOT[s.icon_color] || COLOR_DOT.terra) + '"></span>' +
+        '<span class="sf-filter-label">' + s.name + '</span>' +
+        '<span style="font-size:11px;color:#B0A496;margin-right:6px">' + s.node_count + ' nodes</span>' +
+        (_isAdmin ? _adminBtn(s.id, true) : '') +
+        '<button class="st-toggle' + (isOn ? ' on' : '') + '" data-filter-id="' + fid + '"><div class="st-toggle-thumb"></div></button>';
+      list.appendChild(row);
+    });
+  }
+
+  function renderPersonalMaps(maps) {
+    var section = document.getElementById('sf-personal-section');
+    var list    = document.getElementById('sf-personal-list');
+    list.innerHTML = '';
+    section.style.display = maps.length ? '' : 'none';
+    maps.forEach(function(s) {
       var row = document.createElement('div');
       row.className = 'sf-filter-row';
-      var adminControls = _isAdmin
-        ? '<button class="sf-publish-btn" data-subset-id="' + s.id + '" data-public="' + isPublic + '" title="' + (isPublic ? 'Make private' : 'Make public') + '" style="font-size:11px;padding:2px 8px;border-radius:6px;border:1px solid rgba(58,48,40,0.14);background:' + (isPublic ? 'rgba(94,154,94,0.12)' : 'rgba(58,48,40,0.06)') + ';color:' + (isPublic ? '#2E7A2E' : '#6E6358') + ';cursor:pointer;margin-right:6px;font-family:inherit">' + (isPublic ? 'Public' : 'Private') + '</button>'
-        : '';
       row.innerHTML =
-        '<span class="sf-color-dot" style="background:' + dot + '"></span>' +
-        '<span class="sf-filter-label">' + s.name + (isPublic ? ' <span style="font-size:10px;color:#2E7A2E;font-weight:700">PUBLIC</span>' : '') + '</span>' +
-        '<span style="font-size:11px;color:#B0A496;margin-right:8px">' + s.node_count + ' nodes</span>' +
-        adminControls +
+        '<span class="sf-color-dot" style="background:' + (COLOR_DOT[s.icon_color] || COLOR_DOT.terra) + '"></span>' +
+        '<span class="sf-filter-label">' + s.name + '</span>' +
+        '<span style="font-size:11px;color:#B0A496;margin-right:6px">' + s.node_count + ' nodes</span>' +
+        (_isAdmin ? _adminBtn(s.id, false) : '') +
         '<button class="sf-delete-btn" data-subset-id="' + s.id + '" title="Delete">✕</button>';
       list.appendChild(row);
     });
   }
 
+  function reloadMaps() {
+    fetch('/api/subsets').then(function(r) { return r.json(); }).then(function(subs) {
+      renderPublicMaps(subs.filter(function(s) { return s.type === 'public'; }));
+      renderPersonalMaps(subs.filter(function(s) { return s.type === 'personal'; }));
+    }).catch(function() {});
+  }
+
+  // Resolve admin status then load
   fetch('/auth/me').then(function(r) { return r.json(); }).then(function(u) {
-    _isAdmin = u && (u.role === 'admin' || u.role === 'super_admin');
-  }).catch(function() {});
+    _isAdmin = !!(u && (u.role === 'admin' || u.role === 'super_admin'));
+    reloadMaps();
+  }).catch(reloadMaps);
 
-  fetch('/api/subsets')
-    .then(function(r) { return r.json(); })
-    .then(sfRenderCustom)
-    .catch(function() {});
+  // Visibility toggles on public list
+  document.getElementById('sf-public-list').addEventListener('click', function(e) {
+    var btn = e.target.closest('.st-toggle');
+    if (!btn) return;
+    var fid  = btn.dataset.filterId;
+    var isOn = btn.classList.toggle('on');
+    var h    = sfGetHidden();
+    if (isOn) { h = h.filter(function(id) { return id !== fid; }); }
+    else if (h.indexOf(fid) === -1) { h.push(fid); }
+    sfSetHidden(h);
+  });
 
-  document.getElementById('sf-custom-list').addEventListener('click', function(e) {
+  // Delete + publish/demote on personal list (and public for admins)
+  function handleMapClick(e) {
     var del = e.target.closest('.sf-delete-btn');
     if (del) {
-      var sid = del.dataset.subsetId;
       if (!confirm('Delete this map? This cannot be undone.')) return;
-      fetch('/api/subsets/' + sid, { method: 'DELETE' })
-        .then(function() { del.closest('.sf-filter-row').remove(); })
-        .catch(function() { alert('Could not delete.'); });
+      fetch('/api/subsets/' + del.dataset.subsetId, { method: 'DELETE' })
+        .then(reloadMaps).catch(function() { alert('Could not delete.'); });
     }
     var pub = e.target.closest('.sf-publish-btn');
     if (pub) {
-      var sid = pub.dataset.subsetId;
       var makePublic = pub.dataset.public !== 'true';
-      fetch('/api/subsets/' + sid + '/publish', {
+      fetch('/api/subsets/' + pub.dataset.subsetId + '/publish', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ publish: makePublic }),
-      }).then(function() {
-        fetch('/api/subsets').then(function(r) { return r.json(); }).then(sfRenderCustom);
-      }).catch(function() { alert('Could not update.'); });
+      }).then(reloadMaps).catch(function() { alert('Could not update.'); });
     }
-  });
+  }
+  document.getElementById('sf-public-list').addEventListener('click', handleMapClick);
+  document.getElementById('sf-personal-list').addEventListener('click', handleMapClick);
 
   /* ── Font size picker ── */
   const fontPicker = document.getElementById('font-size-picker');

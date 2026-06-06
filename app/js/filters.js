@@ -27,6 +27,10 @@
   var COLOR_HEX = { terra: '#C4826A', sage: '#8BAD7E', amber: '#C4A55A', lavender: '#9B8FB5' };
 
   (function loadDBSubsets() {
+    var hidden;
+    try { hidden = JSON.parse(localStorage.getItem('kq_filter_hidden') || '[]'); }
+    catch(e) { hidden = []; }
+
     fetch('/api/subsets')
       .then(function(r) { return r.json(); })
       .then(function(subsets) {
@@ -39,6 +43,7 @@
           div.className = 'fp-item';
           div.dataset.filterId = filterId;
           div.style.setProperty('--fi-color', color);
+          if (hidden.indexOf(filterId) !== -1) div.style.display = 'none';
           div.innerHTML = '<div class="fp-radio"></div><div class="fp-dot"></div>'
                         + '<span class="fp-label">' + s.name + '</span>';
           list.appendChild(div);
