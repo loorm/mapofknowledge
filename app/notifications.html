@@ -128,6 +128,21 @@ body {
   color: #C4B8B0;
 }
 
+/* per-card mark-as-read button */
+.notif-read-btn {
+  flex-shrink: 0; align-self: flex-start;
+  margin-top: 2px; margin-left: 6px;
+  width: 24px; height: 24px; border-radius: 7px;
+  background: none; border: 1px solid rgba(58,48,40,0.12);
+  color: #B0A496; font-size: 11px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.13s, color 0.13s;
+}
+.notif-read-btn:hover {
+  background: rgba(139,173,126,0.15); color: #508046;
+  border-color: rgba(139,173,126,0.30);
+}
+
 </style>
 </head>
 <body>
@@ -157,6 +172,7 @@ body {
         <svg width="16" height="14" viewBox="0 0 16 14" fill="none">
           <path d="M1 1h14M1 7h14M1 13h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
+        <span id="topbar-notif-dot"></span>
       </button>
 
       <div id="nav-dropdown" class="nav-dropdown">
@@ -201,109 +217,20 @@ body {
 
   <div class="notif-header">
     <h1 class="notif-title">Notifications</h1>
-    <button class="notif-mark-all" onclick="markAllRead()">Mark all as read</button>
+    <button class="notif-mark-all" id="mark-all-btn">Mark all as read</button>
   </div>
 
   <div class="notif-tabs">
-    <button class="notif-tab active" onclick="switchTab(this, 'all')">All</button>
-    <button class="notif-tab" onclick="switchTab(this, 'unread')">Unread</button>
-    <button class="notif-tab" onclick="switchTab(this, 'achievements')">Achievements</button>
+    <button class="notif-tab active" data-filter="all">All</button>
+    <button class="notif-tab" data-filter="unread">Unread</button>
+    <button class="notif-tab" data-filter="achievements">Achievements</button>
   </div>
 
-  <!-- NEW -->
-  <div class="notif-section-label" id="section-new">New</div>
-
-  <div class="notif-card" data-type="achievements">
-    <div class="notif-unread-dot"></div>
-    <div class="notif-icon amber">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-        <path d="M9 2l2 5h5l-4 3 1.5 5L9 12l-4.5 3L6 10 2 7h5z" stroke="#C4A55A" stroke-width="1.3" stroke-linejoin="round"/>
-      </svg>
-    </div>
-    <div class="notif-body">
-      <div class="notif-name">7-day learning streak!</div>
-      <div class="notif-desc">You've opened the map every day this week. Keep the momentum going.</div>
-      <div class="notif-time">2 hours ago</div>
-    </div>
-  </div>
-
-  <div class="notif-card" data-type="achievements">
-    <div class="notif-unread-dot"></div>
-    <div class="notif-icon lavender">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-        <path d="M9 2.5a4.5 4.5 0 0 1 2.8 8V13a.5.5 0 0 1-.5.5H6.7a.5.5 0 0 1-.5-.5v-2.5A4.5 4.5 0 0 1 9 2.5z" stroke="#9B8FB5" stroke-width="1.2" stroke-linejoin="round"/>
-        <path d="M6.5 15.5h5M7 17h4" stroke="#9B8FB5" stroke-width="1.2" stroke-linecap="round"/>
-      </svg>
-    </div>
-    <div class="notif-body">
-      <div class="notif-name">3 knobits mastered in Algebra</div>
-      <div class="notif-desc">You completed Solving linear equations, Inequalities, and Systems of equations this week.</div>
-      <div class="notif-time">Yesterday</div>
-    </div>
-  </div>
-
-  <div class="notif-card" data-type="all">
-    <div class="notif-unread-dot"></div>
-    <div class="notif-icon sage">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-        <circle cx="9" cy="9" r="6.5" stroke="#8BAD7E" stroke-width="1.2"/>
-        <path d="M9 5.5v4l2.5 2" stroke="#8BAD7E" stroke-width="1.3" stroke-linecap="round"/>
-      </svg>
-    </div>
-    <div class="notif-body">
-      <div class="notif-name">New content: Quantum Computing</div>
-      <div class="notif-desc">12 new L5 nodes added under Computer Science › Quantum Computing. Explore the map to see them.</div>
-      <div class="notif-time">2 days ago</div>
-    </div>
-  </div>
-
-  <!-- EARLIER -->
-  <div class="notif-section-label" id="section-earlier">Earlier</div>
-
-  <div class="notif-card read" data-type="all">
-    <div class="notif-icon lavender">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-        <path d="M3 9.5 7 13.5 15 5.5" stroke="#9B8FB5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-    <div class="notif-body">
-      <div class="notif-name">Ready to continue?</div>
-      <div class="notif-desc">You left off at Knobit 4 in Linear Equations. Pick up where you stopped.</div>
-      <div class="notif-time">4 days ago</div>
-    </div>
-  </div>
-
-  <div class="notif-card read" data-type="all">
-    <div class="notif-icon terra">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-        <circle cx="9" cy="9" r="6.5" stroke="#C4826A" stroke-width="1.2"/>
-        <path d="M9 6v4" stroke="#C4826A" stroke-width="1.5" stroke-linecap="round"/>
-        <circle cx="9" cy="13" r="0.8" fill="#C4826A"/>
-      </svg>
-    </div>
-    <div class="notif-body">
-      <div class="notif-name">Estonian Basic School filter updated</div>
-      <div class="notif-desc">The curriculum filter has been refined with more precise subject coverage for grades 1–9.</div>
-      <div class="notif-time">1 week ago</div>
-    </div>
-  </div>
-
-  <div class="notif-card read" data-type="achievements">
-    <div class="notif-icon amber">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-        <path d="M9 2l2 5h5l-4 3 1.5 5L9 12l-4.5 3L6 10 2 7h5z" stroke="#C4A55A" stroke-width="1.3" stroke-linejoin="round"/>
-      </svg>
-    </div>
-    <div class="notif-body">
-      <div class="notif-name">First exploration milestone</div>
-      <div class="notif-desc">You've visited nodes in 5 different domains. The map is opening up.</div>
-      <div class="notif-time">2 weeks ago</div>
-    </div>
-  </div>
+  <div id="notif-list"></div>
 
 </main>
 
-
+<script src="js/topbar-notif.js"></script>
 <script>
   /* ── Burger dropdown ── */
   document.getElementById('nav-menu').addEventListener('click', function(e) {
@@ -314,44 +241,132 @@ body {
     document.getElementById('nav-dropdown').classList.remove('open');
   });
 
-  /* ── Tabs ── */
-  function switchTab(btn, type) {
-    document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.notif-card').forEach(function(card) {
-      if (type === 'all') {
-        card.style.display = 'flex';
-      } else if (type === 'unread') {
-        card.style.display = card.querySelector('.notif-unread-dot') ? 'flex' : 'none';
-      } else if (type === 'achievements') {
-        card.style.display = card.dataset.type === 'achievements' ? 'flex' : 'none';
-      }
-    });
-    updateSectionVisibility();
+  /* ── Icon SVG per notification type ── */
+  var ICONS = {
+    welcome: '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 9l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    knobit_complete: '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9.5L7 13.5L15 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    unit_complete: '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2l2 5h5l-4 3 1.5 5L9 12l-4.5 3L6 10 2 7h5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>',
+    credential: '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2l2 5h5l-4 3 1.5 5L9 12l-4.5 3L6 10 2 7h5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>',
+    test_result: '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3.5" y="2.5" width="11" height="13" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M6 7h6M6 10h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+    goal_complete: '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.2"/><path d="M6 9l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    knowledge_marked: '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2.5a4.5 4.5 0 0 1 2.8 8V13a.5.5 0 0 1-.5.5H6.7a.5.5 0 0 1-.5-.5v-2.5A4.5 4.5 0 0 1 9 2.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M6.5 15.5h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+    admin: '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.2"/><path d="M9 6v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="13" r="0.8" fill="currentColor"/></svg>',
+    badge: '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2l2 5h5l-4 3 1.5 5L9 12l-4.5 3L6 10 2 7h5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>',
+    streak: '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M10 2s-5 4-2 8c1 1.5 2 1 2 1s-1-2 1-3c0 0 3 2 3 4s-1.5 3-4 3c-3 0-6-2-6-5.5C4 5.5 10 2 10 2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>',
+  };
+
+  var ACHIEVEMENT_TYPES = { unit_complete:1, credential:1, badge:1, streak:1, goal_complete:1 };
+
+  function relTime(ts) {
+    var diff = Math.floor((Date.now() - new Date(ts)) / 1000);
+    if (diff < 60)        return 'Just now';
+    if (diff < 3600)      return Math.floor(diff / 60) + ' min ago';
+    if (diff < 86400)     return Math.floor(diff / 3600) + ' h ago';
+    if (diff < 86400 * 2) return 'Yesterday';
+    if (diff < 86400 * 7) return Math.floor(diff / 86400) + ' days ago';
+    if (diff < 86400 * 30) return Math.floor(diff / 86400 / 7) + ' wk ago';
+    return Math.floor(diff / 86400 / 30) + ' mo ago';
   }
 
-  function updateSectionVisibility() {
-    ['new', 'earlier'].forEach(function(id) {
-      const label = document.getElementById('section-' + id);
-      if (!label) return;
-      let next = label.nextElementSibling;
-      let hasVisible = false;
-      while (next && !next.classList.contains('notif-section-label')) {
-        if (next.style.display !== 'none') hasVisible = true;
-        next = next.nextElementSibling;
+  var _all = [];
+  var _filter = 'all';
+
+  function render() {
+    var list = document.getElementById('notif-list');
+    var items = _all.filter(function(n) {
+      if (_filter === 'unread')       return !n.is_read;
+      if (_filter === 'achievements') return !!ACHIEVEMENT_TYPES[n.type];
+      return true;
+    });
+
+    if (!items.length) {
+      list.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2a5 5 0 0 0-5 5v3L3 12h14l-2-2V7a5 5 0 0 0-5-5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 14a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.3"/></svg></div>'
+        + (_filter === 'unread' ? 'All caught up!' : 'Nothing here yet.') + '</div>';
+      return;
+    }
+
+    var cutoff = Date.now() - 2 * 86400 * 1000;
+    var html = '';
+    var shownNew = false, shownEarlier = false;
+
+    items.forEach(function(n) {
+      var isNew = new Date(n.created_at).getTime() > cutoff;
+      if (isNew && !shownNew) {
+        html += '<div class="notif-section-label">New</div>';
+        shownNew = true;
+      } else if (!isNew && !shownEarlier) {
+        html += '<div class="notif-section-label">Earlier</div>';
+        shownEarlier = true;
       }
-      label.style.display = hasVisible ? '' : 'none';
+      var icon = ICONS[n.type] || ICONS.admin;
+      var readClass = n.is_read ? ' read' : '';
+      html += '<div class="notif-card' + readClass + '" data-id="' + n.id + '">'
+        + (!n.is_read ? '<div class="notif-unread-dot"></div>' : '')
+        + '<div class="notif-icon ' + (n.icon_color || 'terra') + '">' + icon + '</div>'
+        + '<div class="notif-body">'
+        + '<div class="notif-name">' + esc(n.title) + '</div>'
+        + (n.body ? '<div class="notif-desc">' + esc(n.body) + '</div>' : '')
+        + '<div class="notif-time">' + relTime(n.created_at) + '</div>'
+        + '</div>'
+        + (!n.is_read ? '<button class="notif-read-btn" data-id="' + n.id + '" title="Mark as read">✓</button>' : '')
+        + '</div>';
+    });
+    list.innerHTML = html;
+
+    list.querySelectorAll('.notif-read-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        markOne(parseInt(btn.dataset.id));
+      });
     });
   }
 
-  /* ── Mark all read ── */
+  function esc(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function markOne(id) {
+    fetch('/api/notifications/' + id + '/read', { method: 'POST' }).catch(function(){});
+    _all.forEach(function(n) { if (n.id === id) n.is_read = 1; });
+    render();
+    updateDot();
+  }
+
   function markAllRead() {
-    document.querySelectorAll('.notif-card').forEach(function(card) {
-      card.classList.add('read');
-      const dot = card.querySelector('.notif-unread-dot');
-      if (dot) dot.remove();
-    });
+    fetch('/api/notifications/read-all', { method: 'POST' }).catch(function(){});
+    _all.forEach(function(n) { n.is_read = 1; });
+    render();
+    updateDot();
   }
+
+  function updateDot() {
+    var unread = _all.filter(function(n) { return !n.is_read; }).length;
+    var dot = document.getElementById('topbar-notif-dot');
+    if (dot) dot.style.display = unread ? 'block' : 'none';
+  }
+
+  document.getElementById('mark-all-btn').addEventListener('click', markAllRead);
+
+  document.querySelectorAll('.notif-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.notif-tab').forEach(function(t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+      _filter = tab.dataset.filter;
+      render();
+    });
+  });
+
+  fetch('/api/notifications')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      _all = Array.isArray(data) ? data : [];
+      render();
+      updateDot();
+    })
+    .catch(function() {
+      document.getElementById('notif-list').innerHTML =
+        '<div class="notif-empty">Could not load notifications.</div>';
+    });
 </script>
 
 </body>

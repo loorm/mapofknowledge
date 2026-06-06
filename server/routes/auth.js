@@ -2,6 +2,7 @@ const express  = require('express');
 const passport = require('passport');
 const { Strategy: GoogleStrategy } = require('passport-google-oauth20');
 const db       = require('../db');
+const { notify } = require('../services/notifications');
 const router   = express.Router();
 
 // Accounts that get elevated roles on first login.
@@ -35,7 +36,12 @@ passport.use(new GoogleStrategy(
         }
 
         const user = users[0];
+        const isFirstLogin = !user.last_login;
         await conn.execute('UPDATE users SET last_login = NOW() WHERE id = ?', [user.id]);
+        if (isFirstLogin) {
+          notify(user.id, 'welcome', 'Welcome to the Map of Knowledge!',
+            'We\'re glad you\'re here. Start exploring the map and begin your journey of discovery. Happy learning!');
+        }
         done(null, user);
       } finally {
         conn.release();

@@ -2,6 +2,7 @@ const express = require('express');
 const router  = express.Router();
 const db      = require('../db');
 const llm     = require('../services/llm');
+const { notify } = require('../services/notifications');
 
 // ── In-memory map cache (10k+ nodes — cache after first DB load) ─────────────
 let mapCache = null;
@@ -251,6 +252,10 @@ router.post('/nodes/:id/knowledge', async (req, res) => {
          VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', ?, 'activity', 0)`,
         [passportId, eventTitle, id]
       ).catch(() => {});
+      if (pct >= 100) {
+        notify(req.user?.id, 'knowledge_marked', `Marked as known: ${label}`,
+          `Added to your Learner Passport knowledge map.`);
+      }
     }
 
     res.json({ ok: true, percentage, source });
@@ -392,13 +397,13 @@ router.post('/learn/knobit/:id/complete', async (req, res) => {
 
     // Recompute node knowledge %
     const [krow] = await db.execute(
-      `SELECT k.node_id, n.external_id AS nodeExtId, n.label AS nodeLabel, k.locale
+      `SELECT k.node_id, n.external_id AS nodeExtId, n.label AS nodeLabel, k.locale, k.title AS knobitTitle
        FROM knobits k JOIN nodes n ON k.node_id = n.id
        WHERE k.id = ?`,
       [knobitId]
     );
     if (krow.length) {
-      const { node_id, nodeExtId, nodeLabel, locale } = krow[0];
+      const { node_id, nodeExtId, nodeLabel, locale, knobitTitle } = krow[0];
       const [[{ total }]] = await db.execute(
         'SELECT COUNT(*) AS total FROM knobits WHERE node_id = ? AND locale = ?',
         [node_id, locale]
@@ -410,6 +415,22 @@ router.post('/learn/knobit/:id/complete', async (req, res) => {
         [passportId, node_id]
       );
       const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+      // Per-knobit notification (first-ever gets a special message)
+      const userId = req.user?.id;
+      const [[{ totalEver }]] = await db.execute(
+        `SELECT COUNT(*) AS totalEver FROM knobit_progress
+         WHERE passport_id = ? AND phase_reached = 'done'`,
+        [passportId]
+      );
+      if (totalEver === 1) {
+        notify(userId, 'knobit_complete', 'First knobit mastered!',
+          `You completed your very first learning step: "${knobitTitle}". An exciting journey begins!`);
+      } else {
+        notify(userId, 'knobit_complete', `Knobit complete: ${knobitTitle}`,
+          `Topic: ${nodeLabel}`);
+      }
+
       await db.execute(
         `INSERT INTO user_node_knowledge
            (passport_id, node_external_id, percentage, source, updated_at)
@@ -448,6 +469,10 @@ router.post('/learn/knobit/:id/complete', async (req, res) => {
              VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', 'Score: 100%', ?, 'assessment', 0)`,
             [passportId, `Completed: ${nodeLabel}`, nodeExtId]
           );
+          notify(userId, 'unit_complete', `${nodeLabel} — fully mastered!`,
+            `You've completed every learning step for this topic.`);
+          notify(userId, 'credential', `New credential: ${credTitle}`,
+            `A platform credential has been added to your Learner Passport.`);
         }
       }
     }
@@ -670,10 +695,18 @@ router.post('/profile/goals/:id/complete', async (req, res) => {
   const passportId = req.user?.passport_id;
   if (!passportId) return res.status(400).json({ error: 'No passport' });
   try {
+    const [goals] = await db.execute(
+      'SELECT text FROM passport_goals WHERE id = ? AND passport_id = ?',
+      [req.params.id, passportId]
+    );
     await db.execute(
       `UPDATE passport_goals SET status='completed', completed_at=NOW() WHERE id=? AND passport_id=?`,
       [req.params.id, passportId]
     );
+    if (goals.length) {
+      notify(req.user?.id, 'goal_complete', 'Goal achieved!',
+        `You completed: "${goals[0].text}"`);
+    }
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: 'Failed to complete goal' });
@@ -814,6 +847,64 @@ router.post('/profile/identity', async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update identity' });
+  }
+});
+
+// ── Notifications ────────────────────────────────────────────────────────────
+router.get('/notifications/unread-count', async (req, res) => {
+  const userId = req.user?.id;
+  if (!userId) return res.json({ count: 0 });
+  try {
+    const [[{ count }]] = await db.execute(
+      'SELECT COUNT(*) AS count FROM notifications WHERE user_id = ? AND is_read = 0',
+      [userId]
+    );
+    res.json({ count });
+  } catch (err) {
+    res.json({ count: 0 });
+  }
+});
+
+router.get('/notifications', async (req, res) => {
+  const userId = req.user?.id;
+  if (!userId) return res.status(401).json({ error: 'Not authenticated' });
+  try {
+    const [rows] = await db.execute(
+      `SELECT id, type, title, body, icon_color, is_read, created_at
+       FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 50`,
+      [userId]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error('[api/notifications]', err.message);
+    res.status(500).json({ error: 'Failed to load notifications' });
+  }
+});
+
+router.post('/notifications/read-all', async (req, res) => {
+  const userId = req.user?.id;
+  if (!userId) return res.status(401).json({ error: 'Not authenticated' });
+  try {
+    await db.execute(
+      'UPDATE notifications SET is_read = 1 WHERE user_id = ?', [userId]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to mark all read' });
+  }
+});
+
+router.post('/notifications/:id/read', async (req, res) => {
+  const userId = req.user?.id;
+  if (!userId) return res.status(401).json({ error: 'Not authenticated' });
+  try {
+    await db.execute(
+      'UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?',
+      [req.params.id, userId]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to mark read' });
   }
 });
 
@@ -971,6 +1062,8 @@ router.post('/test/evaluate', async (req, res) => {
          VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', ?, ?, 'assessment', 0)`,
         [passportId, `Knowledge test: ${label}`, `Score: ${evaluation.finalScore}%`, nodeId]
       );
+      notify(req.user?.id, 'test_result', `Test result: ${label}`,
+        `You scored ${evaluation.finalScore}% on the knowledge diagnostic.`);
     }
 
     res.json(evaluation);
