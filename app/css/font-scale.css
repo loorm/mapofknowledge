@@ -7,7 +7,7 @@
 
 /* ── Medium (~14% larger) ─────────────────── */
 html.fs-medium #learning-mode,
-html.fs-medium #testing-mode   { zoom: 1.14; }
+html.fs-medium #testing-mode   { zoom: 1.14; top: 45.6px; } /* 52/1.14 — corrects zoom-shifted top */
 
 html.fs-medium #sidebar .sb-body { zoom: 1.14; }
 
@@ -25,7 +25,7 @@ html.fs-medium .settings-page   { zoom: 1.14; }
 
 /* ── Large (~28% larger) ─────────────────── */
 html.fs-large #learning-mode,
-html.fs-large #testing-mode    { zoom: 1.28; }
+html.fs-large #testing-mode    { zoom: 1.28; top: 40.625px; } /* 52/1.28 */
 
 html.fs-large #sidebar .sb-body { zoom: 1.28; }
 

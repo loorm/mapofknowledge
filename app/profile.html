@@ -80,8 +80,23 @@
 <script>
   document.getElementById('nav-menu').addEventListener('click', e => { e.stopPropagation(); document.getElementById('nav-dropdown').classList.toggle('open'); document.getElementById('nav-menu').classList.toggle('active'); });
   document.addEventListener('click', () => { document.getElementById('nav-dropdown').classList.remove('open'); document.getElementById('nav-menu').classList.remove('active'); });
+
+  (function () {
+    var nav      = document.getElementById('profile-nav');
+    var backdrop = document.getElementById('pnav-backdrop');
+    var toggle   = document.getElementById('pnav-toggle');
+    function openNav()  { nav.classList.add('open'); backdrop.classList.add('open'); }
+    function closeNav() { nav.classList.remove('open'); backdrop.classList.remove('open'); }
+    if (toggle)   toggle.addEventListener('click', function (e) { e.stopPropagation(); openNav(); });
+    if (backdrop) backdrop.addEventListener('click', closeNav);
+    if (nav) nav.querySelectorAll('.pnav-link').forEach(function (a) {
+      a.addEventListener('click', closeNav);
+    });
+  })();
 </script>
 
+
+<div id="pnav-backdrop"></div>
 
 <!-- ════════════════════════════════════════
      LEFT NAV
@@ -112,6 +127,12 @@
      MAIN CONTENT
      ════════════════════════════════════════ -->
 <main id="profile-main">
+  <button id="pnav-toggle" aria-label="Open sections menu">
+    <svg width="14" height="12" viewBox="0 0 14 12" fill="none">
+      <path d="M1 1h12M1 6h12M1 11h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    Sections
+  </button>
 
 
   <!-- ══════════════════════════════════════
