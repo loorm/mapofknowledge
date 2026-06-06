@@ -236,8 +236,30 @@ router.patch('/:id/publish', async (req, res) => {
       "UPDATE knowledge_subsets SET type = ? WHERE id = ?",
       [publish ? 'public' : 'personal', req.params.id]
     );
+
+    // Notify all users when a map is made public
+    if (publish) {
+      const [[subset]] = await db.execute(
+        'SELECT name FROM knowledge_subsets WHERE id = ?', [req.params.id]
+      );
+      if (subset) {
+        const [users] = await db.execute('SELECT id FROM users');
+        if (users.length) {
+          const title = `New map filter available: ${subset.name}`;
+          const body  = `The "${subset.name}" knowledge map filter has been added. Activate it in the filter panel on the map.`;
+          const ph    = users.map(() => '(?,?,?,?,?)').join(',');
+          const vals  = users.flatMap(u => [u.id, 'admin', title, body, 'lavender']);
+          await db.execute(
+            `INSERT INTO notifications (user_id, type, title, body, icon_color) VALUES ${ph}`,
+            vals
+          );
+        }
+      }
+    }
+
     res.json({ ok: true });
   } catch (err) {
+    console.error('[subsets PATCH publish]', err.message);
     res.status(500).json({ error: 'Failed to update' });
   }
 });
