@@ -19,7 +19,7 @@ html.fs-medium #search-dropdown { zoom: 1.14; }
 html.fs-medium .tour-tooltip    { zoom: 1.14; }
 
 html.fs-medium #profile-main,
-html.fs-medium #profile-nav     { zoom: 1.14; }
+html.fs-medium #profile-nav     { zoom: 1.14; top: 45.6px; }
 
 html.fs-medium .settings-page   { zoom: 1.14; }
 
@@ -37,6 +37,6 @@ html.fs-large #search-dropdown  { zoom: 1.28; }
 html.fs-large .tour-tooltip     { zoom: 1.28; }
 
 html.fs-large #profile-main,
-html.fs-large #profile-nav      { zoom: 1.28; }
+html.fs-large #profile-nav      { zoom: 1.28; top: 40.625px; }
 
 html.fs-large .settings-page    { zoom: 1.28; }

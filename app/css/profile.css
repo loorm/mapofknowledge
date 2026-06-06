@@ -515,7 +515,22 @@ select.p-edit-input { cursor: pointer; }
 #pnav-backdrop.open { display: block; }
 
 @media (max-width: 640px) {
-  #pnav-toggle { display: flex; }
+  #pnav-toggle {
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    /* bleed full-width past parent padding */
+    width: calc(100% + 36px);
+    margin: -20px -18px 20px;
+    padding: 12px 18px;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid rgba(58,48,40,0.09);
+    background: rgba(245,238,232,0.97);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
 
   #profile-nav {
     transform: translateX(-100%);

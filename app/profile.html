@@ -16,7 +16,7 @@
      ════════════════════════════════════════ -->
 <header id="top-bar">
 
-  <a class="topbar-logo" href="index.html">
+  <a class="topbar-logo" href="index.html" onclick="if(history.length>1){history.back();return false;}"
     <div class="topbar-logo-icon">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <circle cx="8" cy="8" r="5.5" stroke="white" stroke-width="1.3"/>
@@ -89,8 +89,14 @@
     var toggle   = document.getElementById('pnav-toggle');
     function openNav()  { nav.classList.add('open'); backdrop.classList.add('open'); }
     function closeNav() { nav.classList.remove('open'); backdrop.classList.remove('open'); }
-    if (toggle)   toggle.addEventListener('click', function (e) { e.stopPropagation(); openNav(); });
-    if (backdrop) backdrop.addEventListener('click', closeNav);
+    if (toggle) {
+      toggle.addEventListener('click', function (e) { e.stopPropagation(); openNav(); });
+      toggle.addEventListener('touchstart', function (e) { e.stopPropagation(); e.preventDefault(); openNav(); }, { passive: false });
+    }
+    if (backdrop) {
+      backdrop.addEventListener('click', closeNav);
+      backdrop.addEventListener('touchstart', function (e) { e.preventDefault(); closeNav(); }, { passive: false });
+    }
     if (nav) nav.querySelectorAll('.pnav-link').forEach(function (a) {
       a.addEventListener('click', closeNav);
     });
