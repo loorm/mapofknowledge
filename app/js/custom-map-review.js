@@ -255,6 +255,13 @@ window.CMReview = (function () {
       document.getElementById('cm-upload-view').style.display = '';
       document.getElementById('cm-review-view').style.display = 'none';
     });
+
+    document.getElementById('cm-discard-btn').addEventListener('click', function () {
+      if (!confirm('Discard this map? It will be permanently deleted.')) return;
+      fetch('/api/subsets/' + _subsetId, { method: 'DELETE' })
+        .then(function () { window.location.href = 'settings.html#filters'; })
+        .catch(function () { _showMsg('error', 'Could not discard map.'); });
+    });
   }
 
   /* ── Commit ────────────────────────────────────────────────── */
