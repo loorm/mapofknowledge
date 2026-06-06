@@ -30,16 +30,16 @@ body {
 }
 .notif-title {
   font-size: 22px; font-weight: 720;
-  color: #2C2820; letter-spacing: -0.4px;
+  color: var(--c1); letter-spacing: -0.4px;
 }
 .notif-mark-all {
-  font-size: 12px; font-weight: 550; color: #C4826A;
+  font-size: 12px; font-weight: 550; color: var(--accent);
   background: none; border: none; cursor: pointer;
   padding: 6px 10px; border-radius: 8px;
   font-family: inherit;
   transition: background 0.15s, color 0.15s;
 }
-.notif-mark-all:hover { background: rgba(196,130,106,0.10); }
+.notif-mark-all:hover { background: var(--accent-s); }
 
 /* ── filter tabs ── */
 .notif-tabs {
@@ -49,46 +49,46 @@ body {
 .notif-tab {
   padding: 6px 14px; border-radius: 20px;
   font-size: 12px; font-weight: 550;
-  color: #8A7E72; border: 1px solid rgba(58,48,40,0.12);
+  color: var(--c5); border: 1px solid var(--i12);
   background: rgba(255,255,255,0.45); cursor: pointer;
   font-family: inherit;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
-.notif-tab:hover { background: rgba(255,255,255,0.7); color: #3A3028; }
+.notif-tab:hover { background: rgba(255,255,255,0.7); color: var(--c2); }
 .notif-tab.active {
-  background: rgba(196,130,106,0.12);
-  border-color: rgba(196,130,106,0.30);
-  color: #C4826A;
+  background: var(--accent-s);
+  border-color: var(--accent-focus);
+  color: var(--accent);
 }
 
 /* ── section label ── */
 .notif-section-label {
   font-size: 10px; font-weight: 700; letter-spacing: 0.9px;
-  text-transform: uppercase; color: #B0A496;
+  text-transform: uppercase; color: var(--c7);
   margin: 20px 0 8px;
 }
 
 /* ── notification card ── */
 .notif-card {
   display: flex; align-items: flex-start; gap: 14px;
-  background: rgba(255,255,255,0.65);
-  border: 1px solid rgba(58,48,40,0.08);
+  background: var(--notif-card-bg, rgba(255,255,255,0.65));
+  border: 1px solid var(--i08);
   border-radius: 14px;
   padding: 14px 16px;
   margin-bottom: 8px;
-  box-shadow: 0 2px 10px rgba(58,48,40,0.06);
+  box-shadow: 0 2px 10px var(--i06);
   transition: background 0.15s;
   position: relative;
   cursor: default;
 }
-.notif-card:hover { background: rgba(255,255,255,0.85); }
+.notif-card:hover { background: var(--notif-card-bg-hover, rgba(255,255,255,0.85)); }
 .notif-card.read { opacity: 0.65; }
 
 /* unread dot */
 .notif-unread-dot {
   position: absolute; top: 16px; right: 16px;
   width: 7px; height: 7px; border-radius: 50%;
-  background: #C4826A;
+  background: var(--accent);
 }
 
 /* icon blob */
@@ -100,31 +100,31 @@ body {
 .notif-icon.amber  { background: rgba(196,165,90,0.18); }
 .notif-icon.sage   { background: rgba(139,173,126,0.18); }
 .notif-icon.lavender { background: rgba(155,143,181,0.18); }
-.notif-icon.terra  { background: rgba(196,130,106,0.18); }
+.notif-icon.terra  { background: var(--accent-m); }
 
 /* text block */
 .notif-body { flex: 1; min-width: 0; }
 .notif-name {
-  font-size: 13px; font-weight: 620; color: #2C2820;
+  font-size: 13px; font-weight: 620; color: var(--c1);
   margin-bottom: 3px; padding-right: 18px;
 }
-.notif-card.read .notif-name { font-weight: 500; color: #6E6358; }
+.notif-card.read .notif-name { font-weight: 500; color: var(--c3); }
 .notif-desc {
-  font-size: 12px; color: #8A7E72; line-height: 1.55;
+  font-size: 12px; color: var(--c5); line-height: 1.55;
 }
 .notif-time {
-  font-size: 11px; color: #B0A496;
+  font-size: 11px; color: var(--c7);
   margin-top: 6px;
 }
 
 /* ── empty state ── */
 .notif-empty {
   text-align: center; padding: 60px 20px;
-  color: #B0A496; font-size: 13px; line-height: 1.6;
+  color: var(--c7); font-size: 13px; line-height: 1.6;
 }
 .notif-empty-icon {
   width: 48px; height: 48px; border-radius: 14px;
-  background: rgba(58,48,40,0.06);
+  background: var(--i06);
   display: flex; align-items: center; justify-content: center;
   margin: 0 auto 16px;
   color: #C4B8B0;
@@ -135,8 +135,8 @@ body {
   flex-shrink: 0; align-self: flex-start;
   margin-top: 2px; margin-left: 6px;
   width: 24px; height: 24px; border-radius: 7px;
-  background: none; border: 1px solid rgba(58,48,40,0.12);
-  color: #B0A496; font-size: 11px; cursor: pointer;
+  background: none; border: 1px solid var(--i12);
+  color: var(--c7); font-size: 11px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background 0.13s, color 0.13s;
 }
