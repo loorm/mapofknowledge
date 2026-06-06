@@ -29,12 +29,12 @@
   /* ─── Render functions ────────────────────────────────────────── */
 
   function renderIdentity(passport) {
-    const name  = passport.display_name || 'Your Name';
+    const name  = passport.display_name || t('label.your_name');
     const about = passport.about || '';
 
     // Top-bar banner
     const banner = document.querySelector('.topbar-banner-inner');
-    if (banner) banner.innerHTML = `<span class="topbar-banner-dot"></span>Learner Passport — ${esc(name)}`;
+    if (banner) banner.innerHTML = `<span class="topbar-banner-dot"></span>${t('label.learner_passport')} — ${esc(name)}`;
 
     // Left nav
     const avatarCircle = document.querySelector('.pnav-avatar-circle');
@@ -48,30 +48,30 @@
     const idCard = document.getElementById('identity-card');
     if (idCard) {
       idCard.innerHTML = `
-        <div class="p-card-title">Identity</div>
+        <div class="p-card-title">${t('section.identity')}</div>
         <div class="p-kv">
-          <div class="p-kv-label">Full name</div>
+          <div class="p-kv-label">${t('label.full_name')}</div>
           <div class="p-kv-value" data-field="display_name">${esc(passport.display_name || '')}</div>
-          <div class="p-kv-label">Year of birth</div>
+          <div class="p-kv-label">${t('label.year_of_birth')}</div>
           <div class="p-kv-value" data-field="birth_year">${esc(passport.birth_year || '')}</div>
-          <div class="p-kv-label">Language</div>
+          <div class="p-kv-label">${t('label.language')}</div>
           <div class="p-kv-value" data-field="location">${esc(passport.location || '')}</div>
-          <div class="p-kv-label">Culture</div>
+          <div class="p-kv-label">${t('label.culture')}</div>
           <div class="p-kv-value" data-field="cultural_background">${esc(passport.cultural_background || '')}</div>
-          <div class="p-kv-label">ID number</div>
+          <div class="p-kv-label">${t('label.id_number')}</div>
           <div class="p-kv-value" data-field="id_number">${esc(passport.id_number || '')}</div>
         </div>
-        <button class="p-edit-btn" onclick="window.editIdentity()">Edit</button>`;
+        <button class="p-edit-btn" onclick="window.editIdentity()">${t('btn.edit')}</button>`;
     }
 
     // Learning needs and preferences card
     const aboutCard = document.getElementById('about-card');
     if (aboutCard) {
-      aboutCard.innerHTML = `<div class="p-card-title">Learning needs and preferences</div>` + (about
+      aboutCard.innerHTML = `<div class="p-card-title">${t('section.learning_needs')}</div>` + (about
         ? `<div class="p-kv-value p-about-text">${esc(about)}</div>
-           <button class="p-edit-btn" onclick="window.editAbout()">Edit</button>`
-        : `${empty('Describe how and when and where you learn best, and any special needs that impact your learning.')}
-           <button class="p-edit-btn" onclick="window.editAbout()">Add</button>`);
+           <button class="p-edit-btn" onclick="window.editAbout()">${t('btn.edit')}</button>`
+        : `${empty(t('placeholder.about'))}
+           <button class="p-edit-btn" onclick="window.editAbout()">${t('btn.add')}</button>`);
     }
   }
 
@@ -84,21 +84,21 @@
 
     const iHtml = interests.length
       ? interests.map(t => `<span class="p-tag interest">${esc(t.text)}</span>`).join('')
-      : '<span class="p-tag-empty">None added yet</span>';
+      : `<span class="p-tag-empty">${window.t('msg.none_added_yet')}</span>`;
     const vHtml = values.length
       ? values.map(t => `<span class="p-tag value">${esc(t.text)}</span>`).join('')
-      : '<span class="p-tag-empty">None added yet</span>';
+      : `<span class="p-tag-empty">${window.t('msg.none_added_yet')}</span>`;
 
     card.innerHTML = `
       <div class="p-subsection-block-sm">
-        <div class="p-subsection-label">Core interests</div>
+        <div class="p-subsection-label">${window.t('label.core_interests')}</div>
         <div class="p-tags">${iHtml}</div>
       </div>
       <div>
-        <div class="p-subsection-label">Values</div>
+        <div class="p-subsection-label">${window.t('label.values')}</div>
         <div class="p-tags">${vHtml}</div>
       </div>
-      <button class="p-edit-btn" onclick="window.editInterests()">Edit</button>`;
+      <button class="p-edit-btn" onclick="window.editInterests()">${window.t('btn.edit')}</button>`;
   }
 
   window.editInterests = function () {
@@ -113,9 +113,10 @@
     }
 
     function addRow(type) {
+      var placeholderKey = 'placeholder.add_' + type;
       return `<div class="p-tag-add-row">
-        <input id="tag-input-${type}" class="p-edit-input p-flex-1" placeholder="Add ${type}…" onkeydown="if(event.key==='Enter')window.addTag('${type}')">
-        <button class="p-edit-btn primary p-edit-btn-inline p-edit-btn-nowrap" onclick="window.addTag('${type}')">+ Add</button>
+        <input id="tag-input-${type}" class="p-edit-input p-flex-1" placeholder="${esc(window.t(placeholderKey))}" onkeydown="if(event.key==='Enter')window.addTag('${type}')">
+        <button class="p-edit-btn primary p-edit-btn-inline p-edit-btn-nowrap" onclick="window.addTag('${type}')">+ ${window.t('btn.add')}</button>
       </div>`;
     }
 
@@ -124,9 +125,9 @@
         const interests = (d.tags || []).filter(t => t.type === 'interest');
         const values    = (d.tags || []).filter(t => t.type === 'value');
         document.getElementById('tag-list-interest').innerHTML =
-          interests.length ? interests.map(tagRow).join('') : '<span class="p-tag-empty">None yet</span>';
+          interests.length ? interests.map(tagRow).join('') : `<span class="p-tag-empty">${window.t('msg.none_yet')}</span>`;
         document.getElementById('tag-list-value').innerHTML =
-          values.length ? values.map(tagRow).join('') : '<span class="p-tag-empty">None yet</span>';
+          values.length ? values.map(tagRow).join('') : `<span class="p-tag-empty">${window.t('msg.none_yet')}</span>`;
       });
     }
     window._rebuildTags = rebuild;
@@ -136,16 +137,16 @@
       const values    = (d.tags || []).filter(t => t.type === 'value');
       card.innerHTML = `
         <div class="p-subsection-block">
-          <div class="p-subsection-label">Core interests</div>
-          <div class="p-tags" id="tag-list-interest">${interests.length ? interests.map(tagRow).join('') : '<span class="p-tag-empty">None yet</span>'}</div>
+          <div class="p-subsection-label">${window.t('label.core_interests')}</div>
+          <div class="p-tags" id="tag-list-interest">${interests.length ? interests.map(tagRow).join('') : `<span class="p-tag-empty">${window.t('msg.none_yet')}</span>`}</div>
           ${addRow('interest')}
         </div>
         <div>
-          <div class="p-subsection-label">Values</div>
-          <div class="p-tags" id="tag-list-value">${values.length ? values.map(tagRow).join('') : '<span class="p-tag-empty">None yet</span>'}</div>
+          <div class="p-subsection-label">${window.t('label.values')}</div>
+          <div class="p-tags" id="tag-list-value">${values.length ? values.map(tagRow).join('') : `<span class="p-tag-empty">${window.t('msg.none_yet')}</span>`}</div>
           ${addRow('value')}
         </div>
-        <button class="p-edit-btn p-edit-btn-done" onclick="window.loadProfile()">Done</button>`;
+        <button class="p-edit-btn p-edit-btn-done" onclick="window.loadProfile()">${window.t('btn.done')}</button>`;
     });
   };
 
@@ -172,22 +173,22 @@
     const card = document.getElementById('learning-style-card');
     if (!card) return;
     if (!style) {
-      card.innerHTML = `${empty('How do you learn best? Modalities, peak times, accessibility needs.')}
-        <button class="p-edit-btn" onclick="window.editLearningStyle()">Add learning style</button>`;
+      card.innerHTML = `${empty(t('msg.learning_style_empty'))}
+        <button class="p-edit-btn" onclick="window.editLearningStyle()">${t('btn.add_learning_style')}</button>`;
       return;
     }
     const rows = [
-      ['Modalities',   style.modalities],
-      ['Peak time',    style.peak_time],
-      ['Session length', style.session_length],
-      ['Works best',   style.works_best],
-      ['Needs',        style.needs],
-      ['Accessibility', style.accessibility],
+      [t('label.modalities'),     style.modalities],
+      [t('label.peak_time'),      style.peak_time],
+      [t('label.session_length'), style.session_length],
+      [t('label.works_best'),     style.works_best],
+      [t('label.needs'),          style.needs],
+      [t('label.accessibility'),  style.accessibility],
     ].filter(([, v]) => v);
     card.innerHTML = `<div class="p-kv">
       ${rows.map(([k, v]) => `<div class="p-kv-label">${esc(k)}</div><div class="p-kv-value">${esc(v)}</div>`).join('')}
     </div>
-    <button class="p-edit-btn" onclick="window.editLearningStyle()">Edit</button>`;
+    <button class="p-edit-btn" onclick="window.editLearningStyle()">${t('btn.edit')}</button>`;
   }
 
   // ── Events state ──────────────────────────────────────────────────
@@ -214,10 +215,10 @@
     const filtered = _filteredEvents();
 
     // Type filter pills
-    const typePills = ['all','activity','assessment','evidence'].map(function(t) {
-      const label  = t === 'all' ? 'All' : t.charAt(0).toUpperCase() + t.slice(1);
-      const active = _evFilter.type === t;
-      return `<button onclick="window.setEvTypeFilter('${t}')" class="p-ev-pill ${active ? 'p-ev-pill-active' : 'p-ev-pill-inactive'}">${label}</button>`;
+    const typePills = ['all','activity','assessment','evidence'].map(function(type) {
+      const label  = type === 'all' ? window.t('tab.all') : (window.t('label.' + type) || (type.charAt(0).toUpperCase() + type.slice(1)));
+      const active = _evFilter.type === type;
+      return `<button onclick="window.setEvTypeFilter('${type}')" class="p-ev-pill ${active ? 'p-ev-pill-active' : 'p-ev-pill-inactive'}">${label}</button>`;
     }).join('');
 
     const hasDates  = _evFilter.dateFrom || _evFilter.dateTo;
@@ -239,7 +240,7 @@
       </div>`;
 
     const rowsHtml = !filtered.length
-      ? empty(_allEvents.length ? 'No events match your filter.' : 'Your learning events will appear here.')
+      ? empty(_allEvents.length ? t('msg.no_events_filter') : t('msg.no_events'))
       : filtered.map(function(ev) {
           var titleHtml = esc(ev.title);
           if (ev.node_external_id) {
@@ -264,33 +265,32 @@
         }).join('');
 
     const scrollList = `<div class="p-scroll-lg">${rowsHtml}</div>`;
-    const moreBtn = '';
 
     const today   = new Date().toISOString().split('T')[0];
     const srcOpts = ['Book','YouTube video','Conference','Workshop','Self-study period','Other']
       .map(function(s) { return `<option value="${s}">${s}</option>`; }).join('');
 
-    ledger.innerHTML = `<div class="p-card-title">Events</div>` + filterRow + scrollList + `
+    ledger.innerHTML = `<div class="p-card-title">${t('section.events') || 'Events'}</div>` + filterRow + scrollList + `
       <button class="p-edit-btn p-ev-add-btn" id="ev-add-btn"
         onclick="document.getElementById('ev-form').style.display='';this.style.display='none';document.getElementById('ev-title').focus()">
-        + Add activity
+        ${t('btn.add_activity')}
       </button>
       <div id="ev-form" style="display:none" class="p-ev-form">
         <div class="p-form-grid">
-          <input id="ev-title" class="p-edit-input" placeholder="What you studied or attended (required)">
+          <input id="ev-title" class="p-edit-input" placeholder="${esc(t('placeholder.event_title'))}">
           <div class="p-flex-row">
             <select id="ev-source" class="p-edit-input p-flex-1">${srcOpts}</select>
-            <input id="ev-provider" class="p-edit-input p-flex-1-5" placeholder="Author / Channel / Organiser (optional)">
+            <input id="ev-provider" class="p-edit-input p-flex-1-5" placeholder="${esc(t('placeholder.event_provider'))}">
           </div>
           <div class="p-flex-row">
             <input id="ev-date" type="date" class="p-edit-input p-flex-1" value="${today}">
-            <input id="ev-notes" class="p-edit-input p-flex-2" placeholder="Test score or other outcome (optional)">
+            <input id="ev-notes" class="p-edit-input p-flex-2" placeholder="${esc(t('placeholder.event_notes'))}">
           </div>
           <textarea id="ev-reflection" class="p-edit-input p-textarea-full"
-            placeholder="Reflection — what did you learn, what surprised you, what would you do differently? (optional)"></textarea>
+            placeholder="${esc(t('placeholder.event_reflection'))}"></textarea>
           <div class="p-form-btn-row">
-            <button class="p-edit-btn primary p-edit-btn-inline" onclick="window.saveManualEvent()">Add</button>
-            <button class="p-edit-btn p-edit-btn-inline" onclick="document.getElementById('ev-form').style.display='none';document.getElementById('ev-add-btn').style.display=''">Cancel</button>
+            <button class="p-edit-btn primary p-edit-btn-inline" onclick="window.saveManualEvent()">${t('btn.add')}</button>
+            <button class="p-edit-btn p-edit-btn-inline" onclick="document.getElementById('ev-form').style.display='none';document.getElementById('ev-add-btn').style.display=''">${t('btn.cancel')}</button>
           </div>
         </div>
       </div>`;
@@ -355,13 +355,13 @@
       return `
         <button class="p-edit-btn p-rel-add-btn" id="rel-add-btn-${type}"
           onclick="document.getElementById('rel-form-${type}').style.display='';this.style.display='none';document.getElementById('rel-f0-${type}').focus()">
-          + Add
+          + ${t('btn.add')}
         </button>
         <div id="rel-form-${type}" style="display:none" class="p-rel-form">
           <div class="p-form-grid-sm">${inputs}
             <div class="p-flex-row-sm">
               <button class="p-edit-btn primary p-edit-btn-inline" onclick="window.saveRelationship('${type}')">${btnLabel}</button>
-              <button class="p-edit-btn p-edit-btn-inline" onclick="document.getElementById('rel-form-${type}').style.display='none';document.getElementById('rel-add-btn-${type}').style.display=''">Cancel</button>
+              <button class="p-edit-btn p-edit-btn-inline" onclick="document.getElementById('rel-form-${type}').style.display='none';document.getElementById('rel-add-btn-${type}').style.display=''">${t('btn.cancel')}</button>
             </div>
           </div>
         </div>`;
@@ -371,7 +371,7 @@
     var indCard = document.getElementById('individuals-card');
     if (indCard) {
       var indRows = !individuals.length
-        ? empty('Add professors, mentors, and role models who shaped your learning.')
+        ? empty(t('msg.no_individuals'))
         : individuals.map(function(r) {
             return `<div class="p-person p-person-row">
               <div class="p-person-avatar">${esc(r.name.split(' ').map(function(w){return w[0];}).slice(0,2).join('').toUpperCase())}</div>
@@ -381,23 +381,23 @@
               </div>
             </div>`;
           }).join('');
-      indCard.innerHTML = `<div class="p-card-title">Profs, mentors, role models</div>
+      indCard.innerHTML = `<div class="p-card-title">${t('section.individuals')}</div>
         <div class="p-scroll-md">${indRows}</div>` +
         addForm('individual', [
-          {id:'f0-individual', label:'Full name'},
-          {id:'f1-individual', label:'Role or connection (e.g. PhD supervisor, Author)'},
-        ], 'Add');
+          {id:'f0-individual', label: t('label.full_name')},
+          {id:'f1-individual', label: t('placeholder.individual_role')},
+        ], t('btn.add'));
     }
 
     // ── Study Groups ──
     var grpCard = document.getElementById('groups-card');
     if (grpCard) {
       var grpRows = !groups.length
-        ? empty('Add study groups, reading circles, and communities.')
+        ? empty(t('msg.no_groups'))
         : groups.map(function(r) {
             var badge = r.status === 'active'
-              ? `<span class="p-badge active">Active</span>`
-              : r.status === 'concluded' ? `<span class="p-badge done">Concluded</span>` : '';
+              ? `<span class="p-badge active">${t('label.active')}</span>`
+              : r.status === 'concluded' ? `<span class="p-badge done">${t('label.concluded')}</span>` : '';
             return `<div class="p-entry">
               <div class="p-entry-header">
                 <div class="p-entry-title">${esc(r.name)}${delBtn(r.id)}</div>
@@ -406,22 +406,22 @@
               ${r.role_description ? `<div class="p-entry-sub">${esc(r.role_description)}</div>` : ''}
             </div>`;
           }).join('');
-      grpCard.innerHTML = `<div class="p-card-title">Study Groups</div>
+      grpCard.innerHTML = `<div class="p-card-title">${t('section.study_groups')}</div>
         <div class="p-scroll-md">${grpRows}</div>` +
         addForm('group', [
-          {id:'f0-group', label:'Group name'},
-          {id:'f1-group', label:'Description (frequency, size, focus…)'},
-          {id:'f2-group', type:'select', options:[{v:'',l:'Status (optional)'},{v:'active',l:'Active'},{v:'concluded',l:'Concluded'}]},
-        ], 'Add');
+          {id:'f0-group', label: t('placeholder.group_name')},
+          {id:'f1-group', label: t('placeholder.group_desc')},
+          {id:'f2-group', type:'select', options:[{v:'',l: t('placeholder.status_opt') || 'Status (optional)'},{v:'active',l: t('label.active')},{v:'concluded',l: t('label.concluded')}]},
+        ], t('btn.add'));
     }
 
     // ── Learning providers ──
     var provCard = document.getElementById('providers-card');
     if (provCard) {
       var provRows = !providers.length
-        ? empty('Add universities, courses, apps, and tools that shaped your learning.')
+        ? empty(t('msg.no_providers'))
         : providers.map(function(r) {
-            var catBadge = `<span class="p-provider-type">${r.type === 'tool' ? 'Tool' : 'Institution'}</span>`;
+            var catBadge = `<span class="p-provider-type">${r.type === 'tool' ? t('label.tool') : t('label.institution')}</span>`;
             return `<div class="p-entry">
               <div class="p-entry-header">
                 <div class="p-entry-title">${esc(r.name)}${catBadge}${delBtn(r.id)}</div>
@@ -429,13 +429,13 @@
               ${r.role_description ? `<div class="p-entry-sub">${esc(r.role_description)}</div>` : ''}
             </div>`;
           }).join('');
-      provCard.innerHTML = `<div class="p-card-title">Learning providers</div>
+      provCard.innerHTML = `<div class="p-card-title">${t('section.learning_providers')}</div>
         <div class="p-scroll-md">${provRows}</div>` +
         addForm('provider', [
-          {id:'f0-provider', label:'Name'},
-          {id:'f1-provider', label:'Description (course, dates, how used…)'},
-          {id:'f2-provider', type:'select', options:[{v:'institution',l:'Institution'},{v:'tool',l:'Tool'}]},
-        ], 'Add');
+          {id:'f0-provider', label: t('placeholder.provider_name')},
+          {id:'f1-provider', label: t('placeholder.provider_desc')},
+          {id:'f2-provider', type:'select', options:[{v:'institution',l: t('label.institution')},{v:'tool',l: t('label.tool')}]},
+        ], t('btn.add'));
     }
   }
 
@@ -479,16 +479,16 @@
       return `
         <button class="p-edit-btn p-rel-add-btn" id="cred-add-btn-${type}"
           onclick="document.getElementById('cred-form-${type}').style.display='';this.style.display='none';document.getElementById('cred-title-${type}').focus()">
-          + Add
+          + ${t('btn.add')}
         </button>
         <div id="cred-form-${type}" style="display:none" class="p-rel-form">
           <div class="p-form-grid-sm">
-            <input id="cred-title-${type}" class="p-edit-input" placeholder="Title (required)">
-            <input id="cred-issuer-${type}" class="p-edit-input" placeholder="Issuer / Institution">
+            <input id="cred-title-${type}" class="p-edit-input" placeholder="${esc(t('placeholder.cred_title'))}">
+            <input id="cred-issuer-${type}" class="p-edit-input" placeholder="${esc(t('placeholder.cred_issuer'))}">
             <div>${dateField}</div>
             <div class="p-flex-row-sm">
-              <button class="p-edit-btn primary p-edit-btn-inline" onclick="window.saveCredential('${type}')">Add</button>
-              <button class="p-edit-btn p-edit-btn-inline" onclick="document.getElementById('cred-form-${type}').style.display='none';document.getElementById('cred-add-btn-${type}').style.display=''">Cancel</button>
+              <button class="p-edit-btn primary p-edit-btn-inline" onclick="window.saveCredential('${type}')">${t('btn.add')}</button>
+              <button class="p-edit-btn p-edit-btn-inline" onclick="document.getElementById('cred-form-${type}').style.display='none';document.getElementById('cred-add-btn-${type}').style.display=''">${t('btn.cancel')}</button>
             </div>
           </div>
         </div>`;
@@ -499,7 +499,7 @@
     var platformCard = document.getElementById('platform-credentials-card');
     if (platformCard) {
       var platRows = !platform.length
-        ? empty('Complete all knobits for a node to earn a platform credential here.')
+        ? empty(t('msg.no_platform_creds'))
         : platform.map(function(c) {
             return `<div class="p-cred">
               <div class="p-cred-icon internal">🗺️</div>
@@ -511,7 +511,7 @@
               </div>
             </div>`;
           }).join('');
-      platformCard.innerHTML = `<div class="p-card-title">Map of Knowledge Credentials</div>
+      platformCard.innerHTML = `<div class="p-card-title">${t('section.platform_creds')}</div>
         <div class="p-scroll-sm">${platRows}</div>`;
     }
 
@@ -520,7 +520,7 @@
     var qualCard = document.getElementById('qualifications-card');
     if (qualCard) {
       var qualRows = !quals.length
-        ? empty('Add your formal qualifications — degrees and diplomas.')
+        ? empty(t('msg.no_qualifications'))
         : quals.map(function(c) {
             return `<div class="p-cred">
               <div class="p-cred-icon qual">🎓</div>
@@ -531,7 +531,7 @@
               </div>
             </div>`;
           }).join('');
-      qualCard.innerHTML = `<div class="p-card-title">Qualifications</div>
+      qualCard.innerHTML = `<div class="p-card-title">${t('section.qualifications')}</div>
         <div class="p-scroll-sm">${qualRows}</div>` + credAddForm('qualification', false);
     }
 
@@ -540,7 +540,7 @@
     var awardsCard = document.getElementById('awards-card');
     if (awardsCard) {
       var awardsRows = !awards.length
-        ? empty('Add awards, honours, and endorsements.')
+        ? empty(t('msg.no_awards'))
         : awards.map(function(c) {
             return `<div class="p-cred">
               <div class="p-cred-icon award">⭐</div>
@@ -551,7 +551,7 @@
               </div>
             </div>`;
           }).join('');
-      awardsCard.innerHTML = `<div class="p-card-title">Awards &amp; Endorsements</div>
+      awardsCard.innerHTML = `<div class="p-card-title">${t('section.awards')}</div>
         <div class="p-scroll-sm">${awardsRows}</div>` + credAddForm('award', false);
     }
 
@@ -560,7 +560,7 @@
     var certsCard = document.getElementById('certifications-card');
     if (certsCard) {
       var certRows = !certs.length
-        ? empty('Add certifications, online courses, and badges.')
+        ? empty(t('msg.no_certifications'))
         : certs.map(function(c) {
             return `<div class="p-cred">
               <div class="p-cred-icon cert">📋</div>
@@ -571,7 +571,7 @@
               </div>
             </div>`;
           }).join('');
-      certsCard.innerHTML = `<div class="p-card-title">Certifications &amp; Badges</div>
+      certsCard.innerHTML = `<div class="p-card-title">${t('section.certifications')}</div>
         <div class="p-scroll-sm">${certRows}</div>` + credAddForm('certification', true);
     }
   }
@@ -610,8 +610,8 @@
 
     var items = mapKnowledge || [];
     if (!items.length) {
-      knowledgeCard.innerHTML = `<div class="p-card-title">Knowledge</div>` +
-        empty('Your knowledge map will appear here as you learn and self-assess topics.');
+      knowledgeCard.innerHTML = `<div class="p-card-title">${t('section.knowledge')}</div>` +
+        empty(t('msg.no_knowledge'));
       return;
     }
 
@@ -620,17 +620,12 @@
       self_reported: 'var(--accent)',
       estimated:     'var(--c7)',
     };
-    var SRC_LABELS = {
-      tested:        'Tested',
-      self_reported: 'Self-reported',
-      estimated:     'Estimated',
-    };
 
     var rows = items.map(function(k) {
       var pct      = Math.round(k.percentage) || 0;
       var barColor = BAR_COLORS[k.source] || BAR_COLORS.estimated;
-      var srcClass = k.source === 'tested' ? 'tested' : k.source === 'self_reported' ? 'self-reported' : 'self-reported';
-      var srcLabel = SRC_LABELS[k.source] || '';
+      var srcClass = k.source === 'tested' ? 'tested' : 'self-reported';
+      var srcLabel = k.source === 'tested' ? t('label.tested') : k.source === 'self_reported' ? t('label.self_reported') : t('label.estimated');
       return `<div class="p-prof-row">
         <div class="p-prof-info p-flex-1-noclip">
           <div class="p-prof-name">${esc(k.label)}</div>
@@ -646,7 +641,7 @@
       </div>`;
     }).join('');
 
-    knowledgeCard.innerHTML = `<div class="p-card-title">Knowledge</div>
+    knowledgeCard.innerHTML = `<div class="p-card-title">${t('section.knowledge')}</div>
       <div class="p-scroll-xl">${rows}</div>`;
   }
 
@@ -660,7 +655,7 @@
     const remaining = Math.max(0, _allReflections.length - _reflShowing);
 
     const rowsHtml = !showing.length
-      ? empty('Reflections on your learning will appear here. You can add one when logging an activity.')
+      ? empty(t('msg.no_reflections'))
       : showing.map(function(r) {
           var eventLine = r.event_title
             ? `<div class="p-quote-event-line">On: <em>${esc(r.event_title)}</em>${r.event_date ? ' · ' + fmtDate(r.event_date) : ''}</div>`
@@ -674,11 +669,11 @@
 
     const moreBtn = remaining > 0
       ? `<button class="p-edit-btn p-edit-btn-load-more" onclick="window.loadMoreReflections()">
-           Load more (${remaining} remaining)
+           ${t('btn.load_more')} (${remaining} ${t('label.remaining')})
          </button>`
       : '';
 
-    card.innerHTML = `<div class="p-card-title">Reflections</div>
+    card.innerHTML = `<div class="p-card-title">${t('section.reflections')}</div>
       <div class="p-scroll-lg">${rowsHtml}</div>` + moreBtn;
   }
 
@@ -715,10 +710,10 @@
       var setDate  = g.created_at ? 'Set: ' + fmtDate(g.created_at) : '';
       var doneDate = g.completed_at ? ' · Completed: ' + fmtDate(g.completed_at) : '';
       var badge    = isDone
-        ? `<span class="p-goal-badge-done">COMPLETED</span>`
-        : `<span class="p-goal-badge-active">IN PROGRESS</span>`;
+        ? `<span class="p-goal-badge-done">${t('label.completed_badge')}</span>`
+        : `<span class="p-goal-badge-active">${t('label.in_progress')}</span>`;
       var completeBtn = !isDone
-        ? `<button onclick="window.completeGoal(${g.id})" title="Mark as completed" class="p-goal-complete-btn">✓ Complete</button>`
+        ? `<button onclick="window.completeGoal(${g.id})" title="Mark as completed" class="p-goal-complete-btn">${t('btn.complete')}</button>`
         : '';
       var delBtn = `<button onclick="window.deleteGoal(${g.id})" title="Remove" class="p-goal-delete-btn">×</button>`;
       return `<div class="p-goal-card ${isDone ? 'p-goal-card-done' : 'p-goal-card-active'}">
@@ -732,27 +727,27 @@
 
     var activeRows = active.length
       ? active.map(goalRow).join('')
-      : `<div class="p-no-goals-text">No active goals yet.</div>`;
+      : `<div class="p-no-goals-text">${t('msg.no_active_goals')}</div>`;
     var doneRows = done.length
-      ? `<div class="p-goals-completed-label">Completed</div>` + done.map(goalRow).join('')
+      ? `<div class="p-goals-completed-label">${t('label.completed')}</div>` + done.map(goalRow).join('')
       : '';
 
     var addForm = `
       <button class="p-edit-btn p-rel-add-btn" id="goal-add-btn"
         onclick="document.getElementById('goal-form').style.display='';this.style.display='none';document.getElementById('goal-textarea').focus()">
-        + Add goal
+        ${t('btn.add_goal')}
       </button>
       <div id="goal-form" style="display:none" class="p-rel-form">
         <textarea id="goal-textarea" class="p-edit-input p-textarea-full"
-          placeholder="Describe your goal…"></textarea>
-        <div class="p-goal-smart-hint">💡 SMART goals work best: Specific, Measurable, Achievable, Relevant, Time-bound.</div>
+          placeholder="${esc(t('placeholder.goal_text'))}"></textarea>
+        <div class="p-goal-smart-hint">${t('msg.smart_hint')}</div>
         <div class="p-flex-row-sm">
-          <button class="p-edit-btn primary p-edit-btn-inline" onclick="window.saveGoal()">Add</button>
-          <button class="p-edit-btn p-edit-btn-inline" onclick="document.getElementById('goal-form').style.display='none';document.getElementById('goal-add-btn').style.display=''">Cancel</button>
+          <button class="p-edit-btn primary p-edit-btn-inline" onclick="window.saveGoal()">${t('btn.add')}</button>
+          <button class="p-edit-btn p-edit-btn-inline" onclick="document.getElementById('goal-form').style.display='none';document.getElementById('goal-add-btn').style.display=''">${t('btn.cancel')}</button>
         </div>
       </div>`;
 
-    card.innerHTML = `<div class="p-card-title">Goals</div>` +
+    card.innerHTML = `<div class="p-card-title">${t('section.goals')}</div>` +
       warning + activeRows + doneRows + addForm;
   }
 
@@ -798,35 +793,35 @@
 
     card.innerHTML = `
       <div class="p-kv">
-        <div class="p-kv-label">Full name</div>
+        <div class="p-kv-label">${t('label.full_name')}</div>
         <div class="p-kv-value">
-          <input class="p-edit-input" data-field="display_name" value="${esc(vals.display_name || '')}" placeholder="Full name">
+          <input class="p-edit-input" data-field="display_name" value="${esc(vals.display_name || '')}" placeholder="${esc(t('label.full_name'))}">
         </div>
-        <div class="p-kv-label">Year of birth</div>
+        <div class="p-kv-label">${t('label.year_of_birth')}</div>
         <div class="p-kv-value">
           <select class="p-edit-input" data-field="birth_year">${yearOpts}</select>
         </div>
-        <div class="p-kv-label">Language</div>
+        <div class="p-kv-label">${t('label.language')}</div>
         <div class="p-kv-value">
           <select class="p-edit-input" data-field="location">${langOpts}</select>
         </div>
         <div class="p-kv-label">
-          Culture
+          ${t('label.culture')}
           <span class="p-tip" data-tip="We use this to personalise your learning content. It can indicate your nationality, geographic region, religion, or other cultural context — leave blank if you prefer not to share.">ⓘ</span>
         </div>
         <div class="p-kv-value">
-          <input class="p-edit-input" data-field="cultural_background" value="${esc(vals.cultural_background || '')}" placeholder="Optional">
+          <input class="p-edit-input" data-field="cultural_background" value="${esc(vals.cultural_background || '')}" placeholder="${esc(t('placeholder.optional'))}">
         </div>
         <div class="p-kv-label">
-          ID number
+          ${t('label.id_number')}
           <span class="p-tip" data-tip="Your national ID, social security, driver's licence or similar. Used to resolve identity disputes, if needed.">ⓘ</span>
         </div>
         <div class="p-kv-value">
-          <input class="p-edit-input" data-field="id_number" value="${esc(vals.id_number || '')}" placeholder="Optional">
+          <input class="p-edit-input" data-field="id_number" value="${esc(vals.id_number || '')}" placeholder="${esc(t('placeholder.optional'))}">
         </div>
       </div>
-      <button class="p-edit-btn primary" onclick="window.saveIdentity()">Save</button>
-      <button class="p-edit-btn" onclick="window.loadProfile()">Cancel</button>`;
+      <button class="p-edit-btn primary" onclick="window.saveIdentity()">${t('btn.save')}</button>
+      <button class="p-edit-btn" onclick="window.loadProfile()">${t('btn.cancel')}</button>`;
   };
 
   window.saveIdentity = function () {
@@ -838,7 +833,7 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
-    }).then(() => window.loadProfile()).catch(() => alert('Save failed — please try again.'));
+    }).then(() => window.loadProfile()).catch(() => alert(t('msg.save_failed')));
   };
 
   window.editAbout = function () {
@@ -846,9 +841,9 @@
     if (!card) return;
     const current = card.querySelector('.p-about-text')?.textContent.trim() || '';
     card.innerHTML = `
-      <textarea class="p-edit-input p-about-edit-textarea" placeholder="Describe how and when and where you learn best, and any special needs that impact your learning…">${esc(current)}</textarea>
-      <button class="p-edit-btn primary" onclick="window.saveAbout(this)">Save</button>
-      <button class="p-edit-btn" onclick="window.loadProfile()">Cancel</button>`;
+      <textarea class="p-edit-input p-about-edit-textarea" placeholder="${esc(t('placeholder.about'))}">${esc(current)}</textarea>
+      <button class="p-edit-btn primary" onclick="window.saveAbout(this)">${t('btn.save')}</button>
+      <button class="p-edit-btn" onclick="window.loadProfile()">${t('btn.cancel')}</button>`;
   };
 
   window.saveAbout = function (btn) {
@@ -858,7 +853,7 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ about }),
-    }).then(() => window.loadProfile()).catch(() => alert('Save failed.'));
+    }).then(() => window.loadProfile()).catch(() => alert(t('msg.save_failed_short')));
   };
 
   /* ─── Main load ───────────────────────────────────────────────── */

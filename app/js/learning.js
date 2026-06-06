@@ -120,13 +120,13 @@
 
     var pct = KNOBIT_TOTAL ? Math.round((KNOBIT_DONE_COUNT / KNOBIT_TOTAL) * 100) : 0;
     if (fillEl)  fillEl.style.width   = pct + '%';
-    if (labelEl) labelEl.textContent  = pct + '% complete' + (pct < 100 ? ' — keep going!' : '');
+    if (labelEl) labelEl.textContent  = pct + t('msg.pct_complete_suffix') + (pct < 100 ? ' ' + t('msg.keep_going') : '');
 
     if (!listEl) return;
     listEl.innerHTML = '';
 
     if (!KNOBITS.length) {
-      listEl.innerHTML = '<div class="lm-no-content">No content available yet — try again in a moment.</div>';
+      listEl.innerHTML = '<div class="lm-no-content">' + t('msg.no_content_yet') + '</div>';
       return;
     }
 
@@ -178,7 +178,7 @@
     showLmView('lm-knobit');
 
     _setButtonRow('');
-    _appendPhaseDivider('Step 1 of 4: Read all explanations');
+    _appendPhaseDivider(t('phase.step_1'));
     _showLoadingBlock();
 
     apiInteract({ phase: 'explain', byteIndex: 0, priorChoices: [] })
@@ -236,28 +236,28 @@
     }
 
     if (type === 'explain-options') {
-      btn('I understand',       function () { window.explainOpt('ok');      }, 'btn-understand');
-      btn("I don't understand", function () { window.explainOpt('no');      }, 'btn-other');
-      btn('Too simplistic',     function () { window.explainOpt('simpler'); }, 'btn-adjust');
-      btn('Too complex',        function () { window.explainOpt('complex'); }, 'btn-adjust');
+      btn(t('btn.i_understand'),       function () { window.explainOpt('ok');      }, 'btn-understand');
+      btn(t('btn.i_dont_understand'),  function () { window.explainOpt('no');      }, 'btn-other');
+      btn(t('btn.too_simplistic'),     function () { window.explainOpt('simpler'); }, 'btn-adjust');
+      btn(t('btn.too_complex'),        function () { window.explainOpt('complex'); }, 'btn-adjust');
     } else if (type === 'demo-1') {
-      btn('View next example',  function () { window.demoOpt('next');    }, 'btn-other');
+      btn(t('btn.view_next_example'),  function () { window.demoOpt('next');    }, 'btn-other');
     } else if (type === 'demo-2') {
-      btn('I understand, no more needed', function () { window.demoOpt('ok');      }, 'btn-understand');
-      btn('Give me another',              function () { window.demoOpt('another'); }, 'btn-other');
+      btn(t('btn.i_understand_no_more'), function () { window.demoOpt('ok');      }, 'btn-understand');
+      btn(t('btn.give_me_another'),      function () { window.demoOpt('another'); }, 'btn-other');
     } else if (type === 'demo-3') {
-      btn('I understand — ready to practice', function () { window.demoOpt('ok');       }, 'btn-understand');
-      btn("Still don't understand",           function () { window.demoOpt('still-no'); }, 'btn-other');
+      btn(t('btn.i_understand_ready'),    function () { window.demoOpt('ok');       }, 'btn-understand');
+      btn(t('btn.still_dont_understand'), function () { window.demoOpt('still-no'); }, 'btn-other');
     } else if (type === 'practice-submit') {
-      btn('Submit answer', function () { window.practiceSubmit(); });
+      btn(t('btn.submit_answer'), function () { window.practiceSubmit(); });
     } else if (type === 'practice-next') {
-      btn('Yes, next problem', function () { window.practiceNext(); }, 'btn-other');
-      btn("No, I'm done",      function () { window.practiceDone(); }, 'btn-understand');
+      btn(t('btn.yes_next_problem'), function () { window.practiceNext(); }, 'btn-other');
+      btn(t('btn.no_im_done'),       function () { window.practiceDone(); }, 'btn-understand');
     } else if (type === 'meaning-options') {
-      btn('I understand',       function () { window.meaningOpt('ok');      }, 'btn-understand');
-      btn("I don't understand", function () { window.meaningOpt('no');      }, 'btn-other');
-      btn('Too simplistic',     function () { window.meaningOpt('simpler'); }, 'btn-adjust');
-      btn('Too complex',        function () { window.meaningOpt('complex'); }, 'btn-adjust');
+      btn(t('btn.i_understand'),       function () { window.meaningOpt('ok');      }, 'btn-understand');
+      btn(t('btn.i_dont_understand'),  function () { window.meaningOpt('no');      }, 'btn-other');
+      btn(t('btn.too_simplistic'),     function () { window.meaningOpt('simpler'); }, 'btn-adjust');
+      btn(t('btn.too_complex'),        function () { window.meaningOpt('complex'); }, 'btn-adjust');
     }
 
     s.appendChild(area);
@@ -266,8 +266,7 @@
 
   /* ─── Explain ─────────────────────────────────────────────────── */
   window.explainOpt = function (opt) {
-    var label = { ok: 'I understand', no: "I don't understand", simpler: 'Too simplistic', complex: 'Too complex' }[opt];
-    _lockButtons(label);
+    _lockButtons();
     _priorChoices.push(opt);
     _setButtonRow('');
 
@@ -298,7 +297,7 @@
 
   /* ─── Demonstrate ─────────────────────────────────────────────── */
   function _enterDemonstrate() {
-    _appendPhaseDivider('Step 2 of 4: Review the demonstration');
+    _appendPhaseDivider(t('phase.step_2'));
     _demoIdx = 0;
     _setPhase('demonstrate');
     _fetchDemo();
@@ -321,17 +320,17 @@
 
   window.demoOpt = function (opt) {
     if (opt === 'ok') {
-      _lockButtons('I understand');
+      _lockButtons();
       _setButtonRow('');
       _enterPractice();
     } else if (opt === 'next' || opt === 'another') {
-      _lockButtons(opt === 'next' ? 'View next' : 'Give me another');
+      _lockButtons();
       _demoIdx++;
       _setButtonRow('');
       _fetchDemo();
     } else {
-      _lockButtons("Still don't understand");
-      _appendBlock({ type: 'note', content: 'Try YouTube: "' + (_node ? _node.label : '') + ' explained"' });
+      _lockButtons();
+      _appendBlock({ type: 'note', content: t('msg.try_youtube') + ' "' + (_node ? _node.label : '') + ' ' + t('msg.explained') + '"' });
       _setButtonRow('');
       setTimeout(_enterPractice, 1200);
     }
@@ -339,7 +338,7 @@
 
   /* ─── Practice ────────────────────────────────────────────────── */
   function _enterPractice() {
-    _appendPhaseDivider('Step 3 of 4: Practice it yourself');
+    _appendPhaseDivider(t('phase.step_3'));
     _practiceIdx = 0;
     _setPhase('practice');
     _fetchPractice();
@@ -358,7 +357,7 @@
           var inp         = document.createElement('textarea');
           inp.id          = 'kn-practice-input';
           inp.className   = 'kn-answer-input';
-          inp.placeholder = 'Your answer…';
+          inp.placeholder = t('placeholder.your_answer');
           inp.rows        = 2;
           wrapper.appendChild(inp);
         }
@@ -371,7 +370,7 @@
     var ans = inp ? inp.value.trim() : '';
     if (!ans) return;
     if (inp) inp.disabled = true;
-    _lockButtons('Submit answer');
+    _lockButtons();
     _setButtonRow('');
     _showLoadingBlock();
 
@@ -392,21 +391,21 @@
   };
 
   window.practiceNext = function () {
-    _lockButtons('Yes, next problem');
+    _lockButtons();
     _practiceIdx++;
     _setButtonRow('');
     _fetchPractice();
   };
 
   window.practiceDone = function () {
-    _lockButtons("I'm done");
+    _lockButtons();
     _setButtonRow('');
     _enterMeaning();
   };
 
   /* ─── Meaning ─────────────────────────────────────────────────── */
   function _enterMeaning() {
-    _appendPhaseDivider('Step 4 of 4: Discover the Meaning');
+    _appendPhaseDivider(t('phase.step_4'));
     _setPhase('meaning');
     _showLoadingBlock();
     apiInteract({ phase: 'meaning' })
@@ -419,13 +418,12 @@
 
   window.meaningOpt = function (opt) {
     if (opt === 'ok') {
-      _lockButtons('I understand');
+      _lockButtons();
       _setButtonRow('');
       _completeKnobit();
       return;
     }
-    var label = { no: "I don't understand", simpler: 'Too simplistic', complex: 'Too complex' }[opt];
-    _lockButtons(label);
+    _lockButtons();
     var lastContent = _getLastContent(['meaning']);
     _showLoadingBlock();
     apiInteract({ phase: 'meaning', action: opt, original: lastContent })
@@ -453,15 +451,15 @@
   }
 
   function _showUnitComplete() {
-    var t = document.querySelector('.lm-complete-title');
+    var titleEl = document.querySelector('.lm-complete-title');
     var s = document.querySelector('.lm-complete-sub');
-    if (t) t.textContent = 'Unit complete!';
+    if (titleEl) titleEl.textContent = t('msg.unit_complete');
     if (s) s.textContent = _node ? _node.label : '';
 
     var stat = document.querySelector('.lm-complete-stats');
     if (stat) {
       var cards = stat.querySelectorAll('.lm-complete-stat');
-      if (cards[0]) cards[0].innerHTML = '<div class="lm-stat-num">' + KNOBIT_TOTAL + '</div><div class="lm-stat-label">Knobits</div>';
+      if (cards[0]) cards[0].innerHTML = '<div class="lm-stat-num">' + KNOBIT_TOTAL + '</div><div class="lm-stat-label">' + t('label.knobits') + '</div>';
     }
     showLmView('lm-complete');
   }
@@ -544,7 +542,7 @@
     if (el) el.remove();
   }
 
-  function _lockButtons(chosenLabel) {
+  function _lockButtons() {
     if (!_streamButtonEl) return;
     if (_streamButtonEl.parentNode) _streamButtonEl.parentNode.removeChild(_streamButtonEl);
     _streamButtonEl = null;
@@ -574,7 +572,7 @@
 
   function _onApiError() {
     _removeLoadingBlock();
-    _appendBlock({ type: 'note', content: 'Connection error — please try again.' });
+    _appendBlock({ type: 'note', content: t('msg.connection_error') });
   }
 
   /* ─── Quit guard ──────────────────────────────────────────────── */
