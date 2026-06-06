@@ -669,6 +669,18 @@
 }
 .lm-complete-btn-ghost:hover { background: var(--i05); }
 
+/* ── JS-rendered additions ── */
+
+/* No content message (knobit list empty) */
+.lm-no-content {
+  color: #8A7E72; font-size: 13px; padding: 14px 0;
+}
+
+/* Demo "What I did" annotation */
+.lm-demo-what-i-did {
+  opacity: 0.55; font-size: 0.95em;
+}
+
 /* ── API-driven additions ── */
 
 /* ── Max content width for readability ── */

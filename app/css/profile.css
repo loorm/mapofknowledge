@@ -491,6 +491,274 @@ select.p-edit-input { cursor: pointer; }
 .p-lang-level { font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 20px;
                 background: var(--i08); color: var(--c3); }
 
+/* ── Dynamic / JS-rendered additions ──────────────────────────── */
+
+/* About text (pre-wrap multiline) */
+.p-about-text {
+  font-size: 13px; color: var(--c2);
+  line-height: 1.75; white-space: pre-wrap;
+}
+
+/* Tag with inline remove button */
+.p-tag-removable {
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.p-tag-remove-btn {
+  background: none; border: none; cursor: pointer;
+  color: inherit; opacity: 0.6;
+  font-size: 11px; padding: 0; line-height: 1;
+}
+
+/* Add-tag row (input + button) */
+.p-tag-add-row {
+  display: flex; gap: 6px; margin-top: 8px;
+}
+.p-tag-add-row .p-edit-input { flex: 1; }
+
+/* Empty-state text (inline, inside tag container) */
+.p-tag-empty {
+  color: var(--c6); font-size: 12px;
+}
+
+/* Sub-section wrapper (interests/values editor) */
+.p-subsection-block { margin-bottom: 16px; }
+.p-subsection-block-sm { margin-bottom: 13px; }
+
+/* Scrollable list containers */
+.p-scroll-sm  { max-height: 300px; overflow-y: auto; }
+.p-scroll-md  { max-height: 340px; overflow-y: auto; }
+.p-scroll-lg  { max-height: 380px; overflow-y: auto; }
+.p-scroll-xl  { max-height: 480px; overflow-y: auto; }
+
+/* Flex form grid */
+.p-form-grid { display: grid; gap: 8px; }
+.p-form-grid-sm { display: grid; gap: 6px; }
+
+/* Flex row utilities */
+.p-flex-row     { display: flex; gap: 8px; }
+.p-flex-row-sm  { display: flex; gap: 6px; }
+.p-flex-1       { flex: 1; }
+.p-flex-1-5     { flex: 1.5; }
+.p-flex-2       { flex: 2; }
+.p-flex-1-noclip { flex: 1; min-width: 0; }
+.p-form-btn-row { display: flex; gap: 8px; }
+
+/* Person row (avatar + text) */
+.p-person-row {
+  display: flex; align-items: center; gap: 10px;
+}
+
+/* Textarea full-width resize */
+.p-textarea-full {
+  width: 100%; min-height: 80px;
+  resize: vertical; box-sizing: border-box;
+}
+
+/* About edit textarea (taller) */
+.p-about-edit-textarea {
+  width: 100%; min-height: 140px; resize: vertical;
+}
+
+/* Button with no top margin (used inline in forms) */
+.p-edit-btn-inline { margin-top: 0; }
+
+/* Done button (edit mode close) */
+.p-edit-btn-done { margin-top: 14px; }
+
+/* Load more button */
+.p-edit-btn-load-more { margin-top: 4px; }
+
+/* Quote with bottom margin (in scroll list) */
+.p-quote-entry { margin-bottom: 14px; }
+
+/* Inline whitespace-nowrap button variant */
+.p-edit-btn-nowrap { white-space: nowrap; }
+
+/* Delete × button (in ledger rows, credential lists) */
+.p-row-delete-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--c7); font-size: 15px;
+  padding: 0 0 0 6px; line-height: 1; vertical-align: middle;
+}
+
+/* Provider category badge */
+.p-provider-type {
+  font-size: 10px; color: var(--c6); margin-left: 6px;
+}
+
+/* Knowledge bar wrapper */
+.p-bar-wrap {
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+/* Knowledge progress bar track */
+.p-bar-track {
+  width: 72px; height: 4px;
+  background: rgba(58,48,40,0.09);
+  border-radius: 2px; overflow: hidden;
+}
+/* Knowledge bar fill: width and background are dynamic — set via inline style */
+.p-bar-fill {
+  height: 100%; border-radius: 2px;
+}
+/* Knowledge percentage label */
+.p-bar-pct {
+  font-size: 12px; font-weight: 650; color: #2C2820;
+  width: 34px; text-align: right;
+}
+
+/* Goal card */
+.p-goal-card {
+  border-radius: 12px; padding: 14px 16px;
+  border: 1px solid rgba(58,48,40,0.08);
+  margin-bottom: 8px;
+}
+.p-goal-card-active {
+  background: rgba(255,255,255,0.55);
+  opacity: 1;
+}
+.p-goal-card-done {
+  background: rgba(255,255,255,0.35);
+  opacity: 0.7;
+}
+.p-goal-text {
+  font-size: 13px; color: #2C2820; line-height: 1.65; margin-bottom: 8px;
+}
+.p-goal-footer {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap; gap: 6px;
+}
+.p-goal-date {
+  font-size: 11px; color: var(--c6);
+}
+.p-goal-actions {
+  display: flex; align-items: center; gap: 6px;
+}
+.p-goal-badge-done {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.6px;
+  color: #5E9052;
+  background: rgba(139,173,126,0.18);
+  padding: 2px 8px; border-radius: 20px;
+}
+.p-goal-badge-active {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.6px;
+  color: #8A6A3A;
+  background: rgba(196,166,106,0.18);
+  padding: 2px 8px; border-radius: 20px;
+}
+.p-goal-complete-btn {
+  background: none;
+  border: 1px solid rgba(94,144,82,0.35);
+  border-radius: 6px; cursor: pointer;
+  font-size: 11px; font-weight: 600; color: #5E9052;
+  padding: 2px 8px; font-family: inherit;
+  transition: background 0.12s;
+}
+.p-goal-delete-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--c7); font-size: 15px;
+  padding: 0; line-height: 1;
+}
+.p-goal-warning {
+  background: var(--accent-s);
+  border: 1px solid rgba(196,130,106,0.28);
+  border-radius: 10px; padding: 10px 14px;
+  font-size: 12px; color: #7A4030; margin-bottom: 12px;
+}
+.p-no-goals-text {
+  font-size: 12px; color: var(--c6);
+  font-style: italic; padding: 8px 0;
+}
+.p-goals-completed-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+  text-transform: uppercase; color: var(--c7);
+  margin: 14px 0 8px;
+}
+.p-goal-smart-hint {
+  font-size: 11px; color: var(--c6);
+  margin: 5px 0 8px; font-style: italic;
+}
+
+/* Event filter controls */
+.p-ev-filter-row {
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 12px; flex-wrap: wrap;
+}
+.p-ev-type-pills { display: flex; gap: 4px; }
+.p-ev-date-row {
+  display: flex; gap: 4px; margin-left: auto; align-items: center;
+}
+.p-ev-date-sep { font-size: 11px; color: var(--c6); }
+.p-ev-clear-btn {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--i10); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--c5); font-size: 10px; line-height: 1;
+  flex-shrink: 0; transition: background 0.12s;
+}
+.p-ev-date-input { padding: 3px 6px; font-size: 11px; width: 100px; }
+
+/* Add-activity button (below event list) */
+.p-ev-add-btn { margin-top: 10px; }
+
+/* Relationship add button */
+.p-rel-add-btn { margin-top: 10px; }
+
+/* Relationship add form */
+.p-rel-form { display: none; margin-top: 10px; }
+
+/* Add-event form wrapper */
+.p-ev-form {
+  margin-top: 14px; padding-top: 14px;
+  border-top: 1px solid var(--i07);
+}
+
+/* Event type filter pill */
+.p-ev-pill {
+  padding: 3px 10px; border-radius: 20px; border: 1.5px solid;
+  font-size: 11px; font-weight: 600; font-family: inherit; cursor: pointer;
+}
+.p-ev-pill-active {
+  border-color: var(--accent);
+  background: var(--accent-s);
+  color: var(--accent);
+}
+.p-ev-pill-inactive {
+  border-color: var(--i12);
+  background: transparent;
+  color: var(--c5);
+}
+
+/* Reflection quote wrapper */
+.p-quote-date { font-size: 10px; color: var(--c7); margin-bottom: 6px; }
+.p-quote-event-line {
+  font-size: 11px; color: var(--c6); margin-top: 8px;
+}
+
+/* Credential add form date input variants */
+.p-cred-date-month { width: 150px; }
+.p-cred-date-year  { width: 100px; }
+
+/* ── Interests card sub-sections ────────── */
+.p-interests-section { margin-bottom: 13px; }
+.p-interests-section:last-child { margin-bottom: 0; }
+.p-subsection-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+  text-transform: uppercase; color: #8A7E72;
+  margin-bottom: 8px;
+}
+.p-subsection-label-lg {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+  text-transform: uppercase; color: #8A7E72;
+  margin-bottom: 10px;
+}
+
+/* ── Knowledge legend ─────────────────── */
+.p-knowledge-legend {
+  font-size: 11px; color: #9A8E86;
+  margin-bottom: 14px;
+}
+
 /* ── Mobile: slide-in nav drawer ─────────── */
 #pnav-toggle {
   display: none;

@@ -68,7 +68,7 @@
     const aboutCard = document.getElementById('about-card');
     if (aboutCard) {
       aboutCard.innerHTML = `<div class="p-card-title">Learning needs and preferences</div>` + (about
-        ? `<div class="p-kv-value" style="font-size:13px;color:var(--c2);line-height:1.75;white-space:pre-wrap">${esc(about)}</div>
+        ? `<div class="p-kv-value p-about-text">${esc(about)}</div>
            <button class="p-edit-btn" onclick="window.editAbout()">Edit</button>`
         : `${empty('Describe how and when and where you learn best, and any special needs that impact your learning.')}
            <button class="p-edit-btn" onclick="window.editAbout()">Add</button>`);
@@ -84,18 +84,18 @@
 
     const iHtml = interests.length
       ? interests.map(t => `<span class="p-tag interest">${esc(t.text)}</span>`).join('')
-      : '<span style="color:var(--c6);font-size:12px">None added yet</span>';
+      : '<span class="p-tag-empty">None added yet</span>';
     const vHtml = values.length
       ? values.map(t => `<span class="p-tag value">${esc(t.text)}</span>`).join('')
-      : '<span style="color:var(--c6);font-size:12px">None added yet</span>';
+      : '<span class="p-tag-empty">None added yet</span>';
 
     card.innerHTML = `
-      <div style="margin-bottom:13px">
-        <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--c5);margin-bottom:8px">Core interests</div>
+      <div class="p-subsection-block-sm">
+        <div class="p-subsection-label">Core interests</div>
         <div class="p-tags">${iHtml}</div>
       </div>
       <div>
-        <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--c5);margin-bottom:8px">Values</div>
+        <div class="p-subsection-label">Values</div>
         <div class="p-tags">${vHtml}</div>
       </div>
       <button class="p-edit-btn" onclick="window.editInterests()">Edit</button>`;
@@ -106,16 +106,16 @@
     if (!card) return;
 
     function tagRow(t) {
-      return `<span class="p-tag ${esc(t.type)}" style="display:inline-flex;align-items:center;gap:5px">
+      return `<span class="p-tag ${esc(t.type)} p-tag-removable">
         ${esc(t.text)}
-        <button onclick="window.deleteTag(${t.id})" style="background:none;border:none;cursor:pointer;color:inherit;opacity:0.6;font-size:11px;padding:0;line-height:1" title="Remove">×</button>
+        <button onclick="window.deleteTag(${t.id})" class="p-tag-remove-btn" title="Remove">×</button>
       </span>`;
     }
 
     function addRow(type) {
-      return `<div style="display:flex;gap:6px;margin-top:8px">
-        <input id="tag-input-${type}" class="p-edit-input" style="flex:1" placeholder="Add ${type}…" onkeydown="if(event.key==='Enter')window.addTag('${type}')">
-        <button class="p-edit-btn primary" onclick="window.addTag('${type}')" style="margin-top:0;white-space:nowrap">+ Add</button>
+      return `<div class="p-tag-add-row">
+        <input id="tag-input-${type}" class="p-edit-input p-flex-1" placeholder="Add ${type}…" onkeydown="if(event.key==='Enter')window.addTag('${type}')">
+        <button class="p-edit-btn primary p-edit-btn-inline p-edit-btn-nowrap" onclick="window.addTag('${type}')">+ Add</button>
       </div>`;
     }
 
@@ -124,9 +124,9 @@
         const interests = (d.tags || []).filter(t => t.type === 'interest');
         const values    = (d.tags || []).filter(t => t.type === 'value');
         document.getElementById('tag-list-interest').innerHTML =
-          interests.length ? interests.map(tagRow).join('') : '<span style="color:var(--c6);font-size:12px">None yet</span>';
+          interests.length ? interests.map(tagRow).join('') : '<span class="p-tag-empty">None yet</span>';
         document.getElementById('tag-list-value').innerHTML =
-          values.length ? values.map(tagRow).join('') : '<span style="color:var(--c6);font-size:12px">None yet</span>';
+          values.length ? values.map(tagRow).join('') : '<span class="p-tag-empty">None yet</span>';
       });
     }
     window._rebuildTags = rebuild;
@@ -135,17 +135,17 @@
       const interests = (d.tags || []).filter(t => t.type === 'interest');
       const values    = (d.tags || []).filter(t => t.type === 'value');
       card.innerHTML = `
-        <div style="margin-bottom:16px">
-          <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--c5);margin-bottom:8px">Core interests</div>
-          <div class="p-tags" id="tag-list-interest">${interests.length ? interests.map(tagRow).join('') : '<span style="color:var(--c6);font-size:12px">None yet</span>'}</div>
+        <div class="p-subsection-block">
+          <div class="p-subsection-label">Core interests</div>
+          <div class="p-tags" id="tag-list-interest">${interests.length ? interests.map(tagRow).join('') : '<span class="p-tag-empty">None yet</span>'}</div>
           ${addRow('interest')}
         </div>
         <div>
-          <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--c5);margin-bottom:8px">Values</div>
-          <div class="p-tags" id="tag-list-value">${values.length ? values.map(tagRow).join('') : '<span style="color:var(--c6);font-size:12px">None yet</span>'}</div>
+          <div class="p-subsection-label">Values</div>
+          <div class="p-tags" id="tag-list-value">${values.length ? values.map(tagRow).join('') : '<span class="p-tag-empty">None yet</span>'}</div>
           ${addRow('value')}
         </div>
-        <button class="p-edit-btn" onclick="window.loadProfile()" style="margin-top:14px">Done</button>`;
+        <button class="p-edit-btn p-edit-btn-done" onclick="window.loadProfile()">Done</button>`;
     });
   };
 
@@ -217,28 +217,22 @@
     const typePills = ['all','activity','assessment','evidence'].map(function(t) {
       const label  = t === 'all' ? 'All' : t.charAt(0).toUpperCase() + t.slice(1);
       const active = _evFilter.type === t;
-      return `<button onclick="window.setEvTypeFilter('${t}')"
-        style="padding:3px 10px;border-radius:20px;border:1.5px solid ${active ? 'var(--accent)' : 'var(--i12)'};
-        background:${active ? 'var(--accent-s)' : 'transparent'};
-        color:${active ? 'var(--accent)' : 'var(--c5)'};font-size:11px;font-weight:600;font-family:inherit;cursor:pointer">${label}</button>`;
+      return `<button onclick="window.setEvTypeFilter('${t}')" class="p-ev-pill ${active ? 'p-ev-pill-active' : 'p-ev-pill-inactive'}">${label}</button>`;
     }).join('');
 
     const hasDates  = _evFilter.dateFrom || _evFilter.dateTo;
     const clearBtn  = hasDates
-      ? `<button onclick="window.clearEvDates()" title="Clear date filter"
-           style="width:18px;height:18px;border-radius:50%;background:var(--i10);
-           border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
-           color:var(--c5);font-size:10px;line-height:1;flex-shrink:0;transition:background 0.12s">✕</button>`
+      ? `<button onclick="window.clearEvDates()" title="Clear date filter" class="p-ev-clear-btn">✕</button>`
       : '';
 
     const filterRow = `
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap">
-        <div style="display:flex;gap:4px">${typePills}</div>
-        <div style="display:flex;gap:4px;margin-left:auto;align-items:center">
-          <input type="date" class="p-edit-input" style="padding:3px 6px;font-size:11px;width:100px"
+      <div class="p-ev-filter-row">
+        <div class="p-ev-type-pills">${typePills}</div>
+        <div class="p-ev-date-row">
+          <input type="date" class="p-edit-input p-ev-date-input"
             value="${_evFilter.dateFrom}" onblur="window.setEvDateFilter('from',this.value)">
-          <span style="font-size:11px;color:var(--c6)">–</span>
-          <input type="date" class="p-edit-input" style="padding:3px 6px;font-size:11px;width:100px"
+          <span class="p-ev-date-sep">–</span>
+          <input type="date" class="p-edit-input p-ev-date-input"
             value="${_evFilter.dateTo}" onblur="window.setEvDateFilter('to',this.value)">
           ${clearBtn}
         </div>
@@ -256,8 +250,7 @@
             }
           }
           var delBtn = ev.user_created
-            ? `<button onclick="window.deleteEvent(${ev.id})" title="Remove"
-                 style="background:none;border:none;cursor:pointer;color:var(--c7);font-size:15px;padding:0 0 0 6px;line-height:1;vertical-align:middle">×</button>`
+            ? `<button onclick="window.deleteEvent(${ev.id})" title="Remove" class="p-row-delete-btn">×</button>`
             : '';
           return `<div class="p-ledger-row">
             <div class="p-ledger-date">${fmtDate(ev.event_date)}</div>
@@ -270,7 +263,7 @@
           </div>`;
         }).join('');
 
-    const scrollList = `<div style="max-height:380px;overflow-y:auto">${rowsHtml}</div>`;
+    const scrollList = `<div class="p-scroll-lg">${rowsHtml}</div>`;
     const moreBtn = '';
 
     const today   = new Date().toISOString().split('T')[0];
@@ -278,26 +271,26 @@
       .map(function(s) { return `<option value="${s}">${s}</option>`; }).join('');
 
     ledger.innerHTML = `<div class="p-card-title">Events</div>` + filterRow + scrollList + `
-      <button class="p-edit-btn" id="ev-add-btn" style="margin-top:10px"
+      <button class="p-edit-btn p-ev-add-btn" id="ev-add-btn"
         onclick="document.getElementById('ev-form').style.display='';this.style.display='none';document.getElementById('ev-title').focus()">
         + Add activity
       </button>
-      <div id="ev-form" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--i07)">
-        <div style="display:grid;gap:8px">
+      <div id="ev-form" style="display:none" class="p-ev-form">
+        <div class="p-form-grid">
           <input id="ev-title" class="p-edit-input" placeholder="What you studied or attended (required)">
-          <div style="display:flex;gap:8px">
-            <select id="ev-source" class="p-edit-input" style="flex:1">${srcOpts}</select>
-            <input id="ev-provider" class="p-edit-input" style="flex:1.5" placeholder="Author / Channel / Organiser (optional)">
+          <div class="p-flex-row">
+            <select id="ev-source" class="p-edit-input p-flex-1">${srcOpts}</select>
+            <input id="ev-provider" class="p-edit-input p-flex-1-5" placeholder="Author / Channel / Organiser (optional)">
           </div>
-          <div style="display:flex;gap:8px">
-            <input id="ev-date" type="date" class="p-edit-input" style="flex:1" value="${today}">
-            <input id="ev-notes" class="p-edit-input" style="flex:2" placeholder="Test score or other outcome (optional)">
+          <div class="p-flex-row">
+            <input id="ev-date" type="date" class="p-edit-input p-flex-1" value="${today}">
+            <input id="ev-notes" class="p-edit-input p-flex-2" placeholder="Test score or other outcome (optional)">
           </div>
-          <textarea id="ev-reflection" class="p-edit-input" style="width:100%;min-height:80px;resize:vertical;box-sizing:border-box"
+          <textarea id="ev-reflection" class="p-edit-input p-textarea-full"
             placeholder="Reflection — what did you learn, what surprised you, what would you do differently? (optional)"></textarea>
-          <div style="display:flex;gap:8px">
-            <button class="p-edit-btn primary" onclick="window.saveManualEvent()" style="margin-top:0">Add</button>
-            <button class="p-edit-btn" onclick="document.getElementById('ev-form').style.display='none';document.getElementById('ev-add-btn').style.display=''" style="margin-top:0">Cancel</button>
+          <div class="p-form-btn-row">
+            <button class="p-edit-btn primary p-edit-btn-inline" onclick="window.saveManualEvent()">Add</button>
+            <button class="p-edit-btn p-edit-btn-inline" onclick="document.getElementById('ev-form').style.display='none';document.getElementById('ev-add-btn').style.display=''">Cancel</button>
           </div>
         </div>
       </div>`;
@@ -348,8 +341,7 @@
     var providers   = (relationships || []).filter(function(r) { return r.type === 'institution' || r.type === 'tool'; });
 
     function delBtn(id) {
-      return `<button onclick="window.deleteRelationship(${id})" title="Remove"
-        style="background:none;border:none;cursor:pointer;color:var(--c7);font-size:15px;padding:0 0 0 6px;line-height:1;vertical-align:middle">×</button>`;
+      return `<button onclick="window.deleteRelationship(${id})" title="Remove" class="p-row-delete-btn">×</button>`;
     }
 
     function addForm(type, fields, btnLabel) {
@@ -361,15 +353,15 @@
         return `<input id="rel-${f.id}" class="p-edit-input" placeholder="${esc(f.label)}">`;
       }).join('');
       return `
-        <button class="p-edit-btn" id="rel-add-btn-${type}" style="margin-top:10px"
+        <button class="p-edit-btn p-rel-add-btn" id="rel-add-btn-${type}"
           onclick="document.getElementById('rel-form-${type}').style.display='';this.style.display='none';document.getElementById('rel-f0-${type}').focus()">
           + Add
         </button>
-        <div id="rel-form-${type}" style="display:none;margin-top:10px;display:none">
-          <div style="display:grid;gap:6px">${inputs}
-            <div style="display:flex;gap:6px">
-              <button class="p-edit-btn primary" onclick="window.saveRelationship('${type}')" style="margin-top:0">${btnLabel}</button>
-              <button class="p-edit-btn" onclick="document.getElementById('rel-form-${type}').style.display='none';document.getElementById('rel-add-btn-${type}').style.display=''" style="margin-top:0">Cancel</button>
+        <div id="rel-form-${type}" style="display:none" class="p-rel-form">
+          <div class="p-form-grid-sm">${inputs}
+            <div class="p-flex-row-sm">
+              <button class="p-edit-btn primary p-edit-btn-inline" onclick="window.saveRelationship('${type}')">${btnLabel}</button>
+              <button class="p-edit-btn p-edit-btn-inline" onclick="document.getElementById('rel-form-${type}').style.display='none';document.getElementById('rel-add-btn-${type}').style.display=''">Cancel</button>
             </div>
           </div>
         </div>`;
@@ -381,16 +373,16 @@
       var indRows = !individuals.length
         ? empty('Add professors, mentors, and role models who shaped your learning.')
         : individuals.map(function(r) {
-            return `<div class="p-person" style="display:flex;align-items:center;gap:10px">
+            return `<div class="p-person p-person-row">
               <div class="p-person-avatar">${esc(r.name.split(' ').map(function(w){return w[0];}).slice(0,2).join('').toUpperCase())}</div>
-              <div style="flex:1;min-width:0">
+              <div class="p-flex-1-noclip">
                 <div class="p-person-name">${esc(r.name)}${delBtn(r.id)}</div>
                 ${r.role_description ? `<div class="p-person-role">${esc(r.role_description)}</div>` : ''}
               </div>
             </div>`;
           }).join('');
       indCard.innerHTML = `<div class="p-card-title">Profs, mentors, role models</div>
-        <div style="max-height:340px;overflow-y:auto">${indRows}</div>` +
+        <div class="p-scroll-md">${indRows}</div>` +
         addForm('individual', [
           {id:'f0-individual', label:'Full name'},
           {id:'f1-individual', label:'Role or connection (e.g. PhD supervisor, Author)'},
@@ -415,7 +407,7 @@
             </div>`;
           }).join('');
       grpCard.innerHTML = `<div class="p-card-title">Study Groups</div>
-        <div style="max-height:340px;overflow-y:auto">${grpRows}</div>` +
+        <div class="p-scroll-md">${grpRows}</div>` +
         addForm('group', [
           {id:'f0-group', label:'Group name'},
           {id:'f1-group', label:'Description (frequency, size, focus…)'},
@@ -429,7 +421,7 @@
       var provRows = !providers.length
         ? empty('Add universities, courses, apps, and tools that shaped your learning.')
         : providers.map(function(r) {
-            var catBadge = `<span style="font-size:10px;color:var(--c6);margin-left:6px">${r.type === 'tool' ? 'Tool' : 'Institution'}</span>`;
+            var catBadge = `<span class="p-provider-type">${r.type === 'tool' ? 'Tool' : 'Institution'}</span>`;
             return `<div class="p-entry">
               <div class="p-entry-header">
                 <div class="p-entry-title">${esc(r.name)}${catBadge}${delBtn(r.id)}</div>
@@ -438,7 +430,7 @@
             </div>`;
           }).join('');
       provCard.innerHTML = `<div class="p-card-title">Learning providers</div>
-        <div style="max-height:340px;overflow-y:auto">${provRows}</div>` +
+        <div class="p-scroll-md">${provRows}</div>` +
         addForm('provider', [
           {id:'f0-provider', label:'Name'},
           {id:'f1-provider', label:'Description (course, dates, how used…)'},
@@ -477,27 +469,26 @@
     var creds = credentials || [];
 
     function credDelBtn(id) {
-      return `<button onclick="window.deleteCredential(${id})" title="Remove"
-        style="background:none;border:none;cursor:pointer;color:var(--c7);font-size:15px;padding:0 0 0 6px;line-height:1;vertical-align:middle">×</button>`;
+      return `<button onclick="window.deleteCredential(${id})" title="Remove" class="p-row-delete-btn">×</button>`;
     }
 
     function credAddForm(type, hasMonth) {
       var dateField = hasMonth
-        ? `<input id="cred-date-${type}" type="month" class="p-edit-input" style="width:150px">`
-        : `<input id="cred-date-${type}" type="number" class="p-edit-input" style="width:100px" min="1900" max="2099" placeholder="Year">`;
+        ? `<input id="cred-date-${type}" type="month" class="p-edit-input p-cred-date-month">`
+        : `<input id="cred-date-${type}" type="number" class="p-edit-input p-cred-date-year" min="1900" max="2099" placeholder="Year">`;
       return `
-        <button class="p-edit-btn" id="cred-add-btn-${type}" style="margin-top:10px"
+        <button class="p-edit-btn p-rel-add-btn" id="cred-add-btn-${type}"
           onclick="document.getElementById('cred-form-${type}').style.display='';this.style.display='none';document.getElementById('cred-title-${type}').focus()">
           + Add
         </button>
-        <div id="cred-form-${type}" style="display:none;margin-top:10px">
-          <div style="display:grid;gap:6px">
+        <div id="cred-form-${type}" style="display:none" class="p-rel-form">
+          <div class="p-form-grid-sm">
             <input id="cred-title-${type}" class="p-edit-input" placeholder="Title (required)">
             <input id="cred-issuer-${type}" class="p-edit-input" placeholder="Issuer / Institution">
             <div>${dateField}</div>
-            <div style="display:flex;gap:6px">
-              <button class="p-edit-btn primary" onclick="window.saveCredential('${type}')" style="margin-top:0">Add</button>
-              <button class="p-edit-btn" onclick="document.getElementById('cred-form-${type}').style.display='none';document.getElementById('cred-add-btn-${type}').style.display=''" style="margin-top:0">Cancel</button>
+            <div class="p-flex-row-sm">
+              <button class="p-edit-btn primary p-edit-btn-inline" onclick="window.saveCredential('${type}')">Add</button>
+              <button class="p-edit-btn p-edit-btn-inline" onclick="document.getElementById('cred-form-${type}').style.display='none';document.getElementById('cred-add-btn-${type}').style.display=''">Cancel</button>
             </div>
           </div>
         </div>`;
@@ -521,7 +512,7 @@
             </div>`;
           }).join('');
       platformCard.innerHTML = `<div class="p-card-title">Map of Knowledge Credentials</div>
-        <div style="max-height:300px;overflow-y:auto">${platRows}</div>`;
+        <div class="p-scroll-sm">${platRows}</div>`;
     }
 
     // ── Qualifications ──
@@ -533,7 +524,7 @@
         : quals.map(function(c) {
             return `<div class="p-cred">
               <div class="p-cred-icon qual">🎓</div>
-              <div style="flex:1;min-width:0">
+              <div class="p-flex-1-noclip">
                 <div class="p-cred-title">${esc(c.title)}${credDelBtn(c.id)}</div>
                 ${c.issuer ? `<div class="p-cred-issuer">${esc(c.issuer)}</div>` : ''}
                 <div class="p-cred-date">${fmtDate(c.awarded_date)}${c.grade ? ` · ${esc(c.grade)}` : ''}</div>
@@ -541,7 +532,7 @@
             </div>`;
           }).join('');
       qualCard.innerHTML = `<div class="p-card-title">Qualifications</div>
-        <div style="max-height:300px;overflow-y:auto">${qualRows}</div>` + credAddForm('qualification', false);
+        <div class="p-scroll-sm">${qualRows}</div>` + credAddForm('qualification', false);
     }
 
     // ── Awards & Endorsements ──
@@ -553,7 +544,7 @@
         : awards.map(function(c) {
             return `<div class="p-cred">
               <div class="p-cred-icon award">⭐</div>
-              <div style="flex:1;min-width:0">
+              <div class="p-flex-1-noclip">
                 <div class="p-cred-title">${esc(c.title)}${credDelBtn(c.id)}</div>
                 ${c.issuer ? `<div class="p-cred-issuer">${esc(c.issuer)}</div>` : ''}
                 <div class="p-cred-date">${fmtDate(c.awarded_date)}${c.grade ? ` · ${esc(c.grade)}` : ''}</div>
@@ -561,7 +552,7 @@
             </div>`;
           }).join('');
       awardsCard.innerHTML = `<div class="p-card-title">Awards &amp; Endorsements</div>
-        <div style="max-height:300px;overflow-y:auto">${awardsRows}</div>` + credAddForm('award', false);
+        <div class="p-scroll-sm">${awardsRows}</div>` + credAddForm('award', false);
     }
 
     // ── Certifications & Badges ──
@@ -573,7 +564,7 @@
         : certs.map(function(c) {
             return `<div class="p-cred">
               <div class="p-cred-icon cert">📋</div>
-              <div style="flex:1;min-width:0">
+              <div class="p-flex-1-noclip">
                 <div class="p-cred-title">${esc(c.title)}${credDelBtn(c.id)}</div>
                 ${c.issuer ? `<div class="p-cred-issuer">${esc(c.issuer)}</div>` : ''}
                 <div class="p-cred-date">${fmtDate(c.awarded_date)}${c.grade ? ` · ${esc(c.grade)}` : ''}</div>
@@ -581,7 +572,7 @@
             </div>`;
           }).join('');
       certsCard.innerHTML = `<div class="p-card-title">Certifications &amp; Badges</div>
-        <div style="max-height:300px;overflow-y:auto">${certRows}</div>` + credAddForm('certification', true);
+        <div class="p-scroll-sm">${certRows}</div>` + credAddForm('certification', true);
     }
   }
 
@@ -641,22 +632,22 @@
       var srcClass = k.source === 'tested' ? 'tested' : k.source === 'self_reported' ? 'self-reported' : 'self-reported';
       var srcLabel = SRC_LABELS[k.source] || '';
       return `<div class="p-prof-row">
-        <div class="p-prof-info" style="flex:1;min-width:0">
+        <div class="p-prof-info p-flex-1-noclip">
           <div class="p-prof-name">${esc(k.label)}</div>
           ${k.breadcrumb ? `<div class="p-prof-sub">${esc(k.breadcrumb)}</div>` : ''}
           <span class="p-source ${srcClass}">${srcLabel}</span>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-          <div style="width:72px;height:4px;background:rgba(58,48,40,0.09);border-radius:2px;overflow:hidden">
-            <div style="width:${pct}%;height:100%;background:${barColor};border-radius:2px"></div>
+        <div class="p-bar-wrap">
+          <div class="p-bar-track">
+            <div class="p-bar-fill" style="width:${pct}%;background:${barColor}"></div>
           </div>
-          <span style="font-size:12px;font-weight:650;color:#2C2820;width:34px;text-align:right">${pct}%</span>
+          <span class="p-bar-pct">${pct}%</span>
         </div>
       </div>`;
     }).join('');
 
     knowledgeCard.innerHTML = `<div class="p-card-title">Knowledge</div>
-      <div style="max-height:480px;overflow-y:auto">${rows}</div>`;
+      <div class="p-scroll-xl">${rows}</div>`;
   }
 
   var _allReflections = [];
@@ -672,25 +663,23 @@
       ? empty('Reflections on your learning will appear here. You can add one when logging an activity.')
       : showing.map(function(r) {
           var eventLine = r.event_title
-            ? `<div style="font-size:11px;color:var(--c6);margin-top:8px">
-                 On: <em>${esc(r.event_title)}</em>${r.event_date ? ' · ' + fmtDate(r.event_date) : ''}
-               </div>`
+            ? `<div class="p-quote-event-line">On: <em>${esc(r.event_title)}</em>${r.event_date ? ' · ' + fmtDate(r.event_date) : ''}</div>`
             : '';
-          return `<div class="p-quote" style="margin-bottom:14px">
-            <div style="font-size:10px;color:var(--c7);margin-bottom:6px">${fmtDate(r.created_at)}</div>
+          return `<div class="p-quote p-quote-entry">
+            <div class="p-quote-date">${fmtDate(r.created_at)}</div>
             "${esc(r.text)}"
             ${eventLine}
           </div>`;
         }).join('');
 
     const moreBtn = remaining > 0
-      ? `<button class="p-edit-btn" onclick="window.loadMoreReflections()" style="margin-top:4px">
+      ? `<button class="p-edit-btn p-edit-btn-load-more" onclick="window.loadMoreReflections()">
            Load more (${remaining} remaining)
          </button>`
       : '';
 
     card.innerHTML = `<div class="p-card-title">Reflections</div>
-      <div style="max-height:380px;overflow-y:auto">${rowsHtml}</div>` + moreBtn;
+      <div class="p-scroll-lg">${rowsHtml}</div>` + moreBtn;
   }
 
   function renderReflections(reflections) {
@@ -718,10 +707,7 @@
     var done     = all.filter(function(g) { return g.status === 'completed'; });
 
     var warning = active.length >= 4
-      ? `<div style="background:var(--accent-s);border:1px solid rgba(196,130,106,0.28);
-           border-radius:10px;padding:10px 14px;font-size:12px;color:#7A4030;margin-bottom:12px">
-           ⚠️ You have ${active.length} active goals. Research shows that focusing on fewer goals leads to better outcomes — consider completing one before adding more.
-         </div>`
+      ? `<div class="p-goal-warning">⚠️ You have ${active.length} active goals. Research shows that focusing on fewer goals leads to better outcomes — consider completing one before adding more.</div>`
       : '';
 
     function goalRow(g) {
@@ -729,54 +715,40 @@
       var setDate  = g.created_at ? 'Set: ' + fmtDate(g.created_at) : '';
       var doneDate = g.completed_at ? ' · Completed: ' + fmtDate(g.completed_at) : '';
       var badge    = isDone
-        ? `<span style="font-size:10px;font-weight:700;letter-spacing:0.6px;color:#5E9052;
-             background:rgba(139,173,126,0.18);padding:2px 8px;border-radius:20px">COMPLETED</span>`
-        : `<span style="font-size:10px;font-weight:700;letter-spacing:0.6px;color:#8A6A3A;
-             background:rgba(196,166,106,0.18);padding:2px 8px;border-radius:20px">IN PROGRESS</span>`;
+        ? `<span class="p-goal-badge-done">COMPLETED</span>`
+        : `<span class="p-goal-badge-active">IN PROGRESS</span>`;
       var completeBtn = !isDone
-        ? `<button onclick="window.completeGoal(${g.id})" title="Mark as completed"
-             style="background:none;border:1px solid rgba(94,144,82,0.35);border-radius:6px;
-             cursor:pointer;font-size:11px;font-weight:600;color:#5E9052;padding:2px 8px;
-             font-family:inherit;transition:background 0.12s">✓ Complete</button>`
+        ? `<button onclick="window.completeGoal(${g.id})" title="Mark as completed" class="p-goal-complete-btn">✓ Complete</button>`
         : '';
-      var delBtn = `<button onclick="window.deleteGoal(${g.id})" title="Remove"
-        style="background:none;border:none;cursor:pointer;color:var(--c7);font-size:15px;
-        padding:0;line-height:1">×</button>`;
-      return `<div style="border-radius:12px;padding:14px 16px;
-          background:rgba(255,255,255,${isDone ? '0.35' : '0.55'});
-          border:1px solid rgba(58,48,40,0.08);margin-bottom:8px;
-          opacity:${isDone ? '0.7' : '1'}">
-        <div style="font-size:13px;color:#2C2820;line-height:1.65;margin-bottom:8px">${esc(g.text)}</div>
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
-          <span style="font-size:11px;color:var(--c6)">${setDate}${doneDate}</span>
-          <div style="display:flex;align-items:center;gap:6px">${badge}${completeBtn}${delBtn}</div>
+      var delBtn = `<button onclick="window.deleteGoal(${g.id})" title="Remove" class="p-goal-delete-btn">×</button>`;
+      return `<div class="p-goal-card ${isDone ? 'p-goal-card-done' : 'p-goal-card-active'}">
+        <div class="p-goal-text">${esc(g.text)}</div>
+        <div class="p-goal-footer">
+          <span class="p-goal-date">${setDate}${doneDate}</span>
+          <div class="p-goal-actions">${badge}${completeBtn}${delBtn}</div>
         </div>
       </div>`;
     }
 
     var activeRows = active.length
       ? active.map(goalRow).join('')
-      : `<div style="font-size:12px;color:var(--c6);font-style:italic;padding:8px 0">No active goals yet.</div>`;
+      : `<div class="p-no-goals-text">No active goals yet.</div>`;
     var doneRows = done.length
-      ? `<div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;
-           color:var(--c7);margin:14px 0 8px">Completed</div>` + done.map(goalRow).join('')
+      ? `<div class="p-goals-completed-label">Completed</div>` + done.map(goalRow).join('')
       : '';
 
     var addForm = `
-      <button class="p-edit-btn" id="goal-add-btn" style="margin-top:10px"
+      <button class="p-edit-btn p-rel-add-btn" id="goal-add-btn"
         onclick="document.getElementById('goal-form').style.display='';this.style.display='none';document.getElementById('goal-textarea').focus()">
         + Add goal
       </button>
-      <div id="goal-form" style="display:none;margin-top:10px">
-        <textarea id="goal-textarea" class="p-edit-input"
-          style="width:100%;min-height:80px;resize:vertical;box-sizing:border-box"
+      <div id="goal-form" style="display:none" class="p-rel-form">
+        <textarea id="goal-textarea" class="p-edit-input p-textarea-full"
           placeholder="Describe your goal…"></textarea>
-        <div style="font-size:11px;color:var(--c6);margin:5px 0 8px;font-style:italic">
-          💡 SMART goals work best: Specific, Measurable, Achievable, Relevant, Time-bound.
-        </div>
-        <div style="display:flex;gap:6px">
-          <button class="p-edit-btn primary" onclick="window.saveGoal()" style="margin-top:0">Add</button>
-          <button class="p-edit-btn" onclick="document.getElementById('goal-form').style.display='none';document.getElementById('goal-add-btn').style.display=''" style="margin-top:0">Cancel</button>
+        <div class="p-goal-smart-hint">💡 SMART goals work best: Specific, Measurable, Achievable, Relevant, Time-bound.</div>
+        <div class="p-flex-row-sm">
+          <button class="p-edit-btn primary p-edit-btn-inline" onclick="window.saveGoal()">Add</button>
+          <button class="p-edit-btn p-edit-btn-inline" onclick="document.getElementById('goal-form').style.display='none';document.getElementById('goal-add-btn').style.display=''">Cancel</button>
         </div>
       </div>`;
 
@@ -872,9 +844,9 @@
   window.editAbout = function () {
     const card = document.getElementById('about-card');
     if (!card) return;
-    const current = card.querySelector('[style]')?.textContent.trim() || '';
+    const current = card.querySelector('.p-about-text')?.textContent.trim() || '';
     card.innerHTML = `
-      <textarea class="p-edit-input" style="width:100%;min-height:140px;resize:vertical" placeholder="Describe how and when and where you learn best, and any special needs that impact your learning…">${esc(current)}</textarea>
+      <textarea class="p-edit-input p-about-edit-textarea" placeholder="Describe how and when and where you learn best, and any special needs that impact your learning…">${esc(current)}</textarea>
       <button class="p-edit-btn primary" onclick="window.saveAbout(this)">Save</button>
       <button class="p-edit-btn" onclick="window.loadProfile()">Cancel</button>`;
   };

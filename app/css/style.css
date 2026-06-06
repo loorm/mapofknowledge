@@ -628,6 +628,21 @@ body { background: var(--map-bg); font-family: system-ui, -apple-system, sans-se
   flex-shrink: 0;
 }
 
+/* ── Map load error message ── */
+.map-load-error {
+  color: white; padding: 20px;
+}
+
+/* ── Tooltip sub-text (continent / layer label) ── */
+.tt-sub {
+  color: #888; font-size: 11px;
+}
+
+/* ── Learn button loading state label ── */
+.sb-learn-loading-label {
+  opacity: 0.75; font-size: 12px;
+}
+
 /* ── Full-screen page overlay (profile / settings / notifications) ── */
 #page-overlay {
   position: fixed;

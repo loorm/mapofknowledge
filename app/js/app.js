@@ -96,7 +96,7 @@ Promise.all([
   init(base, emergent);
   if (window._tourCheckAutoStart) window._tourCheckAutoStart(settings);
 }).catch(() => {
-  document.body.innerHTML = '<div style="color:white;padding:20px">Could not load map — please refresh or log in again.</div>';
+  document.body.innerHTML = '<div class="map-load-error">Could not load map — please refresh or log in again.</div>';
 });
 
 // Load user's knowledge progress and overlay on map
@@ -336,7 +336,7 @@ function init(data, emergentData) {
         .on("end",   (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }))
       .on("mouseover", (e, d) => {
         tt.style.display = "block";
-        tt.innerHTML = `<strong style="color:${d.color}">${d.label}</strong><br><span style="color:#888;font-size:11px">${d.continent}</span>`;
+        tt.innerHTML = `<strong style="color:${d.color}">${d.label}</strong><br><span class="tt-sub">${d.continent}</span>`;
       })
       .on("mousemove", e => { tt.style.left = (e.clientX+14)+"px"; tt.style.top = (e.clientY-10)+"px"; })
       .on("mouseout",  () => { tt.style.display = "none"; })
@@ -452,7 +452,7 @@ function init(data, emergentData) {
         const originalHTML = learnBtn.innerHTML;
         learnBtn.disabled = true;
         learnBtn.innerHTML =
-          '<span style="opacity:0.75;font-size:12px">Creating your learning path</span>' +
+          '<span class="sb-learn-loading-label">Creating your learning path</span>' +
           '<span class="sb-learn-dots">' +
           '<span class="sb-learn-dot"></span>' +
           '<span class="sb-learn-dot"></span>' +
@@ -1015,7 +1015,7 @@ function init(data, emergentData) {
         .on("end",   (e, d) => { if (!e.active) simEmergent.alphaTarget(0); d.fx = null; d.fy = null; }))
       .on("mouseover", (e, d) => {
         tt.style.display = "block";
-        tt.innerHTML = `<strong style="color:${d.color}">${d.label}</strong><br><span style="color:#888;font-size:11px">Emergent field · Layer 2</span>`;
+        tt.innerHTML = `<strong style="color:${d.color}">${d.label}</strong><br><span class="tt-sub">Emergent field · Layer 2</span>`;
       })
       .on("mousemove", e => { tt.style.left = (e.clientX + 14) + "px"; tt.style.top = (e.clientY - 10) + "px"; })
       .on("mouseout",  () => { tt.style.display = "none"; })

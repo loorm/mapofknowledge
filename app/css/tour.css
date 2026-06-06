@@ -141,6 +141,20 @@
 }
 .tour-flash.show { opacity: 1; }
 
+/* ── JS-rendered tour content helpers ── */
+.tour-ico {
+  vertical-align: middle; flex-shrink: 0;
+}
+.tour-row {
+  display: flex; align-items: flex-start; gap: 8px; margin-bottom: 7px;
+}
+.tour-row-icon {
+  margin-top: 1px; color: #6E6358;
+}
+.tour-btn-group {
+  display: flex; gap: 8px;
+}
+
 /* Progress dots */
 .tour-dots {
   display: flex;
