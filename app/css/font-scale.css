@@ -1,0 +1,42 @@
+/* ═══════════════════════════════════════════
+   FONT SCALE  —  font-scale.css
+   Applied via html.fs-medium / html.fs-large
+   Uses CSS zoom on containers — rollback by
+   removing the link tag from HTML files.
+   ═══════════════════════════════════════════ */
+
+/* ── Medium (~14% larger) ─────────────────── */
+html.fs-medium #learning-mode,
+html.fs-medium #testing-mode   { zoom: 1.14; }
+
+html.fs-medium #sidebar .sb-body { zoom: 1.14; }
+
+html.fs-medium .nav-dropdown,
+html.fs-medium #filter-panel,
+html.fs-medium #layer-panel,
+html.fs-medium #search-dropdown { zoom: 1.14; }
+
+html.fs-medium .tour-tooltip    { zoom: 1.14; }
+
+html.fs-medium #profile-main,
+html.fs-medium #profile-nav     { zoom: 1.14; }
+
+html.fs-medium .settings-page   { zoom: 1.14; }
+
+/* ── Large (~28% larger) ─────────────────── */
+html.fs-large #learning-mode,
+html.fs-large #testing-mode    { zoom: 1.28; }
+
+html.fs-large #sidebar .sb-body { zoom: 1.28; }
+
+html.fs-large .nav-dropdown,
+html.fs-large #filter-panel,
+html.fs-large #layer-panel,
+html.fs-large #search-dropdown  { zoom: 1.28; }
+
+html.fs-large .tour-tooltip     { zoom: 1.28; }
+
+html.fs-large #profile-main,
+html.fs-large #profile-nav      { zoom: 1.28; }
+
+html.fs-large .settings-page    { zoom: 1.28; }
