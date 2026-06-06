@@ -117,6 +117,37 @@ router.post('/settings', async (req, res) => {
   }
 });
 
+// ── UI strings (i18n) ────────────────────────────────────────────────────────
+// Per-locale in-memory cache; cleared on server restart.
+// Falls back to 'en' for any keys missing in the requested locale.
+const _stringsCache = {};
+
+router.get('/strings', async (req, res) => {
+  const locale = (req.query.locale || 'en').replace(/[^a-zA-Z-]/g, '').slice(0, 10) || 'en';
+  if (_stringsCache[locale]) {
+    return res.set('Cache-Control', 'public, max-age=300').json(_stringsCache[locale]);
+  }
+  try {
+    const [rows] = await db.execute(
+      'SELECT key_name, value FROM ui_strings WHERE locale = ?', [locale]
+    );
+    const out = {};
+    rows.forEach(r => { out[r.key_name] = r.value; });
+    // Fill missing keys from English fallback
+    if (locale !== 'en') {
+      const [enRows] = await db.execute(
+        'SELECT key_name, value FROM ui_strings WHERE locale = ?', ['en']
+      );
+      enRows.forEach(r => { if (out[r.key_name] === undefined) out[r.key_name] = r.value; });
+    }
+    _stringsCache[locale] = out;
+    res.set('Cache-Control', 'public, max-age=300').json(out);
+  } catch (err) {
+    console.error('[api/strings]', err.message);
+    res.json({});
+  }
+});
+
 // ── Most recent in-progress learning path ────────────────────────────────────
 router.get('/learn/resume', async (req, res) => {
   const passportId = req.user?.passport_id;
