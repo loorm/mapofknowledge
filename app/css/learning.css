@@ -167,9 +167,13 @@
   padding: 14px 20px 20px;
   border-top: 1px solid rgba(58,48,40,0.07);
 }
+@keyframes startBtnPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(94,168,94,0); }
+  50%       { box-shadow: 0 0 0 12px rgba(94,168,94,0.28); }
+}
 .lm-start-btn {
   width: 100%; padding: 14px;
-  background: linear-gradient(135deg, var(--lm-accent) 0%, #B06848 100%);
+  background: linear-gradient(135deg, #6BAF6B 0%, #4E9A4E 100%);
   color: #fff;
   border: none; border-radius: 14px;
   font-size: 15px; font-weight: 650;
@@ -177,6 +181,7 @@
   display: flex; align-items: center; justify-content: center; gap: 9px;
   letter-spacing: 0.1px;
   transition: opacity 0.15s, transform 0.1s;
+  animation: startBtnPulse 2.5s ease-in-out infinite;
 }
 .lm-start-btn:hover { opacity: 0.92; transform: translateY(-1px); }
 .lm-start-btn:active { transform: translateY(0); }
@@ -244,12 +249,16 @@
   transition: background 0.14s, color 0.14s;
 }
 .kn-chip.active {
-  background: var(--lm-accent);
+  background: #5E9A5E;
   color: #fff;
 }
 .kn-chip.done-chip {
-  background: rgba(139,173,126,0.22);
-  color: #508046;
+  background: rgba(94,154,94,0.22);
+  color: #2E7A2E;
+}
+.kn-chip.locked-chip {
+  opacity: 0.4;
+  pointer-events: none;
 }
 
 
@@ -662,6 +671,16 @@
 
 /* ── API-driven additions ── */
 
+/* ── Max content width for readability ── */
+#lm-knobit { align-items: center; }
+#lm-knobit > .kn-nav { width: 100%; align-self: stretch; }
+.kn-stream,
+.kn-action-area {
+  max-width: 760px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* Option buttons (4-button rows in explain / meaning) */
 .kn-option-btn {
   padding: 9px 16px;
@@ -683,6 +702,40 @@
   opacity: 0.45;
   cursor: default;
   pointer-events: none;
+}
+
+/* ── Button colour variants ── */
+@keyframes understandPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(94,154,94,0); }
+  50%       { box-shadow: 0 0 0 8px rgba(94,154,94,0.22); }
+}
+.kn-option-btn.btn-understand {
+  background: rgba(94,154,94,0.10);
+  border-color: rgba(94,154,94,0.40);
+  color: #2E7A2E;
+}
+.kn-option-btn.btn-understand:hover:not(:disabled) {
+  background: rgba(94,154,94,0.20);
+  border-color: rgba(94,154,94,0.60);
+}
+.kn-option-btn.btn-understand:not(:disabled) {
+  animation: understandPulse 2s ease-in-out infinite;
+}
+.kn-option-btn.btn-other {
+  background: rgba(100,130,195,0.09);
+  border-color: rgba(100,130,195,0.35);
+  color: #2E4D8A;
+}
+.kn-option-btn.btn-other:hover:not(:disabled) {
+  background: rgba(100,130,195,0.18);
+}
+.kn-option-btn.btn-adjust {
+  background: rgba(190,155,75,0.09);
+  border-color: rgba(190,155,75,0.35);
+  color: #7A6010;
+}
+.kn-option-btn.btn-adjust:hover:not(:disabled) {
+  background: rgba(190,155,75,0.18);
 }
 
 /* Answer textarea (practice phase) */
@@ -724,8 +777,56 @@
   40%       { transform: scale(1);   opacity: 1;   }
 }
 
-/* Button row container */
-#kn-button-row {
-  display: flex; flex-wrap: wrap; gap: 8px;
-  padding: 10px 0 4px;
+/* Button row in stream */
+.kn-stream .kn-button-row {
+  padding: 4px 0 8px;
+  margin-bottom: 4px;
 }
+
+/* ── Quit confirmation modal ── */
+#quit-knobit-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(44,40,32,0.55);
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.quit-modal-box {
+  background: #F5EEE8;
+  border-radius: 18px;
+  padding: 28px 28px 22px;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(44,40,32,0.18);
+}
+.quit-modal-title {
+  font-size: 17px; font-weight: 700;
+  color: #2C2820; margin-bottom: 10px;
+}
+.quit-modal-text {
+  font-size: 14px; color: #6E6358;
+  line-height: 1.65; margin-bottom: 22px;
+}
+.quit-modal-btns {
+  display: flex; flex-direction: column; gap: 9px;
+}
+.quit-modal-confirm {
+  padding: 13px;
+  background: rgba(58,48,40,0.08);
+  border: none; border-radius: 12px;
+  font-size: 14px; font-weight: 600; font-family: inherit;
+  color: #3A3028; cursor: pointer;
+  transition: background 0.13s;
+}
+.quit-modal-confirm:hover { background: rgba(58,48,40,0.14); }
+.quit-modal-cancel {
+  padding: 13px;
+  background: linear-gradient(135deg, #6BAF6B 0%, #4E9A4E 100%);
+  border: none; border-radius: 12px;
+  font-size: 14px; font-weight: 650; font-family: inherit;
+  color: #fff; cursor: pointer;
+  transition: opacity 0.13s;
+}
+.quit-modal-cancel:hover { opacity: 0.90; }

@@ -33,7 +33,9 @@
 #tm-knobit {
   flex-direction: column;
   overflow: hidden;
+  align-items: center;
 }
+#tm-knobit > .kn-nav { width: 100%; align-self: stretch; }
 
 #tm-complete {
   flex-direction: column;
