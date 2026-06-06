@@ -211,9 +211,8 @@
 
   /* ─── Button rows ─────────────────────────────────────────────── */
   function _setButtonRow(type) {
-    // Leave locked (already-chosen) rows in stream; only remove an active unlocked one
-    if (_streamButtonEl && !_streamButtonEl.classList.contains('row-locked')) {
-      if (_streamButtonEl.parentNode) _streamButtonEl.parentNode.removeChild(_streamButtonEl);
+    if (_streamButtonEl && _streamButtonEl.parentNode) {
+      _streamButtonEl.parentNode.removeChild(_streamButtonEl);
     }
     _streamButtonEl = null;
     if (!type) return;
@@ -545,11 +544,8 @@
 
   function _lockButtons(chosenLabel) {
     if (!_streamButtonEl) return;
-    _streamButtonEl.classList.add('row-locked');
-    _streamButtonEl.querySelectorAll('button').forEach(function (b) {
-      b.classList.add('choice-locked');
-      b.disabled = true;
-    });
+    if (_streamButtonEl.parentNode) _streamButtonEl.parentNode.removeChild(_streamButtonEl);
+    _streamButtonEl = null;
   }
 
   function _getLastContent(types) {

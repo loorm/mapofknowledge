@@ -168,8 +168,8 @@
   border-top: 1px solid rgba(58,48,40,0.07);
 }
 @keyframes startBtnPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(94,168,94,0); }
-  50%       { box-shadow: 0 0 0 12px rgba(94,168,94,0.28); }
+  0%, 100% { box-shadow: 0 0 2px rgba(94,168,94,0); }
+  50%       { box-shadow: 0 0 22px rgba(94,168,94,0.50); }
 }
 .lm-start-btn {
   width: 100%; padding: 14px;
@@ -706,8 +706,8 @@
 
 /* ── Button colour variants ── */
 @keyframes understandPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(94,154,94,0); }
-  50%       { box-shadow: 0 0 0 8px rgba(94,154,94,0.22); }
+  0%, 100% { box-shadow: 0 0 2px rgba(94,154,94,0); }
+  50%       { box-shadow: 0 0 14px rgba(94,154,94,0.45); }
 }
 .kn-option-btn.btn-understand {
   background: rgba(94,154,94,0.10);
@@ -719,7 +719,7 @@
   border-color: rgba(94,154,94,0.60);
 }
 .kn-option-btn.btn-understand:not(:disabled) {
-  animation: understandPulse 2s ease-in-out infinite;
+  animation: understandPulse 2s ease-in-out 3;
 }
 .kn-option-btn.btn-other {
   background: rgba(100,130,195,0.09);
