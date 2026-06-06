@@ -68,7 +68,7 @@
     const aboutCard = document.getElementById('about-card');
     if (aboutCard) {
       aboutCard.innerHTML = `<div class="p-card-title">Learning needs and preferences</div>` + (about
-        ? `<div class="p-kv-value" style="font-size:13px;color:#4A4038;line-height:1.75;white-space:pre-wrap">${esc(about)}</div>
+        ? `<div class="p-kv-value" style="font-size:13px;color:var(--c2);line-height:1.75;white-space:pre-wrap">${esc(about)}</div>
            <button class="p-edit-btn" onclick="window.editAbout()">Edit</button>`
         : `${empty('Describe how and when and where you learn best, and any special needs that impact your learning.')}
            <button class="p-edit-btn" onclick="window.editAbout()">Add</button>`);
@@ -84,18 +84,18 @@
 
     const iHtml = interests.length
       ? interests.map(t => `<span class="p-tag interest">${esc(t.text)}</span>`).join('')
-      : '<span style="color:#9A8E86;font-size:12px">None added yet</span>';
+      : '<span style="color:var(--c6);font-size:12px">None added yet</span>';
     const vHtml = values.length
       ? values.map(t => `<span class="p-tag value">${esc(t.text)}</span>`).join('')
-      : '<span style="color:#9A8E86;font-size:12px">None added yet</span>';
+      : '<span style="color:var(--c6);font-size:12px">None added yet</span>';
 
     card.innerHTML = `
       <div style="margin-bottom:13px">
-        <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#8A7E72;margin-bottom:8px">Core interests</div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--c5);margin-bottom:8px">Core interests</div>
         <div class="p-tags">${iHtml}</div>
       </div>
       <div>
-        <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#8A7E72;margin-bottom:8px">Values</div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--c5);margin-bottom:8px">Values</div>
         <div class="p-tags">${vHtml}</div>
       </div>
       <button class="p-edit-btn" onclick="window.editInterests()">Edit</button>`;
@@ -124,9 +124,9 @@
         const interests = (d.tags || []).filter(t => t.type === 'interest');
         const values    = (d.tags || []).filter(t => t.type === 'value');
         document.getElementById('tag-list-interest').innerHTML =
-          interests.length ? interests.map(tagRow).join('') : '<span style="color:#9A8E86;font-size:12px">None yet</span>';
+          interests.length ? interests.map(tagRow).join('') : '<span style="color:var(--c6);font-size:12px">None yet</span>';
         document.getElementById('tag-list-value').innerHTML =
-          values.length ? values.map(tagRow).join('') : '<span style="color:#9A8E86;font-size:12px">None yet</span>';
+          values.length ? values.map(tagRow).join('') : '<span style="color:var(--c6);font-size:12px">None yet</span>';
       });
     }
     window._rebuildTags = rebuild;
@@ -136,13 +136,13 @@
       const values    = (d.tags || []).filter(t => t.type === 'value');
       card.innerHTML = `
         <div style="margin-bottom:16px">
-          <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#8A7E72;margin-bottom:8px">Core interests</div>
-          <div class="p-tags" id="tag-list-interest">${interests.length ? interests.map(tagRow).join('') : '<span style="color:#9A8E86;font-size:12px">None yet</span>'}</div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--c5);margin-bottom:8px">Core interests</div>
+          <div class="p-tags" id="tag-list-interest">${interests.length ? interests.map(tagRow).join('') : '<span style="color:var(--c6);font-size:12px">None yet</span>'}</div>
           ${addRow('interest')}
         </div>
         <div>
-          <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#8A7E72;margin-bottom:8px">Values</div>
-          <div class="p-tags" id="tag-list-value">${values.length ? values.map(tagRow).join('') : '<span style="color:#9A8E86;font-size:12px">None yet</span>'}</div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--c5);margin-bottom:8px">Values</div>
+          <div class="p-tags" id="tag-list-value">${values.length ? values.map(tagRow).join('') : '<span style="color:var(--c6);font-size:12px">None yet</span>'}</div>
           ${addRow('value')}
         </div>
         <button class="p-edit-btn" onclick="window.loadProfile()" style="margin-top:14px">Done</button>`;
@@ -218,17 +218,17 @@
       const label  = t === 'all' ? 'All' : t.charAt(0).toUpperCase() + t.slice(1);
       const active = _evFilter.type === t;
       return `<button onclick="window.setEvTypeFilter('${t}')"
-        style="padding:3px 10px;border-radius:20px;border:1.5px solid ${active ? '#C4826A' : 'rgba(58,48,40,0.12)'};
-        background:${active ? 'rgba(196,130,106,0.10)' : 'transparent'};
-        color:${active ? '#C4826A' : '#8A7E72'};font-size:11px;font-weight:600;font-family:inherit;cursor:pointer">${label}</button>`;
+        style="padding:3px 10px;border-radius:20px;border:1.5px solid ${active ? 'var(--accent)' : 'var(--i12)'};
+        background:${active ? 'var(--accent-s)' : 'transparent'};
+        color:${active ? 'var(--accent)' : 'var(--c5)'};font-size:11px;font-weight:600;font-family:inherit;cursor:pointer">${label}</button>`;
     }).join('');
 
     const hasDates  = _evFilter.dateFrom || _evFilter.dateTo;
     const clearBtn  = hasDates
       ? `<button onclick="window.clearEvDates()" title="Clear date filter"
-           style="width:18px;height:18px;border-radius:50%;background:rgba(58,48,40,0.10);
+           style="width:18px;height:18px;border-radius:50%;background:var(--i10);
            border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
-           color:#8A7E72;font-size:10px;line-height:1;flex-shrink:0;transition:background 0.12s">✕</button>`
+           color:var(--c5);font-size:10px;line-height:1;flex-shrink:0;transition:background 0.12s">✕</button>`
       : '';
 
     const filterRow = `
@@ -237,7 +237,7 @@
         <div style="display:flex;gap:4px;margin-left:auto;align-items:center">
           <input type="date" class="p-edit-input" style="padding:3px 6px;font-size:11px;width:100px"
             value="${_evFilter.dateFrom}" onblur="window.setEvDateFilter('from',this.value)">
-          <span style="font-size:11px;color:#9A8E86">–</span>
+          <span style="font-size:11px;color:var(--c6)">–</span>
           <input type="date" class="p-edit-input" style="padding:3px 6px;font-size:11px;width:100px"
             value="${_evFilter.dateTo}" onblur="window.setEvDateFilter('to',this.value)">
           ${clearBtn}
@@ -257,7 +257,7 @@
           }
           var delBtn = ev.user_created
             ? `<button onclick="window.deleteEvent(${ev.id})" title="Remove"
-                 style="background:none;border:none;cursor:pointer;color:#B0A496;font-size:15px;padding:0 0 0 6px;line-height:1;vertical-align:middle">×</button>`
+                 style="background:none;border:none;cursor:pointer;color:var(--c7);font-size:15px;padding:0 0 0 6px;line-height:1;vertical-align:middle">×</button>`
             : '';
           return `<div class="p-ledger-row">
             <div class="p-ledger-date">${fmtDate(ev.event_date)}</div>
@@ -282,7 +282,7 @@
         onclick="document.getElementById('ev-form').style.display='';this.style.display='none';document.getElementById('ev-title').focus()">
         + Add activity
       </button>
-      <div id="ev-form" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid rgba(58,48,40,0.07)">
+      <div id="ev-form" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--i07)">
         <div style="display:grid;gap:8px">
           <input id="ev-title" class="p-edit-input" placeholder="What you studied or attended (required)">
           <div style="display:flex;gap:8px">
@@ -349,7 +349,7 @@
 
     function delBtn(id) {
       return `<button onclick="window.deleteRelationship(${id})" title="Remove"
-        style="background:none;border:none;cursor:pointer;color:#B0A496;font-size:15px;padding:0 0 0 6px;line-height:1;vertical-align:middle">×</button>`;
+        style="background:none;border:none;cursor:pointer;color:var(--c7);font-size:15px;padding:0 0 0 6px;line-height:1;vertical-align:middle">×</button>`;
     }
 
     function addForm(type, fields, btnLabel) {
@@ -429,7 +429,7 @@
       var provRows = !providers.length
         ? empty('Add universities, courses, apps, and tools that shaped your learning.')
         : providers.map(function(r) {
-            var catBadge = `<span style="font-size:10px;color:#9A8E86;margin-left:6px">${r.type === 'tool' ? 'Tool' : 'Institution'}</span>`;
+            var catBadge = `<span style="font-size:10px;color:var(--c6);margin-left:6px">${r.type === 'tool' ? 'Tool' : 'Institution'}</span>`;
             return `<div class="p-entry">
               <div class="p-entry-header">
                 <div class="p-entry-title">${esc(r.name)}${catBadge}${delBtn(r.id)}</div>
@@ -478,7 +478,7 @@
 
     function credDelBtn(id) {
       return `<button onclick="window.deleteCredential(${id})" title="Remove"
-        style="background:none;border:none;cursor:pointer;color:#B0A496;font-size:15px;padding:0 0 0 6px;line-height:1;vertical-align:middle">×</button>`;
+        style="background:none;border:none;cursor:pointer;color:var(--c7);font-size:15px;padding:0 0 0 6px;line-height:1;vertical-align:middle">×</button>`;
     }
 
     function credAddForm(type, hasMonth) {
@@ -626,8 +626,8 @@
 
     var BAR_COLORS = {
       tested:        '#8BAD7E',
-      self_reported: '#C4826A',
-      estimated:     '#B0A496',
+      self_reported: 'var(--accent)',
+      estimated:     'var(--c7)',
     };
     var SRC_LABELS = {
       tested:        'Tested',
@@ -672,12 +672,12 @@
       ? empty('Reflections on your learning will appear here. You can add one when logging an activity.')
       : showing.map(function(r) {
           var eventLine = r.event_title
-            ? `<div style="font-size:11px;color:#9A8E86;margin-top:8px">
+            ? `<div style="font-size:11px;color:var(--c6);margin-top:8px">
                  On: <em>${esc(r.event_title)}</em>${r.event_date ? ' · ' + fmtDate(r.event_date) : ''}
                </div>`
             : '';
           return `<div class="p-quote" style="margin-bottom:14px">
-            <div style="font-size:10px;color:#B0A496;margin-bottom:6px">${fmtDate(r.created_at)}</div>
+            <div style="font-size:10px;color:var(--c7);margin-bottom:6px">${fmtDate(r.created_at)}</div>
             "${esc(r.text)}"
             ${eventLine}
           </div>`;
@@ -718,7 +718,7 @@
     var done     = all.filter(function(g) { return g.status === 'completed'; });
 
     var warning = active.length >= 4
-      ? `<div style="background:rgba(196,130,106,0.10);border:1px solid rgba(196,130,106,0.28);
+      ? `<div style="background:var(--accent-s);border:1px solid rgba(196,130,106,0.28);
            border-radius:10px;padding:10px 14px;font-size:12px;color:#7A4030;margin-bottom:12px">
            ⚠️ You have ${active.length} active goals. Research shows that focusing on fewer goals leads to better outcomes — consider completing one before adding more.
          </div>`
@@ -740,7 +740,7 @@
              font-family:inherit;transition:background 0.12s">✓ Complete</button>`
         : '';
       var delBtn = `<button onclick="window.deleteGoal(${g.id})" title="Remove"
-        style="background:none;border:none;cursor:pointer;color:#B0A496;font-size:15px;
+        style="background:none;border:none;cursor:pointer;color:var(--c7);font-size:15px;
         padding:0;line-height:1">×</button>`;
       return `<div style="border-radius:12px;padding:14px 16px;
           background:rgba(255,255,255,${isDone ? '0.35' : '0.55'});
@@ -748,7 +748,7 @@
           opacity:${isDone ? '0.7' : '1'}">
         <div style="font-size:13px;color:#2C2820;line-height:1.65;margin-bottom:8px">${esc(g.text)}</div>
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
-          <span style="font-size:11px;color:#9A8E86">${setDate}${doneDate}</span>
+          <span style="font-size:11px;color:var(--c6)">${setDate}${doneDate}</span>
           <div style="display:flex;align-items:center;gap:6px">${badge}${completeBtn}${delBtn}</div>
         </div>
       </div>`;
@@ -756,10 +756,10 @@
 
     var activeRows = active.length
       ? active.map(goalRow).join('')
-      : `<div style="font-size:12px;color:#9A8E86;font-style:italic;padding:8px 0">No active goals yet.</div>`;
+      : `<div style="font-size:12px;color:var(--c6);font-style:italic;padding:8px 0">No active goals yet.</div>`;
     var doneRows = done.length
       ? `<div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;
-           color:#B0A496;margin:14px 0 8px">Completed</div>` + done.map(goalRow).join('')
+           color:var(--c7);margin:14px 0 8px">Completed</div>` + done.map(goalRow).join('')
       : '';
 
     var addForm = `
@@ -771,7 +771,7 @@
         <textarea id="goal-textarea" class="p-edit-input"
           style="width:100%;min-height:80px;resize:vertical;box-sizing:border-box"
           placeholder="Describe your goal…"></textarea>
-        <div style="font-size:11px;color:#9A8E86;margin:5px 0 8px;font-style:italic">
+        <div style="font-size:11px;color:var(--c6);margin:5px 0 8px;font-style:italic">
           💡 SMART goals work best: Specific, Measurable, Achievable, Relevant, Time-bound.
         </div>
         <div style="display:flex;gap:6px">

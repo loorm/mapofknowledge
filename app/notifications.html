@@ -6,7 +6,7 @@
 <title>Notifications — Map of Knowledge</title>
 <link rel="stylesheet" href="css/palette.css">
 <link rel="stylesheet" href="css/style.css">
-<script>fetch('/api/settings').then(function(r){return r.json();}).then(function(s){var p=s.palette;if(p&&p!=='sunset')document.documentElement.classList.add('palette-'+p);}).catch(function(){});</script>
+<script>fetch('/api/settings').then(function(r){return r.json();}).then(function(s){var p=s.palette==='midnight'?'vampire':s.palette;if(p&&p!=='sunset')document.documentElement.classList.add('palette-'+p);}).catch(function(){});</script>
 <style>
 
 /* ── page overrides ── */

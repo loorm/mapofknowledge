@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="css/palette.css">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/font-scale.css">
-<script>fetch('/api/settings').then(function(r){return r.json();}).then(function(s){var f=s.font_size;if(f==='medium')document.documentElement.classList.add('fs-medium');if(f==='large')document.documentElement.classList.add('fs-large');var p=s.palette;if(p&&p!=='sunset')document.documentElement.classList.add('palette-'+p);window._loadedSettings=s;}).catch(function(){});</script>
+<script>fetch('/api/settings').then(function(r){return r.json();}).then(function(s){var f=s.font_size;if(f==='medium')document.documentElement.classList.add('fs-medium');if(f==='large')document.documentElement.classList.add('fs-large');var p=s.palette==='midnight'?'vampire':s.palette;if(p&&p!=='sunset')document.documentElement.classList.add('palette-'+p);window._loadedSettings=s;}).catch(function(){});</script>
 <style>
 
 /* ── page ── */
@@ -359,13 +359,13 @@ body {
           </div>
           <span class="st-palette-name">Nordic</span>
         </button>
-        <button class="st-palette-card" data-value="midnight">
+        <button class="st-palette-card" data-value="vampire">
           <div class="st-palette-swatch">
             <span style="background:#111420"></span>
             <span style="background:#E8906A"></span>
             <span style="background:#E8ECF8"></span>
           </div>
-          <span class="st-palette-name">Midnight</span>
+          <span class="st-palette-name">Vampire</span>
         </button>
         <button class="st-palette-card" data-value="candystore">
           <div class="st-palette-swatch">
@@ -531,12 +531,12 @@ body {
       b.classList.toggle('active', b === btn);
     });
     const palVal = btn.dataset.value;
-    document.documentElement.classList.remove('palette-nordic', 'palette-midnight', 'palette-candystore');
+    document.documentElement.classList.remove('palette-nordic', 'palette-vampire', 'palette-candystore');
     if (palVal !== 'sunset') document.documentElement.classList.add('palette-' + palVal);
     // Propagate to parent frame (map page) immediately — settings runs as an overlay iframe
     try {
       if (window.parent !== window && window.parent.document) {
-        window.parent.document.documentElement.classList.remove('palette-nordic', 'palette-midnight', 'palette-candystore');
+        window.parent.document.documentElement.classList.remove('palette-nordic', 'palette-vampire', 'palette-candystore');
         if (palVal !== 'sunset') window.parent.document.documentElement.classList.add('palette-' + palVal);
       }
     } catch(e) {}
