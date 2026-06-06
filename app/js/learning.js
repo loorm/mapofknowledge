@@ -475,7 +475,7 @@
     _showLoadingBlock();
 
     var context = _streamBlocks.slice(-3).map(function (b) { return b.content || ''; }).join(' ');
-    apiInteract({ phase: 'ask', question: q, context: context })
+    apiInteract({ phase: 'ask', action: _phase, question: q, context: context })
       .then(function (d) {
         _removeLoadingBlock();
         _appendBlock({ type: 'note', content: d.text || '' });
