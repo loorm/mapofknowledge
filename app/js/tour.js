@@ -11,40 +11,62 @@
   'use strict';
 
   var _step = 0;
-  var _overlay, _spot, _tip;
+  var _overlay, _spot, _tip, _flash, _flashTimer;
 
-  /* ─── Step definitions ─────────────────────────────────────── */
+  /* ─── Inline icon helpers ──────────────────────────────────── */
+  function _ico(d, s) {
+    s = s || 13;
+    return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 15 15" fill="none" style="vertical-align:middle;flex-shrink:0">'+d+'</svg>';
+  }
+  var _icoGlobe   = _ico('<circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 7.5h12M7.5 1.5c-2 2-2 8 0 12M7.5 1.5c2 2 2 8 0 12" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>');
+  var _icoLayers  = _ico('<path d="M7.5 2 L13 5.5 L7.5 9 L2 5.5 Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M2 9L7.5 12.5L13 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>');
+  var _icoFilter  = _ico('<path d="M2 4.5h11M4 7.5h7M6 10.5h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>');
+  var _icoZoomIn  = _ico('<circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M6 4v4M4 6h4M10 10l2.5 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>');
+  var _icoZoomOut = _ico('<circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M4 6h4M10 10l2.5 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>');
+  var _icoTiltUp  = _ico('<ellipse cx="7.5" cy="10" rx="5.5" ry="2" stroke="currentColor" stroke-width="1.2"/><ellipse cx="7.5" cy="7" rx="5.5" ry="2" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 2"/><path d="M7.5 4V1M6 2.5l1.5-1.5 1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>');
+  var _icoTiltDn  = _ico('<ellipse cx="7.5" cy="5" rx="5.5" ry="2" stroke="currentColor" stroke-width="1.2"/><ellipse cx="7.5" cy="8" rx="5.5" ry="2" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 2"/><path d="M7.5 11v3M6 12.5l1.5 1.5 1.5-1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>');
+
+  function _row(icon, label, desc) {
+    return '<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:7px">'
+      + '<span style="margin-top:1px;color:#6E6358">'+icon+'</span>'
+      + '<span><strong>'+label+'</strong>'+(desc?' — '+desc:'')+'</span></div>';
+  }
+
+  /* ─── Step definitions (order: sidebar → zoom → controls → learning → passport) ── */
   var STEPS = [
+    {
+      target:   '#sidebar',
+      position: 'left',
+      title:    'Welcome — this is a learning platform',
+      text:     'Click any node on the map to open its sidebar. From here you can <strong>mark it as known</strong>, run a <strong>4-question knowledge test</strong>, or start a <strong>guided learning session</strong>.<br><br>No curriculum. No prerequisites. Complete freedom to learn whatever you want, in any order.',
+      before: function() {
+        if (window.MapView && window.MapView.openDemoNode) window.MapView.openDemoNode();
+      },
+      after: function() {
+        if (window.MapView && window.MapView.closeSidebar) window.MapView.closeSidebar();
+      },
+      padding: 0,
+    },
     {
       target:   '#ctrl-zoom',
       position: 'left',
-      title:    'Welcome to the Map of Knowledge',
-      text:     'Every concept humans have ever studied — over 10,000 of them — organised as an interactive graph. Use these controls to zoom in and explore, drag nodes around, and click anything that catches your eye.',
-      padding:  10,
+      title:    'Explore the map',
+      text:     'Navigate with the controls here:<br><br>'
+        + _row(_icoZoomIn,  'Zoom in')
+        + _row(_icoZoomOut, 'Zoom out')
+        + _row(_icoTiltUp,  'Tilt', 'view the map in 3D')
+        + _row(_icoTiltDn,  'Flatten', 'return to top-down view')
+        + '<br>Drag any node to rearrange. Over 10,000 concepts across all domains of human knowledge.',
+      padding: 10,
     },
     {
       target:   '#ctrl-left-stack',
       position: 'right',
-      title:    'Navigate the map',
-      text:     '<strong>Layers</strong> shows or hides entire knowledge domains. <strong>Filters</strong> focuses the map on a specific curriculum or learning goal. The <strong>Search box</strong> at the top finds any of the 10,000+ topics instantly and jumps straight to it.',
-      padding:  14,
-    },
-    {
-      target:   '#sidebar',
-      position: 'left',
-      title:    'Learn anything. In any order.',
-      text:     'Click any node to open its sidebar. From here you can <strong>mark it as known</strong>, run a <strong>4-question knowledge test</strong>, or start a <strong>guided learning session</strong>.<br><br>No curriculum. No prerequisites. No one telling you what to study next. Complete freedom.',
-      before: function() {
-        if (window.MapView && window.MapView.openDemoNode) {
-          window.MapView.openDemoNode();
-        }
-      },
-      after: function() {
-        if (window.MapView && window.MapView.closeSidebar) {
-          window.MapView.closeSidebar();
-        }
-      },
-      padding: 0,
+      title:    'Map controls',
+      text:     _row(_icoGlobe,  'Map view',  'reset to full overview')
+        + _row(_icoLayers, 'Layers',   'show or hide knowledge domains')
+        + _row(_icoFilter, 'Filters',  'focus on a specific curriculum or learning goal'),
+      padding: 14,
     },
     {
       target:   '#learning-mode',
@@ -52,10 +74,8 @@
       title:    'Learning mode &amp; knobits',
       text:     'Guided learning breaks each topic into <strong>knobits</strong> — small, focused units you master one at a time. Each knobit walks you through four phases:<br><br><em>Explain → Demonstrate → Practice → Meaning</em><br><br>You set the pace. You can ask anything at any time using the field at the bottom.',
       before: function () {
-        // Raise learning-mode above the tour overlay so it shows through
         var lm = document.getElementById('learning-mode');
         if (lm) lm.style.zIndex = '9500';
-        // Open with mock content — no API calls (negative IDs never match)
         if (window.Learn && window.Learn.open) {
           window.Learn.open(
             { id: 'tour-demo', label: 'Quantum Mechanics', color: '#5BC8D8' },
@@ -85,10 +105,26 @@
     },
   ];
 
+  /* ─── Flash message ────────────────────────────────────────── */
+  function _flashMsg(text) {
+    if (!_flash) {
+      _flash = document.createElement('div');
+      _flash.className = 'tour-flash';
+      document.body.appendChild(_flash);
+    }
+    _flash.textContent = text;
+    _flash.classList.add('show');
+    clearTimeout(_flashTimer);
+    _flashTimer = setTimeout(function() { _flash.classList.remove('show'); }, 1800);
+  }
+
   /* ─── DOM setup ────────────────────────────────────────────── */
   function _createDOM() {
     _overlay = document.createElement('div');
     _overlay.className = 'tour-overlay';
+    _overlay.addEventListener('click', function() {
+      _flashMsg('The app is available after the tour. Use Next → to continue.');
+    });
 
     _spot = document.createElement('div');
     _spot.className = 'tour-spotlight';

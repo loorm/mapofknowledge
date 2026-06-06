@@ -35,7 +35,7 @@ function labelOpacity(level, zoom) {
   return 0;
 }
 
-const FONT_SIZE   = { 1: 13, 2: 11, 3: 10, 4: 9, 5: 8 };
+let FONT_SIZE = { 1: 13, 2: 11, 3: 10, 4: 9, 5: 8 };
 const FONT_WEIGHT = { 1: 600, 2: 500, 3: 400, 4: 400, 5: 400 };
 const NODE_OFFSET = { 1: 20, 2: 13, 3: 10, 4: 8, 5: 7 };
 const TOP_BAR_H   = 52;
@@ -80,6 +80,11 @@ Promise.all([
   fetch('/api/settings').then(r => r.json()).catch(() => ({})),
 ]).then(([{ base, emergent }, settings]) => {
   simPreset = SIM_PRESETS[settings.map_animation] || SIM_PRESETS.moderate;
+  // Apply font scale
+  const fs = settings.font_size;
+  document.documentElement.classList.remove('fs-medium', 'fs-large');
+  if (fs === 'medium') { document.documentElement.classList.add('fs-medium'); FONT_SIZE = { 1: 15, 2: 13, 3: 11, 4: 10, 5: 9 }; }
+  if (fs === 'large')  { document.documentElement.classList.add('fs-large');  FONT_SIZE = { 1: 17, 2: 14, 3: 12, 4: 11, 5: 10 }; }
   init(base, emergent);
   if (window._tourCheckAutoStart) window._tourCheckAutoStart(settings);
 }).catch(() => {

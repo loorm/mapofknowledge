@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Settings — Map of Knowledge</title>
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/font-scale.css">
+<script>fetch('/api/settings').then(function(r){return r.json();}).then(function(s){var f=s.font_size;if(f==='medium')document.documentElement.classList.add('fs-medium');if(f==='large')document.documentElement.classList.add('fs-large');}).catch(function(){});</script>
 <style>
 
 /* ── page ── */
@@ -274,6 +276,18 @@ body {
 
     <div class="settings-row">
       <div class="settings-row-text">
+        <div class="settings-row-label">Font size</div>
+        <div class="settings-row-desc">Adjust text size across the app.</div>
+      </div>
+      <div class="st-picker" id="font-size-picker">
+        <button class="st-picker-btn active" data-value="small">Small</button>
+        <button class="st-picker-btn" data-value="medium">Medium</button>
+        <button class="st-picker-btn" data-value="large">Large</button>
+      </div>
+    </div>
+
+    <div class="settings-row">
+      <div class="settings-row-text">
         <div class="settings-row-label">Map animation</div>
         <div class="settings-row-desc">How much the knowledge graph moves.</div>
       </div>
@@ -441,6 +455,34 @@ body {
     sfAddOpen.style.display = '';
     document.getElementById('sf-filter-name').value = '';
     document.getElementById('sf-filter-labels').value = '';
+  });
+
+  /* ── Font size picker ── */
+  const fontPicker = document.getElementById('font-size-picker');
+
+  fetch('/api/settings')
+    .then(r => r.json())
+    .then(s => {
+      const val = s.font_size || 'small';
+      fontPicker.querySelectorAll('.st-picker-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.value === val);
+      });
+    }).catch(() => {});
+
+  fontPicker.addEventListener('click', function(e) {
+    const btn = e.target.closest('.st-picker-btn');
+    if (!btn) return;
+    fontPicker.querySelectorAll('.st-picker-btn').forEach(function(b) {
+      b.classList.toggle('active', b === btn);
+    });
+    document.documentElement.classList.remove('fs-medium', 'fs-large');
+    if (btn.dataset.value === 'medium') document.documentElement.classList.add('fs-medium');
+    if (btn.dataset.value === 'large')  document.documentElement.classList.add('fs-large');
+    fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: 'font_size', value: btn.dataset.value }),
+    });
   });
 
   /* ── Animation picker ── */
