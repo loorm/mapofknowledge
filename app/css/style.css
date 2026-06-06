@@ -617,3 +617,24 @@ body { background: #080810; font-family: system-ui, -apple-system, sans-serif; o
   .topbar-logo-text { display: none; }
 }
 
+/* ── Notification unread indicators ─────────── */
+.topbar-burger { position: relative; }
+#topbar-notif-dot {
+  display: none;
+  position: absolute; top: 7px; right: 7px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #C4826A;
+  border: 1.5px solid #3A2820;
+  pointer-events: none;
+}
+.nav-dropdown-item { position: relative; }
+#nav-notif-badge {
+  display: none;
+  margin-left: auto;
+  background: #C4826A; color: #fff;
+  font-size: 10px; font-weight: 700;
+  padding: 1px 6px; border-radius: 10px;
+  min-width: 18px; text-align: center;
+  flex-shrink: 0;
+}
+
