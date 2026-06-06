@@ -59,6 +59,9 @@
 
   /* ── Node-color blend alpha (per palette) ── */
   --node-alpha: 0.13;
+
+  /* ── Semantic success green ── */
+  --color-success: #8BAD7E;
 }
 
 
@@ -107,8 +110,9 @@ html.palette-nordic {
   --i18: rgba(13,31,48,0.24);
   --i25: rgba(13,31,48,0.32);
 
-  --overlay:    rgba(6,18,32,0.65);
-  --node-alpha: 0.10;
+  --overlay:       rgba(6,18,32,0.65);
+  --node-alpha:    0.10;
+  --color-success: #2E8A50;
 }
 
 
@@ -158,8 +162,9 @@ html.palette-vampire {
   --i18: rgba(200,210,240,0.36);
   --i25: rgba(200,210,240,0.48);
 
-  --overlay:    rgba(0,0,8,0.75);
-  --node-alpha: 0.18;
+  --overlay:       rgba(0,0,8,0.75);
+  --node-alpha:    0.18;
+  --color-success: #5EAA80;
 }
 
 /* Midnight: white/near-white card backgrounds → dark surfaces */
@@ -328,109 +333,79 @@ html.palette-candystore {
   --i18: rgba(0,0,0,0.30);
   --i25: rgba(0,0,0,0.40);
 
-  --overlay:    rgba(0,0,0,0.65);
-  --node-alpha: 0.14;
+  --overlay:       rgba(0,0,0,0.65);
+  --node-alpha:    0.14;
+  --color-success: #18B818;
 }
 
-/* Candystore: notification icon blobs → vivid solid colours */
-html.palette-candystore .notif-icon.amber   { background: #FFD000; }
-html.palette-candystore .notif-icon.sage    { background: #18C018; }
+/* ═══════════════════════════════════════════
+   CANDYSTORE OVERRIDES — zero pastels
+   Every semantic colour: solid, fully saturated
+   ═══════════════════════════════════════════ */
+
+/* Notification icons */
+html.palette-candystore .notif-icon.amber    { background: #FFD000; }
+html.palette-candystore .notif-icon.sage     { background: #18B818; }
 html.palette-candystore .notif-icon.lavender { background: #7040E0; }
-html.palette-candystore .notif-icon.terra   { background: var(--accent); }
-html.palette-candystore .notif-icon svg     { color: #fff; }
-html.palette-candystore .notif-tab.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-  font-weight: 700;
-}
-html.palette-candystore .notif-unread-dot { background: var(--accent); }
+html.palette-candystore .notif-icon.terra    { background: var(--accent); }
+html.palette-candystore .notif-icon svg      { color: #fff; }
+html.palette-candystore .notif-tab.active    { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+html.palette-candystore .notif-unread-dot    { background: var(--accent); }
 
-/* Candystore: ALL semantic colours get full saturation — no more pastels */
+/* ── Green: all toggles, done states, success, start ── */
+html.palette-candystore .st-toggle.on,
+html.palette-candystore .sb-toggle.on        { background: #18B818; }
 
-/* Success / done / correct → Lego bright green */
-html.palette-candystore .sb-toggle.on { background: #18B818; }
-html.palette-candystore .sb-knowledge-badge {
-  background: #D4F0D4;
-  color: #0A7010;
-}
+html.palette-candystore .sb-knowledge-badge  { background: #18B818; color: #fff; }
+
 html.palette-candystore .lm-start-btn,
-html.palette-candystore .quit-modal-cancel {
-  background: linear-gradient(135deg, #18C018 0%, #0EA00E 100%);
-}
-html.palette-candystore .kn-chip.active {
-  background: #18B818;
-  color: #fff;
-}
-html.palette-candystore .kn-chip.done-chip {
-  background: #C8ECC8;
-  color: #0A6010;
-}
+html.palette-candystore .quit-modal-cancel   { background: linear-gradient(135deg, #18C018 0%, #0EA00E 100%); }
+
+html.palette-candystore .kn-chip.active      { background: #18B818; color: #fff; }
+html.palette-candystore .kn-chip.done-chip   { background: #18B818; color: #fff; }
+
+html.palette-candystore .lm-knobit-item.done .kn-index { background: #18B818; color: #fff; }
+
 html.palette-candystore .kn-option-btn.btn-understand {
-  background: #C8ECC8;
-  border: 2px solid #18B818;
-  color: #0A6010;
-  font-weight: 650;
+  background: #18B818; border: 2px solid #0E9A0E; color: #fff; font-weight: 700;
 }
 html.palette-candystore .kn-option-btn.btn-understand:hover:not(:disabled) {
-  background: #A8DCA8;
-  border-color: #0E9A0E;
+  background: #14A014; border-color: #0A8010; color: #fff;
 }
+
 html.palette-candystore .block-feedback.feedback-correct {
-  background: #D4F0D4;
-  border: 1.5px solid #18B818;
+  background: #18B818; border: 2px solid #0E9A0E;
 }
-html.palette-candystore .block-feedback.feedback-correct .block-label { color: #0A7010; }
-html.palette-candystore .lm-knobit-item.done .kn-index {
-  background: #C8ECC8;
-  color: #0A6010;
-}
+html.palette-candystore .block-feedback.feedback-correct .block-label,
+html.palette-candystore .block-feedback.feedback-correct .block-body { color: #fff; }
 
-/* Incorrect → sharp red (reuses accent) */
+/* ── Red: incorrect feedback ── */
 html.palette-candystore .block-feedback.feedback-incorrect {
-  background: #FAD8D8;
-  border: 1.5px solid #C4151C;
+  background: var(--accent); border: 2px solid var(--accent-dark);
 }
-html.palette-candystore .block-feedback.feedback-incorrect .block-label { color: #9E0A10; }
+html.palette-candystore .block-feedback.feedback-incorrect .block-label,
+html.palette-candystore .block-feedback.feedback-incorrect .block-body { color: #fff; }
 
-/* Adjust / rephrase → Lego yellow */
+/* ── Yellow: adjust/rephrase ── */
 html.palette-candystore .kn-option-btn.btn-adjust {
-  background: #FFF0A0;
-  border: 2px solid #DDB800;
-  color: #6A4800;
-  font-weight: 650;
+  background: #FFD000; border: 2px solid #CC9E00; color: #1A1A1A; font-weight: 700;
 }
 html.palette-candystore .kn-option-btn.btn-adjust:hover:not(:disabled) {
-  background: #FFE050;
-  border-color: #BB9A00;
+  background: #F0C000; border-color: #BB9A00;
 }
 
-/* Other/secondary → Lego bright blue */
+/* ── Blue: other/secondary ── */
 html.palette-candystore .kn-option-btn.btn-other {
-  background: #C8DEF8;
-  border: 2px solid #1060C8;
-  color: #0840A0;
-  font-weight: 650;
+  background: #0070CC; border: 2px solid #0050A0; color: #fff; font-weight: 700;
 }
 html.palette-candystore .kn-option-btn.btn-other:hover:not(:disabled) {
-  background: #A0C4F4;
-  border-color: #0848B0;
+  background: #0060B8; border-color: #0040A0;
 }
 
-/* Progress fills → accent (red) */
+html.palette-candystore .btn.btn-secondary         { background: #7040E0; border-color: #5030C0; color: #fff; }
+html.palette-candystore .btn.btn-secondary:hover   { background: #6030D0; border-color: #4020B0; }
+
+/* ── Progress / phase dividers ── */
 html.palette-candystore .lm-progress-fill,
-html.palette-candystore .kn-progress-fill { background: var(--accent); }
-
-/* Phase divider text */
-html.palette-candystore .phase-divider span { color: var(--accent); opacity: 1; }
-
-/* btn-secondary (used for "secondary" option buttons in lesson) */
-html.palette-candystore .btn.btn-secondary {
-  background: #E0D8F8;
-  border-color: #6050C8;
-  color: #3020A0;
-}
-html.palette-candystore .btn.btn-secondary:hover {
-  background: #C8BCF4;
-  border-color: #4030B8;
-}
+html.palette-candystore .kn-progress-fill          { background: var(--accent); }
+html.palette-candystore .phase-divider span        { color: var(--accent); opacity: 1; }

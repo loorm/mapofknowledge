@@ -625,7 +625,7 @@
     }
 
     var BAR_COLORS = {
-      tested:        '#8BAD7E',
+      tested:        'var(--color-success)',
       self_reported: 'var(--accent)',
       estimated:     'var(--c7)',
     };
