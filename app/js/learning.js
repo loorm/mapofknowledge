@@ -33,6 +33,10 @@
   var _PHASES = ['explain', 'demonstrate', 'practice', 'meaning'];
   var MAX_EXPLAIN_BYTES = 6;
 
+  var _knobitStarted  = false;
+  var _streamButtonEl = null;
+  var _quitCallback   = null;
+
   /* ─── API helper ──────────────────────────────────────────────── */
   function apiInteract(params) {
     var knobit = KNOBITS[CURRENT_KNOBIT_IDX];
@@ -82,6 +86,7 @@
   };
 
   window.closeLearningMode = function () {
+    _knobitStarted = false;
     var overlay = document.getElementById('learning-mode');
     if (overlay) overlay.classList.remove('active');
     // Restore search box — always, whether hidden by learning or test mode
@@ -126,8 +131,9 @@
     KNOBITS.forEach(function (k, i) {
       var done    = i < KNOBIT_DONE_COUNT;
       var current = i === CURRENT_KNOBIT_IDX;
+      var locked  = !done && !current;
       var item    = document.createElement('div');
-      item.className = 'lm-knobit-item' + (done ? ' done' : '') + (current ? ' current' : '');
+      item.className = 'lm-knobit-item' + (done ? ' done' : '') + (current ? ' current' : '') + (locked ? ' locked' : '');
 
       var num       = document.createElement('div');
       num.className = 'lm-knobit-num';
@@ -150,6 +156,8 @@
   window.startKnobit = function () {
     if (!KNOBITS.length || _starting) return;
     _starting = true;
+    _knobitStarted  = true;
+    _streamButtonEl = null;
     var k = KNOBITS[CURRENT_KNOBIT_IDX];
 
     _streamBlocks   = [];
@@ -168,7 +176,7 @@
     showLmView('lm-knobit');
 
     _setButtonRow('');
-    _appendPhaseDivider('Explain');
+    _appendPhaseDivider('Step 1 of 4: Read all explanations');
     _showLoadingBlock();
 
     apiInteract({ phase: 'explain', byteIndex: 0, priorChoices: [] })
@@ -190,26 +198,36 @@
     var bar  = document.getElementById('kn-progress-fill-bar');
     if (bar) bar.style.width = (pcts[phase] || 0) + '%';
 
-    document.querySelectorAll('.kn-chip').forEach(function (chip) {
+    document.querySelectorAll('#lm-knobit .kn-chip').forEach(function (chip) {
       var cp  = chip.dataset.phase;
       var pi  = _PHASES.indexOf(phase);
       var ci  = _PHASES.indexOf(cp);
-      chip.classList.remove('active', 'done-chip');
-      if (cp === phase) chip.classList.add('active');
-      else if (ci < pi)  chip.classList.add('done-chip');
+      chip.classList.remove('active', 'done-chip', 'locked-chip');
+      if (cp === phase)   chip.classList.add('active');
+      else if (ci < pi)   chip.classList.add('done-chip');
+      else if (ci > pi)   chip.classList.add('locked-chip');
     });
   }
 
   /* ─── Button rows ─────────────────────────────────────────────── */
   function _setButtonRow(type) {
-    var area = document.getElementById('kn-button-row');
-    if (!area) return;
-    area.innerHTML = '';
+    // Leave locked (already-chosen) rows in stream; only remove an active unlocked one
+    if (_streamButtonEl && !_streamButtonEl.classList.contains('row-locked')) {
+      if (_streamButtonEl.parentNode) _streamButtonEl.parentNode.removeChild(_streamButtonEl);
+    }
+    _streamButtonEl = null;
     if (!type) return;
 
-    function btn(label, handler) {
+    var s = document.getElementById('kn-stream');
+    if (!s) return;
+
+    var area = document.createElement('div');
+    area.className = 'kn-button-row';
+    _streamButtonEl = area;
+
+    function btn(label, handler, cls) {
       var b = document.createElement('button');
-      b.className   = 'kn-option-btn';
+      b.className   = 'kn-option-btn' + (cls ? ' ' + cls : '');
       b.textContent = label;
       b.addEventListener('click', handler);
       area.appendChild(b);
@@ -217,29 +235,32 @@
     }
 
     if (type === 'explain-options') {
-      btn('I understand',       function () { window.explainOpt('ok');      });
-      btn("I don't understand", function () { window.explainOpt('no');      });
-      btn('Too simplistic',     function () { window.explainOpt('simpler'); });
-      btn('Too complex',        function () { window.explainOpt('complex'); });
+      btn('I understand',       function () { window.explainOpt('ok');      }, 'btn-understand');
+      btn("I don't understand", function () { window.explainOpt('no');      }, 'btn-other');
+      btn('Too simplistic',     function () { window.explainOpt('simpler'); }, 'btn-adjust');
+      btn('Too complex',        function () { window.explainOpt('complex'); }, 'btn-adjust');
     } else if (type === 'demo-1') {
-      btn('View next example',  function () { window.demoOpt('next');    });
+      btn('View next example',  function () { window.demoOpt('next');    }, 'btn-other');
     } else if (type === 'demo-2') {
-      btn('I understand, no more needed', function () { window.demoOpt('ok');      });
-      btn('Give me another',              function () { window.demoOpt('another'); });
+      btn('I understand, no more needed', function () { window.demoOpt('ok');      }, 'btn-understand');
+      btn('Give me another',              function () { window.demoOpt('another'); }, 'btn-other');
     } else if (type === 'demo-3') {
-      btn('I understand — ready to practice', function () { window.demoOpt('ok');       });
-      btn("Still don't understand",           function () { window.demoOpt('still-no'); });
+      btn('I understand — ready to practice', function () { window.demoOpt('ok');       }, 'btn-understand');
+      btn("Still don't understand",           function () { window.demoOpt('still-no'); }, 'btn-other');
     } else if (type === 'practice-submit') {
       btn('Submit answer', function () { window.practiceSubmit(); });
     } else if (type === 'practice-next') {
-      btn('Yes, next problem', function () { window.practiceNext(); });
-      btn("No, I'm done",      function () { window.practiceDone(); });
+      btn('Yes, next problem', function () { window.practiceNext(); }, 'btn-other');
+      btn("No, I'm done",      function () { window.practiceDone(); }, 'btn-understand');
     } else if (type === 'meaning-options') {
-      btn('I understand',       function () { window.meaningOpt('ok');      });
-      btn("I don't understand", function () { window.meaningOpt('no');      });
-      btn('Too simplistic',     function () { window.meaningOpt('simpler'); });
-      btn('Too complex',        function () { window.meaningOpt('complex'); });
+      btn('I understand',       function () { window.meaningOpt('ok');      }, 'btn-understand');
+      btn("I don't understand", function () { window.meaningOpt('no');      }, 'btn-other');
+      btn('Too simplistic',     function () { window.meaningOpt('simpler'); }, 'btn-adjust');
+      btn('Too complex',        function () { window.meaningOpt('complex'); }, 'btn-adjust');
     }
+
+    s.appendChild(area);
+    _scrollStream();
   }
 
   /* ─── Explain ─────────────────────────────────────────────────── */
@@ -276,7 +297,7 @@
 
   /* ─── Demonstrate ─────────────────────────────────────────────── */
   function _enterDemonstrate() {
-    _appendPhaseDivider('Demonstrate');
+    _appendPhaseDivider('Step 2 of 4: Review the demonstration');
     _demoIdx = 0;
     _setPhase('demonstrate');
     _fetchDemo();
@@ -317,7 +338,7 @@
 
   /* ─── Practice ────────────────────────────────────────────────── */
   function _enterPractice() {
-    _appendPhaseDivider('Practice');
+    _appendPhaseDivider('Step 3 of 4: Practice it yourself');
     _practiceIdx = 0;
     _setPhase('practice');
     _fetchPractice();
@@ -384,7 +405,7 @@
 
   /* ─── Meaning ─────────────────────────────────────────────────── */
   function _enterMeaning() {
-    _appendPhaseDivider('Meaning');
+    _appendPhaseDivider('Step 4 of 4: Discover the Meaning');
     _setPhase('meaning');
     _showLoadingBlock();
     apiInteract({ phase: 'meaning' })
@@ -416,6 +437,7 @@
 
   /* ─── Knobit completion ───────────────────────────────────────── */
   function _completeKnobit() {
+    _knobitStarted = false;
     var k = KNOBITS[CURRENT_KNOBIT_IDX];
     KNOBIT_DONE_COUNT++;
     apiComplete(k.id);
@@ -467,9 +489,11 @@
   function _appendPhaseDivider(name) {
     var s = document.getElementById('kn-stream');
     if (!s) return;
-    var d       = document.createElement('div');
+    var d    = document.createElement('div');
     d.className = 'phase-divider';
-    d.textContent = '── ' + name + ' ──';
+    var span = document.createElement('span');
+    span.textContent = name;
+    d.appendChild(span);
     s.appendChild(d);
     _scrollStream();
   }
@@ -520,9 +544,9 @@
   }
 
   function _lockButtons(chosenLabel) {
-    var area = document.getElementById('kn-button-row');
-    if (!area) return;
-    area.querySelectorAll('button').forEach(function (b) {
+    if (!_streamButtonEl) return;
+    _streamButtonEl.classList.add('row-locked');
+    _streamButtonEl.querySelectorAll('button').forEach(function (b) {
       b.classList.add('choice-locked');
       b.disabled = true;
     });
@@ -555,13 +579,27 @@
     _appendBlock({ type: 'note', content: 'Connection error — please try again.' });
   }
 
+  /* ─── Quit guard ──────────────────────────────────────────────── */
+  function _quitGuard(callback) {
+    if (!_knobitStarted) { callback(); return; }
+    _quitCallback = callback;
+    var modal = document.getElementById('quit-knobit-modal');
+    if (modal) modal.style.display = 'flex';
+  }
+
+  window.tryLeaveKnobit = function () {
+    _quitGuard(function () {
+      _buildPathView();
+      showLmView('lm-path');
+    });
+  };
+
+  window.tryCloseLearningMode = function () {
+    _quitGuard(window.closeLearningMode);
+  };
+
   /* ─── Static event wiring ─────────────────────────────────────── */
   document.addEventListener('DOMContentLoaded', function () {
-    var backBtn = document.getElementById('kn-back');
-    if (backBtn) backBtn.addEventListener('click', function () {
-      _buildPathView(); showLmView('lm-path');
-    });
-
     var askInp = document.getElementById('kn-ask-input');
     if (askInp) askInp.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); window.sendAsk(); }
@@ -578,6 +616,28 @@
 
     var reviewBtn = document.querySelector('.lm-complete-btn-ghost');
     if (reviewBtn) reviewBtn.addEventListener('click', function () { showLmView('lm-path'); });
+
+    var quitConfirm = document.getElementById('quit-modal-confirm');
+    if (quitConfirm) quitConfirm.addEventListener('click', function () {
+      var modal = document.getElementById('quit-knobit-modal');
+      if (modal) modal.style.display = 'none';
+      _knobitStarted = false;
+      if (_quitCallback) { _quitCallback(); _quitCallback = null; }
+    });
+
+    var quitCancel = document.getElementById('quit-modal-cancel');
+    if (quitCancel) quitCancel.addEventListener('click', function () {
+      var modal = document.getElementById('quit-knobit-modal');
+      if (modal) modal.style.display = 'none';
+      _quitCallback = null;
+    });
+
+    window.addEventListener('beforeunload', function (e) {
+      if (_knobitStarted) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
   });
 
 })();
