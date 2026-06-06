@@ -100,7 +100,7 @@ Promise.all([
   init(base, emergent);
   if (window._tourCheckAutoStart) window._tourCheckAutoStart(settings);
 }).catch(() => {
-  document.body.innerHTML = '<div class="map-load-error">Could not load map — please refresh or log in again.</div>';
+  document.body.innerHTML = '<div class="map-load-error">' + t('msg.map_load_error') + '</div>';
 });
 
 // Load user's knowledge progress and overlay on map
@@ -378,7 +378,7 @@ function init(data, emergentData) {
     sim.force("link").links(simEdges);
     sim.alpha(0.4).restart();
 
-    document.getElementById("node-count").textContent = `${simNodes.length} nodes visible`;
+    document.getElementById("node-count").textContent = simNodes.length + ' ' + t('label.nodes_visible');
     updateLabels();
   }
 
@@ -456,7 +456,7 @@ function init(data, emergentData) {
         const originalHTML = learnBtn.innerHTML;
         learnBtn.disabled = true;
         learnBtn.innerHTML =
-          '<span class="sb-learn-loading-label">Creating your learning path</span>' +
+          '<span class="sb-learn-loading-label">' + t('msg.creating_path') + '</span>' +
           '<span class="sb-learn-dots">' +
           '<span class="sb-learn-dot"></span>' +
           '<span class="sb-learn-dot"></span>' +
@@ -496,7 +496,7 @@ function init(data, emergentData) {
     // Learn this — only active for L5 nodes
     if (learnBtnEl) {
       const learnLabel = learnBtnEl.querySelector('.sb-learn-label');
-      if (learnLabel) learnLabel.textContent = 'Learn this';
+      if (learnLabel) learnLabel.textContent = t('btn.learn_this');
       if (d.level === 5) {
         learnBtnEl.disabled = false;
         learnBtnEl.style.opacity = '';
@@ -505,7 +505,7 @@ function init(data, emergentData) {
           .then(r => r.json())
           .then(({ done, total }) => {
             if (done > 0 && done < total && learnLabel) {
-              learnLabel.textContent = `Continue (${done}/${total})`;
+              learnLabel.textContent = t('label.continue') + ' (' + done + '/' + total + ')';
             }
           }).catch(() => {});
       } else {
@@ -538,7 +538,7 @@ function init(data, emergentData) {
 
     // Overview
     if (sbOverview) {
-      sbOverview.textContent = 'Loading…';
+      sbOverview.textContent = t('msg.loading');
       fetch(`/api/nodes/${nodeExtId}/overview`)
         .then(r => r.json())
         .then(({ overview }) => { if (sbOverview) sbOverview.textContent = overview || ''; })
@@ -561,7 +561,7 @@ function init(data, emergentData) {
           if (!sbPct) return;
           sbPct.textContent = `${percentage}%`;
           if (sbBadge) {
-            const sourceLabel = { tested: 'Tested', self_reported: 'Self-reported', estimated: 'Estimated' };
+            const sourceLabel = { tested: t('label.tested'), self_reported: t('label.self_reported'), estimated: t('label.estimated') };
             sbBadge.textContent = sourceLabel[source] || '';
           }
           if (sbToggle) {
@@ -594,7 +594,7 @@ function init(data, emergentData) {
           body: JSON.stringify({ percentage: pct, source: 'self_reported' }),
         }).then(r => r.json()).then(({ percentage }) => {
           if (sbPct) sbPct.textContent = `${percentage}%`;
-          if (sbBadge) sbBadge.textContent = percentage >= 100 ? 'Self-reported' : '';
+          if (sbBadge) sbBadge.textContent = percentage >= 100 ? t('label.self_reported') : '';
         }).catch(() => {});
       });
     }
@@ -1019,7 +1019,7 @@ function init(data, emergentData) {
         .on("end",   (e, d) => { if (!e.active) simEmergent.alphaTarget(0); d.fx = null; d.fy = null; }))
       .on("mouseover", (e, d) => {
         tt.style.display = "block";
-        tt.innerHTML = `<strong style="color:${d.color}">${d.label}</strong><br><span class="tt-sub">Emergent field · Layer 2</span>`;
+        tt.innerHTML = `<strong style="color:${d.color}">${d.label}</strong><br><span class="tt-sub">${t('label.emergent_field_tooltip')}</span>`;
       })
       .on("mousemove", e => { tt.style.left = (e.clientX + 14) + "px"; tt.style.top = (e.clientY - 10) + "px"; })
       .on("mouseout",  () => { tt.style.display = "none"; })

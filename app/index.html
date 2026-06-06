@@ -40,7 +40,7 @@
         <circle cx="5.5" cy="5.5" r="3.8" stroke="currentColor" stroke-width="1.3"/>
         <line x1="8.5" y1="8.5" x2="11.5" y2="11.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
       </svg>
-      <input id="search-box" type="text" placeholder="Search knowledge…" />
+      <input id="search-box" type="text" placeholder="Search knowledge…" data-i18n-placeholder="placeholder.search_knowledge" />
       <button id="search-clear" class="search-clear" title="Clear" style="display:none">✕</button>
       <div id="search-dropdown" class="search-dropdown"></div>
     </div>
@@ -59,20 +59,20 @@
             <circle cx="7.5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.2"/>
             <path d="M2 13c0-2.8 2.5-4.5 5.5-4.5s5.5 1.7 5.5 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
           </svg>
-          Account
+          <span data-i18n="nav.account">Account</span>
         </button>
         <button class="nav-dropdown-item" onclick="openOverlay('notifications.html')">
           <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
             <path d="M7.5 1.5a4 4 0 0 0-4 4v2.5L2.5 9.5h10l-1-1.5V5.5a4 4 0 0 0-4-4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
             <path d="M6 11.5a1.5 1.5 0 0 0 3 0" stroke="currentColor" stroke-width="1.2"/>
           </svg>
-          Notifications
+          <span data-i18n="nav.notifications">Notifications</span>
           <span id="nav-notif-badge"></span>
         </button>
         <div class="nav-dropdown-divider"></div>
         <button class="nav-dropdown-item" onclick="openOverlay('settings.html')">
           <img src="images/icon-settings.svg" width="15" height="15" alt="">
-          Settings
+          <span data-i18n="nav.settings">Settings</span>
         </button>
         <div class="nav-dropdown-divider"></div>
         <button class="nav-dropdown-item" onclick="window.location='/auth/logout'">
@@ -80,7 +80,7 @@
             <path d="M5.5 7.5h7M10 5l2.5 2.5L10 10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M8 3H3a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
           </svg>
-          Log out
+          <span data-i18n="nav.log_out">Log out</span>
         </button>
       </div>
     </div>
@@ -114,7 +114,7 @@
     </div>
     <div class="continue-chip-body">
       <div class="continue-chip-text">
-        <div class="continue-chip-label">Continue</div>
+        <div class="continue-chip-label" data-i18n="label.continue">Continue</div>
         <div class="continue-chip-topic" id="continue-chip-topic">—</div>
       </div>
       <span class="continue-chip-progress" id="continue-chip-progress"></span>
@@ -161,16 +161,16 @@
      ════════════════════════════════════════ -->
 <div id="layer-panel" class="ctrl-card">
   <div class="fp-header">
-    <span class="fp-title">Layers</span>
+    <span class="fp-title" data-i18n="label.layers">Layers</span>
   </div>
   <div class="fp-list">
     <div class="layer-item" data-layer="base">
       <div class="layer-checkbox checked" style="--lc-color:#6E9EDD"></div>
-      <span class="fp-label">Foundational Knowledge</span>
+      <span class="fp-label" data-i18n="label.foundational_knowledge">Foundational Knowledge</span>
     </div>
     <div class="layer-item" data-layer="emergent">
       <div class="layer-checkbox" style="--lc-color:#C4A55A"></div>
-      <span class="fp-label">Emergent Knowledge</span>
+      <span class="fp-label" data-i18n="label.emergent_knowledge">Emergent Knowledge</span>
     </div>
   </div>
 </div>
@@ -182,7 +182,7 @@
 <div id="filter-panel" class="ctrl-card">
 
   <div class="fp-header">
-    <span class="fp-title">Filter</span>
+    <span class="fp-title" data-i18n="label.filter">Filter</span>
     <div style="display:flex;align-items:center;gap:2px">
       <a class="fp-settings-link" href="settings.html#filters" title="Manage filters">
         <svg width="12" height="12" viewBox="0 0 12 12">
@@ -201,7 +201,7 @@
          style="--fi-color:#9B8FB5">
       <div class="fp-radio"></div>
       <div class="fp-dot"></div>
-      <span class="fp-label">My Knowledge</span>
+      <span class="fp-label" data-i18n="label.my_knowledge">My Knowledge</span>
     </div>
 
   </div>
@@ -257,7 +257,7 @@
     <!-- Your Knowledge card -->
     <div class="sb-knowledge-card">
       <div class="sb-knowledge-header">
-        <span class="sb-knowledge-label">Your Knowledge</span>
+        <span class="sb-knowledge-label" data-i18n="sidebar.your_knowledge">Your Knowledge</span>
         <span class="sb-knowledge-badge">Finished</span>
       </div>
       <div class="sb-pct">0%</div>
@@ -270,7 +270,7 @@
           <path d="M7.5 1.5a4 4 0 0 1 2.8 6.8V11a.5.5 0 0 1-.5.5h-4.6A.5.5 0 0 1 4.7 11V8.3A4 4 0 0 1 7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
           <path d="M5 13h5M5.5 14.5h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
         </svg>
-        I know this
+        <span data-i18n="sidebar.i_know_this">I know this</span>
       </div>
       <div class="sb-toggle">
         <div class="sb-toggle-thumb"></div>
@@ -283,7 +283,7 @@
         <rect x="1.5" y="1.5" width="12" height="12" rx="2.5" stroke="white" stroke-width="1.2"/>
         <path d="M5 7.5h5M7.5 5v5" stroke="white" stroke-width="1.4" stroke-linecap="round"/>
       </svg>
-      Test me
+      <span data-i18n="btn.test_me">Test me</span>
     </button>
 
     <!-- Learn this -->
@@ -295,13 +295,13 @@
       <span class="sb-learn-label">Learn this</span>
     </button>
 
-    <p class="sb-inactive-hint" id="sb-inactive-hint">
+    <p class="sb-inactive-hint" id="sb-inactive-hint" data-i18n="sidebar.inactive_hint">
       Learning and testing are available at the most detailed level — explore deeper into this topic.
     </p>
 
     <!-- Overview -->
     <div>
-      <div class="sb-section-title">Overview</div>
+      <div class="sb-section-title" data-i18n="sidebar.overview">Overview</div>
       <div class="sb-overview-text">
         A fundamental theory in physics describing the physical properties of matter at the scale of atoms and subatomic particles. It is the foundation of all quantum physics including quantum chemistry, quantum field theory, and quantum information science.
       </div>
@@ -353,7 +353,7 @@
           <circle cx="7.5" cy="7.5" r="6" stroke="white" stroke-width="1.3"/>
           <path d="M6 5l4 2.5L6 10V5z" fill="white"/>
         </svg>
-        <span id="lm-start-btn-label">Start learning</span>
+        <span id="lm-start-btn-label" data-i18n="btn.start_learning">Start learning</span>
       </button>
     </div>
   </div><!-- /lm-path -->
@@ -376,10 +376,10 @@
         </div>
       </div>
       <div class="kn-phase-chips">
-        <span class="kn-chip locked-chip" id="chip-explain"     data-phase="explain">Explain</span>
-        <span class="kn-chip locked-chip" id="chip-demonstrate" data-phase="demonstrate">Demo</span>
-        <span class="kn-chip locked-chip" id="chip-practice"    data-phase="practice">Practice</span>
-        <span class="kn-chip locked-chip" id="chip-meaning"     data-phase="meaning">Meaning</span>
+        <span class="kn-chip locked-chip" id="chip-explain"     data-phase="explain"     data-i18n="phase.explain">Explain</span>
+        <span class="kn-chip locked-chip" id="chip-demonstrate" data-phase="demonstrate" data-i18n="phase.demo">Demo</span>
+        <span class="kn-chip locked-chip" id="chip-practice"    data-phase="practice"    data-i18n="phase.practice">Practice</span>
+        <span class="kn-chip locked-chip" id="chip-meaning"     data-phase="meaning"     data-i18n="phase.meaning">Meaning</span>
       </div>
     </div>
 
@@ -389,7 +389,7 @@
     <!-- sticky action area -->
     <div class="kn-action-area" id="kn-action-area">
       <div class="ask-bar">
-        <input type="text" class="ask-input" id="kn-ask-input" placeholder="Ask anything about this knobit…" autocomplete="off">
+        <input type="text" class="ask-input" id="kn-ask-input" placeholder="Ask anything about this knobit…" data-i18n-placeholder="placeholder.ask_knobit" autocomplete="off">
         <button class="ask-send" id="kn-ask-send" title="Send">
           <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
             <path d="M13 7.5L2 2l2.5 5.5L2 13l11-5.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
@@ -409,7 +409,7 @@
           stroke="#C4826A" stroke-width="1.8" stroke-linejoin="round"/>
       </svg>
     </div>
-    <div class="lm-complete-title">Unit complete!</div>
+    <div class="lm-complete-title" data-i18n="msg.unit_complete">Unit complete!</div>
     <div class="lm-complete-sub">
       You've finished all 7 knobits in <strong>Linear Equations</strong>.
       You're building real fluency — keep the momentum going.
@@ -431,10 +431,10 @@
     </div>
 
     <div class="lm-complete-actions">
-      <button class="lm-complete-btn-primary" onclick="closeLearningMode()">
+      <button class="lm-complete-btn-primary" onclick="closeLearningMode()" data-i18n="btn.back_to_map">
         Back to the map
       </button>
-      <button class="lm-complete-btn-ghost" onclick="showLmView('lm-path')">
+      <button class="lm-complete-btn-ghost" onclick="showLmView('lm-path')" data-i18n="btn.review_unit">
         Review this unit
       </button>
     </div>
@@ -485,7 +485,7 @@
           <circle cx="7.5" cy="7.5" r="6" stroke="white" stroke-width="1.3"/>
           <path d="M6 5l4 2.5L6 10V5z" fill="white"/>
         </svg>
-        <span id="tm-start-btn-label">Start learning</span>
+        <span id="tm-start-btn-label" data-i18n="btn.start_learning">Start learning</span>
       </button>
     </div>
   </div><!-- /tm-path -->
@@ -522,7 +522,7 @@
     <div class="kn-action-area" id="tn-action-area">
       <div class="kn-button-row" id="tn-button-row"></div>
       <div class="ask-bar">
-        <input type="text" class="ask-input" id="tm-ask-input" placeholder="Ask anything…" autocomplete="off">
+        <input type="text" class="ask-input" id="tm-ask-input" placeholder="Ask anything…" data-i18n-placeholder="placeholder.ask_anything" autocomplete="off">
         <button class="ask-send" id="tm-ask-send" title="Send">
           <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
             <path d="M13 7.5L2 2l2.5 5.5L2 13l11-5.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
@@ -542,7 +542,7 @@
           stroke="#C4826A" stroke-width="1.8" stroke-linejoin="round"/>
       </svg>
     </div>
-    <div class="lm-complete-title">Unit complete!</div>
+    <div class="lm-complete-title" data-i18n="msg.unit_complete">Unit complete!</div>
     <div class="lm-complete-sub">
       You've finished all 7 knobits in <strong>Linear Equations</strong>.
       You're building real fluency — keep the momentum going.
@@ -564,10 +564,10 @@
     </div>
 
     <div class="lm-complete-actions">
-      <button class="lm-complete-btn-primary" onclick="closeTestingMode()">
+      <button class="lm-complete-btn-primary" onclick="closeTestingMode()" data-i18n="btn.back_to_map">
         Back to the map
       </button>
-      <button class="lm-complete-btn-ghost" onclick="showTmView('tm-path')">
+      <button class="lm-complete-btn-ghost" onclick="showTmView('tm-path')" data-i18n="btn.review_unit">
         Review this unit
       </button>
     </div>
@@ -589,11 +589,11 @@
      ════════════════════════════════════════ -->
 <div id="quit-knobit-modal" style="display:none">
   <div class="quit-modal-box">
-    <div class="quit-modal-title">Leave this knobit?</div>
-    <div class="quit-modal-text">An uncompleted knobit cannot be continued — it must be restarted from the beginning if you quit now.</div>
+    <div class="quit-modal-title" data-i18n="msg.quit_knobit_title">Leave this knobit?</div>
+    <div class="quit-modal-text" data-i18n="msg.quit_knobit_text">An uncompleted knobit cannot be continued — it must be restarted from the beginning if you quit now.</div>
     <div class="quit-modal-btns">
-      <button class="quit-modal-cancel" id="quit-modal-cancel">Keep learning</button>
-      <button class="quit-modal-confirm" id="quit-modal-confirm">Yes, quit</button>
+      <button class="quit-modal-cancel" id="quit-modal-cancel" data-i18n="btn.keep_learning">Keep learning</button>
+      <button class="quit-modal-confirm" id="quit-modal-confirm" data-i18n="btn.yes_quit">Yes, quit</button>
     </div>
   </div>
 </div>

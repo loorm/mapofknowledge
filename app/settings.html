@@ -47,20 +47,20 @@
             <circle cx="7.5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.2"/>
             <path d="M2 13c0-2.8 2.5-4.5 5.5-4.5s5.5 1.7 5.5 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
           </svg>
-          Account
+          <span data-i18n="nav.account">Account</span>
         </button>
         <button class="nav-dropdown-item" onclick="window.location='notifications.html'">
           <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
             <path d="M7.5 1.5a4 4 0 0 0-4 4v2.5L2.5 9.5h10l-1-1.5V5.5a4 4 0 0 0-4-4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
             <path d="M6 11.5a1.5 1.5 0 0 0 3 0" stroke="currentColor" stroke-width="1.2"/>
           </svg>
-          Notifications
+          <span data-i18n="nav.notifications">Notifications</span>
           <span id="nav-notif-badge"></span>
         </button>
         <div class="nav-dropdown-divider"></div>
         <button class="nav-dropdown-item active-page">
           <img src="images/icon-settings.svg" width="15" height="15" alt="">
-          Settings
+          <span data-i18n="nav.settings">Settings</span>
         </button>
         <div class="nav-dropdown-divider"></div>
         <button class="nav-dropdown-item" onclick="window.top.location='/auth/logout'">
@@ -68,7 +68,7 @@
             <path d="M5.5 7.5h7M10 5l2.5 2.5L10 10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M8 3H3a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
           </svg>
-          Log out
+          <span data-i18n="nav.log_out">Log out</span>
         </button>
       </div>
     </div>
@@ -82,16 +82,16 @@
      ════════════════════════════════════════ -->
 <main class="settings-page">
 
-  <h1 class="settings-title">Settings</h1>
+  <h1 class="settings-title" data-i18n="settings.title">Settings</h1>
 
   <!-- MAP BEHAVIOUR -->
   <div class="settings-section">
-    <div class="settings-section-label">Map behaviour</div>
+    <div class="settings-section-label" data-i18n="settings.map_behaviour">Map behaviour</div>
 
     <div class="settings-row">
       <div class="settings-row-text">
-        <div class="settings-row-label">Screen saver</div>
-        <div class="settings-row-desc">After one minute of inactivity the map slowly pans and zooms through the knowledge graph.</div>
+        <div class="settings-row-label" data-i18n="settings.screensaver">Screen saver</div>
+        <div class="settings-row-desc" data-i18n="settings.screensaver_desc">After one minute of inactivity the map slowly pans and zooms through the knowledge graph.</div>
       </div>
       <button class="st-toggle on" id="screensaver-toggle" aria-label="Toggle screen saver">
         <div class="st-toggle-thumb"></div>
@@ -100,33 +100,33 @@
 
     <div class="settings-row">
       <div class="settings-row-text">
-        <div class="settings-row-label">Font size</div>
-        <div class="settings-row-desc">Adjust text size across the app.</div>
+        <div class="settings-row-label" data-i18n="settings.font_size">Font size</div>
+        <div class="settings-row-desc" data-i18n="settings.font_size_desc">Adjust text size across the app.</div>
       </div>
       <div class="st-picker" id="font-size-picker">
-        <button class="st-picker-btn active" data-value="small">Small</button>
-        <button class="st-picker-btn" data-value="medium">Medium</button>
-        <button class="st-picker-btn" data-value="large">Large</button>
+        <button class="st-picker-btn active" data-value="small" data-i18n="settings.size_small">Small</button>
+        <button class="st-picker-btn" data-value="medium" data-i18n="settings.size_medium">Medium</button>
+        <button class="st-picker-btn" data-value="large" data-i18n="settings.size_large">Large</button>
       </div>
     </div>
 
     <div class="settings-row">
       <div class="settings-row-text">
-        <div class="settings-row-label">Map animation</div>
-        <div class="settings-row-desc">How much the knowledge graph moves.</div>
+        <div class="settings-row-label" data-i18n="settings.map_animation">Map animation</div>
+        <div class="settings-row-desc" data-i18n="settings.animation_desc">How much the knowledge graph moves.</div>
       </div>
       <div class="st-picker" id="animation-picker">
-        <button class="st-picker-btn" data-value="lively">Lively</button>
-        <button class="st-picker-btn active" data-value="moderate">Moderate</button>
-        <button class="st-picker-btn" data-value="static">Static</button>
+        <button class="st-picker-btn" data-value="lively" data-i18n="settings.anim_lively">Lively</button>
+        <button class="st-picker-btn active" data-value="moderate" data-i18n="settings.anim_moderate">Moderate</button>
+        <button class="st-picker-btn" data-value="static" data-i18n="settings.anim_static">Static</button>
       </div>
     </div>
     <div class="settings-row">
       <div class="settings-row-text">
-        <div class="settings-row-label">Guided tour</div>
-        <div class="settings-row-desc">Replay the introduction to Map of Knowledge.</div>
+        <div class="settings-row-label" data-i18n="settings.guided_tour">Guided tour</div>
+        <div class="settings-row-desc" data-i18n="settings.tour_desc">Replay the introduction to Map of Knowledge.</div>
       </div>
-      <button class="settings-save-btn settings-save-btn-inline"
+      <button class="settings-save-btn settings-save-btn-inline" data-i18n="btn.restart_tour"
         onclick="localStorage.setItem('kq_force_tour','1');window.location='index.html'">
         Restart tour
       </button>
@@ -135,9 +135,9 @@
 
   <!-- APPEARANCE -->
   <div class="settings-section">
-    <div class="settings-section-label">Appearance</div>
+    <div class="settings-section-label" data-i18n="settings.appearance">Appearance</div>
     <div class="settings-row settings-row-column">
-      <div class="settings-row-label">Colour palette</div>
+      <div class="settings-row-label" data-i18n="settings.colour_palette">Colour palette</div>
       <div class="st-palette-grid" id="palette-picker">
         <button class="st-palette-card active" data-value="sunset">
           <div class="st-palette-swatch">
@@ -145,7 +145,7 @@
             <span style="background:#C4826A"></span>
             <span style="background:#3A3028"></span>
           </div>
-          <span class="st-palette-name">Sunset</span>
+          <span class="st-palette-name" data-i18n="palette.sunset">Sunset</span>
         </button>
         <button class="st-palette-card" data-value="nordic">
           <div class="st-palette-swatch">
@@ -153,7 +153,7 @@
             <span style="background:#0080A8"></span>
             <span style="background:#0D1F30"></span>
           </div>
-          <span class="st-palette-name">Nordic</span>
+          <span class="st-palette-name" data-i18n="palette.nordic">Nordic</span>
         </button>
         <button class="st-palette-card" data-value="vampire">
           <div class="st-palette-swatch">
@@ -161,7 +161,7 @@
             <span style="background:#E8906A"></span>
             <span style="background:#E8ECF8"></span>
           </div>
-          <span class="st-palette-name">Vampire</span>
+          <span class="st-palette-name" data-i18n="palette.vampire">Vampire</span>
         </button>
         <button class="st-palette-card" data-value="candystore">
           <div class="st-palette-swatch">
@@ -169,7 +169,7 @@
             <span style="background:#C4151C"></span>
             <span style="background:#0A0A0A"></span>
           </div>
-          <span class="st-palette-name">Candystore</span>
+          <span class="st-palette-name" data-i18n="palette.candystore">Candystore</span>
         </button>
       </div>
     </div>
@@ -177,7 +177,7 @@
 
   <!-- MAP FILTERS -->
   <div class="settings-section" id="filters">
-    <div class="settings-section-label">Map filters</div>
+    <div class="settings-section-label" data-i18n="settings.map_filters">Map filters</div>
 
     <div id="sf-public-section" style="display:none">
       <div class="sf-custom-label">Public map filters</div>
@@ -189,11 +189,11 @@
       <div id="sf-personal-list"></div>
     </div>
 
-    <button class="sf-add-btn" onclick="window.location.href='custom-map.html'">+ Add custom map</button>
+    <button class="sf-add-btn" onclick="window.location.href='custom-map.html'" data-i18n="btn.add_custom_map">+ Add custom map</button>
 
   </div>
 
-  <button class="settings-save-btn" onclick="if(window.parent!==window&&typeof window.parent.closeOverlay==='function'){window.parent.closeOverlay();}">
+  <button class="settings-save-btn" data-i18n="btn.save_settings" onclick="if(window.parent!==window&&typeof window.parent.closeOverlay==='function'){window.parent.closeOverlay();}">
     Save settings
   </button>
 
@@ -220,7 +220,7 @@
   function _adminBtn(sid, isPublic) {
     var bg = isPublic ? 'rgba(94,154,94,0.12)' : 'rgba(58,48,40,0.06)';
     var col = isPublic ? '#2E7A2E' : '#6E6358';
-    return '<button class="sf-publish-btn" data-subset-id="' + sid + '" data-public="' + isPublic + '" style="background:' + bg + ';color:' + col + '">' + (isPublic ? 'Public' : 'Private') + '</button>';
+    return '<button class="sf-publish-btn" data-subset-id="' + sid + '" data-public="' + isPublic + '" style="background:' + bg + ';color:' + col + '">' + (isPublic ? t('label.public') : t('label.private')) + '</button>';
   }
 
   function renderPublicMaps(maps) {
@@ -237,7 +237,7 @@
       row.innerHTML =
         '<span class="sf-color-dot" style="background:' + (COLOR_DOT[s.icon_color] || COLOR_DOT.terra) + '"></span>' +
         '<span class="sf-filter-label">' + s.name + '</span>' +
-        '<span class="sf-node-count">' + s.node_count + ' nodes</span>' +
+        '<span class="sf-node-count">' + s.node_count + ' ' + t('label.nodes') + '</span>' +
         (_isAdmin ? _adminBtn(s.id, true) : '') +
         '<button class="st-toggle' + (isOn ? ' on' : '') + '" data-filter-id="' + fid + '"><div class="st-toggle-thumb"></div></button>';
       list.appendChild(row);
@@ -255,7 +255,7 @@
       row.innerHTML =
         '<span class="sf-color-dot" style="background:' + (COLOR_DOT[s.icon_color] || COLOR_DOT.terra) + '"></span>' +
         '<span class="sf-filter-label">' + s.name + '</span>' +
-        '<span class="sf-node-count">' + s.node_count + ' nodes</span>' +
+        '<span class="sf-node-count">' + s.node_count + ' ' + t('label.nodes') + '</span>' +
         (_isAdmin ? _adminBtn(s.id, false) : '') +
         '<button class="sf-delete-btn" data-subset-id="' + s.id + '" title="Delete">✕</button>';
       list.appendChild(row);
@@ -291,9 +291,9 @@
   function handleMapClick(e) {
     var del = e.target.closest('.sf-delete-btn');
     if (del) {
-      if (!confirm('Delete this map? This cannot be undone.')) return;
+      if (!confirm(t('msg.delete_map_confirm'))) return;
       fetch('/api/subsets/' + del.dataset.subsetId, { method: 'DELETE' })
-        .then(reloadMaps).catch(function() { alert('Could not delete.'); });
+        .then(reloadMaps).catch(function() { alert(t('msg.could_not_delete')); });
     }
     var pub = e.target.closest('.sf-publish-btn');
     if (pub) {
@@ -302,7 +302,7 @@
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ publish: makePublic }),
-      }).then(reloadMaps).catch(function() { alert('Could not update.'); });
+      }).then(reloadMaps).catch(function() { alert(t('msg.could_not_update')); });
     }
   }
   document.getElementById('sf-public-list').addEventListener('click', handleMapClick);

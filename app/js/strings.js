@@ -24,13 +24,27 @@
     return _strings[key] !== undefined ? _strings[key] : key;
   };
 
+  function _applyDomSweep() {
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n');
+      if (_strings[key]) el.textContent = _strings[key];
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n-placeholder');
+      if (_strings[key]) el.placeholder = _strings[key];
+    });
+  }
+
   window.reloadStrings = function () {
     var locale = window._uiLocale
                || document.documentElement.getAttribute('lang')
                || 'en';
     fetch('/api/strings?locale=' + encodeURIComponent(locale))
       .then(function (r) { return r.json(); })
-      .then(function (d) { _strings = d; })
+      .then(function (d) {
+        _strings = d;
+        _applyDomSweep();
+      })
       .catch(function () {});
   };
 

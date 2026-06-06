@@ -22,8 +22,12 @@
   var _awaitingAnswer  = false;
   var _streamBlocks    = [];
 
-  var _PHASES     = ['q1', 'q2', 'q3', 'q4'];
-  var _TIER_NAMES = ['', 'Factual', 'Conceptual', 'Procedural', 'Analytical'];
+  var _PHASES = ['q1', 'q2', 'q3', 'q4'];
+
+  function _tierName(num) {
+    var keys = ['', 'label.factual', 'label.conceptual', 'label.procedural', 'label.analytical'];
+    return keys[num] ? t(keys[num]) : '';
+  }
 
   /* ─── API helpers ─────────────────────────────────────────────── */
   function apiQuestion(questionNum, history) {
@@ -110,42 +114,42 @@
     if (crumbEl) crumbEl.textContent = _crumb;
     if (titleEl) titleEl.textContent = _node ? _node.label : '';
     if (fillEl)  fillEl.style.width  = '0%';
-    if (labelEl) labelEl.textContent = '4 questions — from recall to analysis';
+    if (labelEl) labelEl.textContent = t('msg.test_intro');
 
     var startLabel = document.getElementById('tm-start-btn-label');
-    if (startLabel) startLabel.textContent = 'Start test';
+    if (startLabel) startLabel.textContent = t('btn.start_test');
 
     if (!listEl) return;
     listEl.innerHTML = '';
 
-    var tiers = [
-      { num: 1, name: 'Factual',    desc: 'Recall a core term or definition' },
-      { num: 2, name: 'Conceptual', desc: 'Explain a mechanism or relationship' },
-      { num: 3, name: 'Procedural', desc: 'Apply a method to a concrete problem' },
-      { num: 4, name: 'Analytical', desc: 'Diagnose a scenario or evaluate a system' },
+    var tierDescs = [
+      t('label.tier1_desc'),
+      t('label.tier2_desc'),
+      t('label.tier3_desc'),
+      t('label.tier4_desc'),
     ];
 
-    tiers.forEach(function (t) {
+    [1, 2, 3, 4].forEach(function (num) {
       var item = document.createElement('div');
       item.className = 'lm-knobit-item';
       item.style.cursor = 'default';
 
-      var num = document.createElement('div');
-      num.className = 'lm-knobit-num';
-      num.textContent = String(t.num);
-      item.appendChild(num);
+      var numEl = document.createElement('div');
+      numEl.className = 'lm-knobit-num';
+      numEl.textContent = String(num);
+      item.appendChild(numEl);
 
       var info = document.createElement('div');
       info.style.flex = '1';
 
       var name = document.createElement('div');
       name.className = 'lm-knobit-name';
-      name.textContent = t.name;
+      name.textContent = _tierName(num);
       info.appendChild(name);
 
       var desc = document.createElement('div');
       desc.style.cssText = 'font-size:12px;color:#9A8E86;margin-top:2px';
-      desc.textContent = t.desc;
+      desc.textContent = tierDescs[num - 1];
       info.appendChild(desc);
 
       item.appendChild(info);
@@ -177,7 +181,7 @@
     _setChip('q' + _questionNum);
 
     var navLabel = document.getElementById('tm-knobit-nav-label');
-    if (navLabel) navLabel.textContent = 'Q' + _questionNum + ' — ' + (_TIER_NAMES[_questionNum] || '');
+    if (navLabel) navLabel.textContent = 'Q' + _questionNum + ' — ' + _tierName(_questionNum);
 
     _showLoadingBlock();
     apiQuestion(_questionNum, _history)
@@ -188,12 +192,12 @@
         _setAnswerInputState(true, q.type === 'mcq');
       }).catch(function () {
         _removeLoadingBlock();
-        _appendBlock({ type: 'note', content: 'Connection error — please try again.' });
+        _appendBlock({ type: 'note', content: t('msg.connection_error') });
       });
   }
 
   function _appendQuestionBlock(q) {
-    _appendPhaseDivider('Q' + _questionNum + ' — ' + (_TIER_NAMES[_questionNum] || ''));
+    _appendPhaseDivider('Q' + _questionNum + ' — ' + _tierName(_questionNum));
 
     var text = q.question || '';
     if (q.type === 'mcq' && q.options && q.options.length) {
@@ -241,7 +245,7 @@
         _removeLoadingBlock();
         _awaitingAnswer = true;
         _setAnswerInputState(true, q.type === 'mcq');
-        _appendBlock({ type: 'note', content: 'Connection error — please try again.' });
+        _appendBlock({ type: 'note', content: t('msg.connection_error') });
       });
   };
 
@@ -249,23 +253,23 @@
     var score     = result.finalScore !== undefined ? result.finalScore : '?';
     var breakdown = result.scoreBreakdown || '';
 
-    _appendPhaseDivider('Result');
+    _appendPhaseDivider(t('label.result'));
     _appendBlock({ type: 'meaning', content: score + '% — ' + breakdown });
 
     setTimeout(function () {
       var correctCount = _history.filter(function (h) { return h.correct; }).length;
 
-      var t = document.querySelector('#testing-mode .lm-complete-title');
+      var titleEl = document.querySelector('#testing-mode .lm-complete-title');
       var s = document.querySelector('#testing-mode .lm-complete-sub');
-      if (t) t.textContent = 'Diagnostic complete';
+      if (titleEl) titleEl.textContent = t('msg.diagnostic_complete');
       if (s) s.textContent = breakdown;
 
       var stat = document.querySelector('#testing-mode .lm-complete-stats');
       if (stat) {
         var cards = stat.querySelectorAll('.lm-complete-stat');
-        if (cards[0]) cards[0].innerHTML = '<div class="lm-cstat-num">4/4</div><div class="lm-cstat-label">Questions<br>answered</div>';
-        if (cards[1]) cards[1].innerHTML = '<div class="lm-cstat-num">' + score + '%</div><div class="lm-cstat-label">Mastery<br>score</div>';
-        if (cards[2]) cards[2].innerHTML = '<div class="lm-cstat-num">' + correctCount + '/4</div><div class="lm-cstat-label">Questions<br>correct</div>';
+        if (cards[0]) cards[0].innerHTML = '<div class="lm-cstat-num">4/4</div><div class="lm-cstat-label">' + t('label.questions_answered') + '</div>';
+        if (cards[1]) cards[1].innerHTML = '<div class="lm-cstat-num">' + score + '%</div><div class="lm-cstat-label">' + t('label.mastery_score') + '</div>';
+        if (cards[2]) cards[2].innerHTML = '<div class="lm-cstat-num">' + correctCount + '/4</div><div class="lm-cstat-label">' + t('label.questions_correct') + '</div>';
       }
       showTmView('tm-complete');
     }, 2200);
@@ -302,10 +306,10 @@
     inp.disabled = !enabled;
     if (btn) btn.disabled = !enabled;
     if (enabled) {
-      inp.placeholder = isMcq ? 'Type A, B, C, or D…' : 'Type your answer…';
+      inp.placeholder = isMcq ? t('placeholder.mcq_answer') : t('placeholder.type_answer');
       inp.focus();
     } else {
-      inp.placeholder = 'Waiting…';
+      inp.placeholder = t('placeholder.waiting');
     }
   }
 

@@ -38,15 +38,15 @@
     <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
       <path d="M8 2L3 6.5 8 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    Back to Settings
+    <span data-i18n="btn.back_to_settings">Back to Settings</span>
   </a>
 
 
   <!-- ══ UPLOAD VIEW ══════════════════════════════════════════ -->
   <div id="cm-upload-view">
 
-    <div class="cm-title">Create a Knowledge Map</div>
-    <div class="cm-subtitle">
+    <div class="cm-title" data-i18n="cm.title">Create a Knowledge Map</div>
+    <div class="cm-subtitle" data-i18n="cm.subtitle">
       Define a custom set of knowledge — a curriculum, certification, or competence model —
       that will appear as a filter on the map.
     </div>
@@ -55,23 +55,23 @@
 
     <!-- 1. Metadata -->
     <div class="cm-card">
-      <div class="cm-card-title">Map details</div>
-      <input class="cm-input" id="cm-name" type="text" placeholder="Name (e.g. AWS Solutions Architect SAA-C03)">
-      <input class="cm-input" id="cm-description" type="text" placeholder="Description (optional)">
+      <div class="cm-card-title" data-i18n="cm.map_details">Map details</div>
+      <input class="cm-input" id="cm-name" type="text" placeholder="Name (e.g. AWS Solutions Architect SAA-C03)" data-i18n-placeholder="placeholder.cm_name">
+      <input class="cm-input" id="cm-description" type="text" placeholder="Description (optional)" data-i18n-placeholder="placeholder.cm_description">
 
-      <div class="cm-card-title cm-card-title-spaced">Colour</div>
+      <div class="cm-card-title cm-card-title-spaced" data-i18n="cm.colour">Colour</div>
       <div class="cm-colors">
         <div class="cm-color-chip" data-color="terra"    title="Terra"></div>
         <div class="cm-color-chip" data-color="sage"     title="Sage"></div>
         <div class="cm-color-chip" data-color="amber"    title="Amber"></div>
         <div class="cm-color-chip" data-color="lavender" title="Lavender"></div>
       </div>
-      <div class="cm-color-label">Shown as the filter dot colour on the map</div>
+      <div class="cm-color-label" data-i18n="cm.color_label">Shown as the filter dot colour on the map</div>
     </div>
 
     <!-- 2. Upload -->
     <div class="cm-card">
-      <div class="cm-card-title">Import nodes</div>
+      <div class="cm-card-title" data-i18n="cm.import_nodes">Import nodes</div>
 
       <p class="cm-import-instructions">
         Download a sample file, fill in the knowledge areas you want to include
@@ -108,9 +108,9 @@
     <div class="cm-btn-row">
       <button class="cm-btn-primary" id="cm-import-btn">
         <span id="cm-spinner" class="cm-spinner"></span>
-        Match and review
+        <span data-i18n="btn.match_and_review">Match and review</span>
       </button>
-      <a class="cm-btn-ghost" href="settings.html#filters">Cancel</a>
+      <a class="cm-btn-ghost" href="settings.html#filters" data-i18n="btn.cancel">Cancel</a>
     </div>
 
   </div><!-- /cm-upload-view -->
@@ -120,10 +120,10 @@
   <div id="cm-review-view" style="display:none">
 
     <div class="cm-review-header">
-      <div class="cm-review-title">Review matched nodes</div>
+      <div class="cm-review-title" data-i18n="cm.review_title">Review matched nodes</div>
       <div class="cm-review-actions">
-        <button class="cm-accept-all" id="cm-accept-all">Accept all</button>
-        <button class="cm-reject-all" id="cm-reject-all">Reject all</button>
+        <button class="cm-accept-all" id="cm-accept-all" data-i18n="btn.accept_all">Accept all</button>
+        <button class="cm-reject-all" id="cm-reject-all" data-i18n="btn.reject_all">Reject all</button>
       </div>
     </div>
 
@@ -135,11 +135,11 @@
       <table class="cm-table">
         <thead>
           <tr>
-            <th>Your term</th>
-            <th>Matched node on map</th>
-            <th>Level</th>
-            <th>Match</th>
-            <th>Action</th>
+            <th data-i18n="th.your_term">Your term</th>
+            <th data-i18n="th.matched_node">Matched node on map</th>
+            <th data-i18n="th.level">Level</th>
+            <th data-i18n="th.match">Match</th>
+            <th data-i18n="th.action">Action</th>
           </tr>
         </thead>
         <tbody id="cm-tbody"></tbody>
@@ -149,16 +149,16 @@
     <!-- Make public toggle (shown for admins only by JS) -->
     <div id="cm-public-row" class="cm-public-row" style="display:none">
       <div>
-        <div class="cm-public-label">Make this map public</div>
-        <div class="cm-public-hint">Public maps appear in the filter panel for all users</div>
+        <div class="cm-public-label" data-i18n="cm.make_public">Make this map public</div>
+        <div class="cm-public-hint" data-i18n="cm.make_public_hint">Public maps appear in the filter panel for all users</div>
       </div>
       <input type="checkbox" id="cm-public-toggle">
     </div>
 
     <div class="cm-btn-row cm-btn-row-review">
-      <button class="cm-btn-primary" id="cm-commit-btn">Save map</button>
-      <button class="cm-btn-ghost" id="cm-review-back">← Back</button>
-      <button class="cm-btn-ghost cm-btn-ghost-danger" id="cm-discard-btn">
+      <button class="cm-btn-primary" id="cm-commit-btn" data-i18n="btn.save_map">Save map</button>
+      <button class="cm-btn-ghost" id="cm-review-back" data-i18n="btn.back_arrow">← Back</button>
+      <button class="cm-btn-ghost cm-btn-ghost-danger" id="cm-discard-btn" data-i18n="btn.delete_map">
         Delete map
       </button>
     </div>
