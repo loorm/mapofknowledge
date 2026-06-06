@@ -126,7 +126,7 @@
     listEl.innerHTML = '';
 
     if (!KNOBITS.length) {
-      listEl.innerHTML = '<div style="color:#8A7E72;font-size:13px;padding:14px 0">No content available yet — try again in a moment.</div>';
+      listEl.innerHTML = '<div class="lm-no-content">No content available yet — try again in a moment.</div>';
       return;
     }
 
@@ -312,7 +312,7 @@
         var ex   = d.demonstrate || {};
         var html = '<strong>Example ' + (_demoIdx + 1) + '</strong><br>' +
                    _escHtml(ex.body || '') +
-                   (ex.whatIDid ? '<br><em style="opacity:0.55;font-size:0.95em">What I did: ' + _escHtml(ex.whatIDid) + '</em>' : '');
+                   (ex.whatIDid ? '<br><em class="lm-demo-what-i-did">What I did: ' + _escHtml(ex.whatIDid) + '</em>' : '');
         _appendBlock({ type: 'example', rawHtml: html });
         var rowType = _demoIdx === 0 ? 'demo-1' : _demoIdx === 1 ? 'demo-2' : 'demo-3';
         _setButtonRow(rowType);

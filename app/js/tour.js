@@ -16,7 +16,7 @@
   /* ─── Inline icon helpers ──────────────────────────────────── */
   function _ico(d, s) {
     s = s || 13;
-    return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 15 15" fill="none" style="vertical-align:middle;flex-shrink:0">'+d+'</svg>';
+    return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 15 15" fill="none" class="tour-ico">'+d+'</svg>';
   }
   var _icoGlobe   = _ico('<circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 7.5h12M7.5 1.5c-2 2-2 8 0 12M7.5 1.5c2 2 2 8 0 12" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>');
   var _icoLayers  = _ico('<path d="M7.5 2 L13 5.5 L7.5 9 L2 5.5 Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M2 9L7.5 12.5L13 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>');
@@ -27,8 +27,8 @@
   var _icoTiltDn  = _ico('<ellipse cx="7.5" cy="5" rx="5.5" ry="2" stroke="currentColor" stroke-width="1.2"/><ellipse cx="7.5" cy="8" rx="5.5" ry="2" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 2"/><path d="M7.5 11v3M6 12.5l1.5 1.5 1.5-1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>');
 
   function _row(icon, label, desc) {
-    return '<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:7px">'
-      + '<span style="margin-top:1px;color:#6E6358">'+icon+'</span>'
+    return '<div class="tour-row">'
+      + '<span class="tour-row-icon">'+icon+'</span>'
       + '<span><strong>'+label+'</strong>'+(desc?' — '+desc:'')+'</span></div>';
   }
 
@@ -226,7 +226,7 @@
       '<div class="tour-text">'  + s.text  + '</div>' +
       '<div class="tour-actions">' +
         '<button class="tour-skip" onclick="window.Tour.skip()">Skip tour</button>' +
-        '<div style="display:flex;gap:8px">' +
+        '<div class="tour-btn-group">' +
           (idx > 0 ? '<button class="tour-btn tour-btn-secondary" onclick="window.Tour.prev()">← Back</button>' : '') +
           '<button class="tour-btn tour-btn-primary" onclick="window.Tour.next()">' +
             (last ? 'Done ✓' : 'Next →') +

@@ -58,7 +58,7 @@
       <input class="cm-input" id="cm-name" type="text" placeholder="Name (e.g. AWS Solutions Architect SAA-C03)">
       <input class="cm-input" id="cm-description" type="text" placeholder="Description (optional)">
 
-      <div class="cm-card-title" style="margin-top:8px">Colour</div>
+      <div class="cm-card-title cm-card-title-spaced">Colour</div>
       <div class="cm-colors">
         <div class="cm-color-chip" data-color="terra"    title="Terra"></div>
         <div class="cm-color-chip" data-color="sage"     title="Sage"></div>
@@ -72,7 +72,7 @@
     <div class="cm-card">
       <div class="cm-card-title">Import nodes</div>
 
-      <p style="font-size:13px;color:#6E6358;line-height:1.6;margin:0 0 14px">
+      <p class="cm-import-instructions">
         Download a sample file, fill in the knowledge areas you want to include
         (one per row), and upload it. Use <strong>exact node labels</strong> from the map.
         The breadcrumb column helps resolve ambiguous names.
@@ -154,11 +154,10 @@
       <input type="checkbox" id="cm-public-toggle">
     </div>
 
-    <div class="cm-btn-row" style="margin-top:24px">
+    <div class="cm-btn-row cm-btn-row-review">
       <button class="cm-btn-primary" id="cm-commit-btn">Save map</button>
       <button class="cm-btn-ghost" id="cm-review-back">← Back</button>
-      <button class="cm-btn-ghost" id="cm-discard-btn"
-              style="margin-left:auto;color:#9A3020;border-color:rgba(196,80,60,0.20)">
+      <button class="cm-btn-ghost cm-btn-ghost-danger" id="cm-discard-btn">
         Delete map
       </button>
     </div>
