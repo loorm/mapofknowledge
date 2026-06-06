@@ -254,7 +254,23 @@ html.palette-midnight .st-palette-card:hover {
   background: var(--i12);
 }
 html.palette-midnight .nav-dropdown {
-  background: linear-gradient(to bottom, var(--panel-a) 0%, var(--panel-b) 60%, var(--panel-c) 100%);
+  background: linear-gradient(to bottom, #151828 0%, #1A1D30 60%, #1E2238 100%);
+  border-color: var(--i14);
+}
+/* Explicit hardcoded bg for sidebar + top-bar to guarantee dark rendering */
+html.palette-midnight #top-bar {
+  background: linear-gradient(to right, #151828 0%, #1A1D30 55%, #1E2238 100%);
+  border-bottom-color: var(--i09);
+}
+html.palette-midnight #sidebar {
+  background: linear-gradient(to bottom, #151828 0%, #1A1D30 55%, #1E2238 100%);
+  border-left-color: var(--i14);
+  box-shadow: -6px 0 32px rgba(0,0,8,0.40);
+}
+html.palette-midnight .ctrl-card {
+  background: linear-gradient(145deg, #1A1D30 0%, #1E2238 100%);
+  border-color: var(--i14);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.28), 0 0 0 1px var(--accent-ring), 0 0 28px var(--accent-glow);
 }
 html.palette-midnight #tooltip {
   background: rgba(0,4,16,0.96);
@@ -310,4 +326,93 @@ html.palette-candystore {
 
   --overlay:    rgba(0,0,0,0.65);
   --node-alpha: 0.14;
+}
+
+/* Candystore: ALL semantic colours get full saturation — no more pastels */
+
+/* Success / done / correct → Lego bright green */
+html.palette-candystore .sb-toggle.on { background: #18B818; }
+html.palette-candystore .sb-knowledge-badge {
+  background: #D4F0D4;
+  color: #0A7010;
+}
+html.palette-candystore .lm-start-btn,
+html.palette-candystore .quit-modal-cancel {
+  background: linear-gradient(135deg, #18C018 0%, #0EA00E 100%);
+}
+html.palette-candystore .kn-chip.active {
+  background: #18B818;
+  color: #fff;
+}
+html.palette-candystore .kn-chip.done-chip {
+  background: #C8ECC8;
+  color: #0A6010;
+}
+html.palette-candystore .kn-option-btn.btn-understand {
+  background: #C8ECC8;
+  border: 2px solid #18B818;
+  color: #0A6010;
+  font-weight: 650;
+}
+html.palette-candystore .kn-option-btn.btn-understand:hover:not(:disabled) {
+  background: #A8DCA8;
+  border-color: #0E9A0E;
+}
+html.palette-candystore .block-feedback.feedback-correct {
+  background: #D4F0D4;
+  border: 1.5px solid #18B818;
+}
+html.palette-candystore .block-feedback.feedback-correct .block-label { color: #0A7010; }
+html.palette-candystore .lm-knobit-item.done .kn-index {
+  background: #C8ECC8;
+  color: #0A6010;
+}
+
+/* Incorrect → sharp red (reuses accent) */
+html.palette-candystore .block-feedback.feedback-incorrect {
+  background: #FAD8D8;
+  border: 1.5px solid #C4151C;
+}
+html.palette-candystore .block-feedback.feedback-incorrect .block-label { color: #9E0A10; }
+
+/* Adjust / rephrase → Lego yellow */
+html.palette-candystore .kn-option-btn.btn-adjust {
+  background: #FFF0A0;
+  border: 2px solid #DDB800;
+  color: #6A4800;
+  font-weight: 650;
+}
+html.palette-candystore .kn-option-btn.btn-adjust:hover:not(:disabled) {
+  background: #FFE050;
+  border-color: #BB9A00;
+}
+
+/* Other/secondary → Lego bright blue */
+html.palette-candystore .kn-option-btn.btn-other {
+  background: #C8DEF8;
+  border: 2px solid #1060C8;
+  color: #0840A0;
+  font-weight: 650;
+}
+html.palette-candystore .kn-option-btn.btn-other:hover:not(:disabled) {
+  background: #A0C4F4;
+  border-color: #0848B0;
+}
+
+/* Progress fills → accent (red) */
+html.palette-candystore .lm-progress-fill,
+html.palette-candystore .kn-progress-fill { background: var(--accent); }
+
+/* Phase divider text */
+html.palette-candystore .phase-divider span { color: var(--accent); opacity: 1; }
+
+/* btn-secondary (used for "secondary" option buttons in lesson) */
+html.palette-candystore .btn.btn-secondary {
+  background: #E0D8F8;
+  border-color: #6050C8;
+  color: #3020A0;
+}
+html.palette-candystore .btn.btn-secondary:hover {
+  background: #C8BCF4;
+  border-color: #4030B8;
 }
