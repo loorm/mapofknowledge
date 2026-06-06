@@ -4,14 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Settings — Map of Knowledge</title>
+<link rel="stylesheet" href="css/palette.css">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/font-scale.css">
-<script>fetch('/api/settings').then(function(r){return r.json();}).then(function(s){var f=s.font_size;if(f==='medium')document.documentElement.classList.add('fs-medium');if(f==='large')document.documentElement.classList.add('fs-large');}).catch(function(){});</script>
+<script>fetch('/api/settings').then(function(r){return r.json();}).then(function(s){var f=s.font_size;if(f==='medium')document.documentElement.classList.add('fs-medium');if(f==='large')document.documentElement.classList.add('fs-large');var p=s.palette;if(p&&p!=='sunset')document.documentElement.classList.add('palette-'+p);window._loadedSettings=s;}).catch(function(){});</script>
 <style>
 
 /* ── page ── */
 body {
-  background: linear-gradient(160deg, #F5EAE3 0%, #EDE6F0 55%, #E4EBF5 100%);
+  background: linear-gradient(160deg, var(--panel-a) 0%, var(--panel-b) 55%, var(--panel-c) 100%);
   overflow: auto;
   min-height: 100vh;
 }
@@ -24,7 +25,7 @@ body {
 /* ── page header ── */
 .settings-title {
   font-size: 22px; font-weight: 720;
-  color: #2C2820; letter-spacing: -0.4px;
+  color: var(--c1); letter-spacing: -0.4px;
   margin-bottom: 28px;
 }
 
@@ -34,7 +35,7 @@ body {
 }
 .settings-section-label {
   font-size: 10px; font-weight: 700; letter-spacing: 0.9px;
-  text-transform: uppercase; color: #B0A496;
+  text-transform: uppercase; color: var(--c7);
   margin-bottom: 8px;
   padding: 0 4px;
 }
@@ -42,28 +43,28 @@ body {
 /* ── row card ── */
 .settings-row {
   background: rgba(255,255,255,0.65);
-  border: 1px solid rgba(58,48,40,0.08);
+  border: 1px solid var(--i08);
   border-radius: 14px;
   padding: 16px 18px;
   display: flex; align-items: center; justify-content: space-between;
   gap: 16px;
-  box-shadow: 0 2px 10px rgba(58,48,40,0.05);
+  box-shadow: 0 2px 10px var(--i05);
 }
 .settings-row + .settings-row { margin-top: 6px; }
 
 .settings-row-text { flex: 1; }
 .settings-row-label {
-  font-size: 13px; font-weight: 600; color: #2C2820;
+  font-size: 13px; font-weight: 600; color: var(--c1);
   margin-bottom: 3px;
 }
 .settings-row-desc {
-  font-size: 12px; color: #8A7E72; line-height: 1.5;
+  font-size: 12px; color: var(--c5); line-height: 1.5;
 }
 
 /* ── toggle ── */
 .st-toggle {
   width: 42px; height: 24px; border-radius: 12px;
-  background: rgba(58,48,40,0.12);
+  background: var(--i12);
   position: relative; flex-shrink: 0;
   cursor: pointer;
   transition: background 0.2s;
@@ -83,7 +84,7 @@ body {
   display: block; width: 100%;
   margin-top: 12px;
   padding: 13px 20px;
-  background: linear-gradient(135deg, #C4826A 0%, #B06850 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
   color: #fff; border: none; border-radius: 14px;
   font-size: 14px; font-weight: 600; font-family: inherit;
   cursor: pointer; letter-spacing: 0.1px;
@@ -98,70 +99,70 @@ body {
 }
 .st-picker-btn {
   padding: 6px 13px; border-radius: 8px;
-  border: 1.5px solid rgba(58,48,40,0.12);
+  border: 1.5px solid var(--i12);
   background: rgba(255,255,255,0.5);
   font-size: 12px; font-weight: 550; font-family: inherit;
-  color: #8A7E72; cursor: pointer;
+  color: var(--c5); cursor: pointer;
   transition: background 0.13s, border-color 0.13s, color 0.13s;
 }
-.st-picker-btn:hover { background: rgba(255,255,255,0.8); color: #3A3028; }
+.st-picker-btn:hover { background: rgba(255,255,255,0.8); color: var(--c2); }
 .st-picker-btn.active {
-  background: linear-gradient(135deg, #C4826A 0%, #B06850 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
   border-color: transparent; color: #fff;
 }
 
 /* ── map filter rows ── */
 .sf-filter-row {
   background: rgba(255,255,255,0.65);
-  border: 1px solid rgba(58,48,40,0.08);
+  border: 1px solid var(--i08);
   border-radius: 14px;
   padding: 12px 18px;
   display: flex; align-items: center; gap: 12px;
-  box-shadow: 0 2px 10px rgba(58,48,40,0.05);
+  box-shadow: 0 2px 10px var(--i05);
 }
 .sf-filter-row + .sf-filter-row { margin-top: 6px; }
 .sf-color-dot {
   width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
 }
-.sf-filter-label { font-size: 13px; font-weight: 600; color: #2C2820; flex: 1; }
+.sf-filter-label { font-size: 13px; font-weight: 600; color: var(--c1); flex: 1; }
 .sf-delete-btn {
-  font-size: 11px; font-weight: 600; color: #B0A496;
+  font-size: 11px; font-weight: 600; color: var(--c7);
   cursor: pointer; border-radius: 6px;
   background: none; border: none; padding: 4px 8px;
   transition: color 0.12s, background 0.12s;
 }
-.sf-delete-btn:hover { color: #C4826A; background: rgba(196,130,106,0.08); }
+.sf-delete-btn:hover { color: var(--accent); background: rgba(196,130,106,0.08); }
 .sf-add-btn {
   width: 100%; margin-top: 8px;
   padding: 11px 18px;
   background: rgba(255,255,255,0.45);
-  border: 1.5px dashed rgba(58,48,40,0.18);
-  border-radius: 14px; color: #8A7E72;
+  border: 1.5px dashed var(--i18);
+  border-radius: 14px; color: var(--c5);
   font-size: 13px; font-weight: 500; font-family: inherit;
   cursor: pointer; text-align: center;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
-.sf-add-btn:hover { background: rgba(255,255,255,0.70); border-color: rgba(58,48,40,0.28); color: #3A3028; }
+.sf-add-btn:hover { background: rgba(255,255,255,0.70); border-color: var(--i25); color: var(--c2); }
 .sf-add-form {
   background: rgba(255,255,255,0.65);
-  border: 1px solid rgba(58,48,40,0.08);
+  border: 1px solid var(--i08);
   border-radius: 14px; padding: 16px 18px;
-  box-shadow: 0 2px 10px rgba(58,48,40,0.05);
+  box-shadow: 0 2px 10px var(--i05);
   margin-top: 8px;
   display: flex; flex-direction: column; gap: 10px;
 }
 .sf-add-form.hidden { display: none; }
 .sf-input {
   width: 100%; padding: 9px 12px;
-  border: 1.5px solid rgba(58,48,40,0.12);
+  border: 1.5px solid var(--i12);
   border-radius: 9px; font-size: 13px;
-  font-family: inherit; color: #2C2820;
+  font-family: inherit; color: var(--c1);
   background: rgba(255,255,255,0.80);
   outline: none; box-sizing: border-box;
   transition: border-color 0.15s;
 }
-.sf-input:focus { border-color: #C4826A; }
-.sf-input::placeholder { color: #B0A496; }
+.sf-input:focus { border-color: var(--accent); }
+.sf-input::placeholder { color: var(--c7); }
 .sf-form-actions {
   display: flex; gap: 8px; justify-content: flex-end;
 }
@@ -169,7 +170,7 @@ body {
   padding: 8px 16px; border-radius: 9px;
   font-size: 13px; font-weight: 500; font-family: inherit;
   cursor: pointer; background: none;
-  border: 1.5px solid rgba(58,48,40,0.14); color: #8A7E72;
+  border: 1.5px solid var(--i14); color: var(--c5);
   transition: background 0.12s;
 }
 .sf-cancel-btn:hover { background: rgba(58,48,40,0.04); }
@@ -177,14 +178,38 @@ body {
   padding: 8px 16px; border-radius: 9px;
   font-size: 13px; font-weight: 600; font-family: inherit;
   cursor: pointer; border: none;
-  background: linear-gradient(135deg, #C4826A 0%, #B06850 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
   color: #fff; transition: opacity 0.15s;
 }
 .sf-save-filter-btn:hover { opacity: 0.88; }
 .sf-custom-label {
   font-size: 10px; font-weight: 700; letter-spacing: 0.9px;
-  text-transform: uppercase; color: #B0A496;
+  text-transform: uppercase; color: var(--c7);
   padding: 0 4px; margin-top: 16px; margin-bottom: 8px;
+}
+
+/* ── palette picker ── */
+.st-palette-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+  margin-top: 10px;
+}
+.st-palette-card {
+  border: 2px solid var(--i10);
+  border-radius: 12px; padding: 10px 8px 9px;
+  background: rgba(255,255,255,0.55);
+  cursor: pointer; font-family: inherit;
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  transition: border-color 0.14s, background 0.14s;
+}
+.st-palette-card:hover { background: rgba(255,255,255,0.80); border-color: var(--i18); }
+.st-palette-card.active { border-color: var(--accent); background: var(--accent-s); }
+.st-palette-swatch {
+  display: flex; width: 100%; height: 20px;
+  border-radius: 5px; overflow: hidden; gap: 2px;
+}
+.st-palette-swatch span { flex: 1; }
+.st-palette-name {
+  font-size: 11px; font-weight: 650; color: var(--c2); letter-spacing: 0.2px;
 }
 
 </style>
@@ -312,6 +337,48 @@ body {
     </div>
   </div>
 
+  <!-- APPEARANCE -->
+  <div class="settings-section">
+    <div class="settings-section-label">Appearance</div>
+    <div class="settings-row" style="flex-direction:column;align-items:stretch;gap:10px">
+      <div class="settings-row-label">Colour palette</div>
+      <div class="st-palette-grid" id="palette-picker">
+        <button class="st-palette-card active" data-value="sunset">
+          <div class="st-palette-swatch">
+            <span style="background:#F5EEE8"></span>
+            <span style="background:#C4826A"></span>
+            <span style="background:#3A3028"></span>
+          </div>
+          <span class="st-palette-name">Sunset</span>
+        </button>
+        <button class="st-palette-card" data-value="nordic">
+          <div class="st-palette-swatch">
+            <span style="background:#F2F6FA"></span>
+            <span style="background:#3E8FA8"></span>
+            <span style="background:#1A2D40"></span>
+          </div>
+          <span class="st-palette-name">Nordic</span>
+        </button>
+        <button class="st-palette-card" data-value="midnight">
+          <div class="st-palette-swatch">
+            <span style="background:#111420"></span>
+            <span style="background:#E8906A"></span>
+            <span style="background:#E8ECF8"></span>
+          </div>
+          <span class="st-palette-name">Midnight</span>
+        </button>
+        <button class="st-palette-card" data-value="candystore">
+          <div class="st-palette-swatch">
+            <span style="background:#FFFFFF"></span>
+            <span style="background:#F04E1A"></span>
+            <span style="background:#111111"></span>
+          </div>
+          <span class="st-palette-name">Candystore</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MAP FILTERS -->
   <div class="settings-section" id="filters">
     <div class="settings-section-label">Map filters</div>
@@ -357,7 +424,7 @@ body {
   function _adminBtn(sid, isPublic) {
     var bg = isPublic ? 'rgba(94,154,94,0.12)' : 'rgba(58,48,40,0.06)';
     var col = isPublic ? '#2E7A2E' : '#6E6358';
-    return '<button class="sf-publish-btn" data-subset-id="' + sid + '" data-public="' + isPublic + '" style="font-size:11px;padding:2px 9px;border-radius:6px;border:1px solid rgba(58,48,40,0.14);background:' + bg + ';color:' + col + ';cursor:pointer;margin-right:6px;font-family:inherit">' + (isPublic ? 'Public' : 'Private') + '</button>';
+    return '<button class="sf-publish-btn" data-subset-id="' + sid + '" data-public="' + isPublic + '" style="font-size:11px;padding:2px 9px;border-radius:6px;border:1px solid var(--i14);background:' + bg + ';color:' + col + ';cursor:pointer;margin-right:6px;font-family:inherit">' + (isPublic ? 'Public' : 'Private') + '</button>';
   }
 
   function renderPublicMaps(maps) {
@@ -374,7 +441,7 @@ body {
       row.innerHTML =
         '<span class="sf-color-dot" style="background:' + (COLOR_DOT[s.icon_color] || COLOR_DOT.terra) + '"></span>' +
         '<span class="sf-filter-label">' + s.name + '</span>' +
-        '<span style="font-size:11px;color:#B0A496;margin-right:6px">' + s.node_count + ' nodes</span>' +
+        '<span style="font-size:11px;color:var(--c7);margin-right:6px">' + s.node_count + ' nodes</span>' +
         (_isAdmin ? _adminBtn(s.id, true) : '') +
         '<button class="st-toggle' + (isOn ? ' on' : '') + '" data-filter-id="' + fid + '"><div class="st-toggle-thumb"></div></button>';
       list.appendChild(row);
@@ -392,7 +459,7 @@ body {
       row.innerHTML =
         '<span class="sf-color-dot" style="background:' + (COLOR_DOT[s.icon_color] || COLOR_DOT.terra) + '"></span>' +
         '<span class="sf-filter-label">' + s.name + '</span>' +
-        '<span style="font-size:11px;color:#B0A496;margin-right:6px">' + s.node_count + ' nodes</span>' +
+        '<span style="font-size:11px;color:var(--c7);margin-right:6px">' + s.node_count + ' nodes</span>' +
         (_isAdmin ? _adminBtn(s.id, false) : '') +
         '<button class="sf-delete-btn" data-subset-id="' + s.id + '" title="Delete">✕</button>';
       list.appendChild(row);
@@ -444,6 +511,33 @@ body {
   }
   document.getElementById('sf-public-list').addEventListener('click', handleMapClick);
   document.getElementById('sf-personal-list').addEventListener('click', handleMapClick);
+
+  /* ── Palette picker ── */
+  const palettePicker = document.getElementById('palette-picker');
+
+  fetch('/api/settings')
+    .then(r => r.json())
+    .then(s => {
+      const val = s.palette || 'sunset';
+      palettePicker.querySelectorAll('.st-palette-card').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.value === val);
+      });
+    }).catch(() => {});
+
+  palettePicker.addEventListener('click', function(e) {
+    const btn = e.target.closest('.st-palette-card');
+    if (!btn) return;
+    palettePicker.querySelectorAll('.st-palette-card').forEach(function(b) {
+      b.classList.toggle('active', b === btn);
+    });
+    document.documentElement.classList.remove('palette-nordic', 'palette-midnight', 'palette-candystore');
+    if (btn.dataset.value !== 'sunset') document.documentElement.classList.add('palette-' + btn.dataset.value);
+    fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: 'palette', value: btn.dataset.value }),
+    });
+  });
 
   /* ── Font size picker ── */
   const fontPicker = document.getElementById('font-size-picker');

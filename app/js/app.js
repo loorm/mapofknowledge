@@ -85,6 +85,9 @@ Promise.all([
   document.documentElement.classList.remove('fs-medium', 'fs-large');
   if (fs === 'medium') { document.documentElement.classList.add('fs-medium'); FONT_SIZE = { 1: 15, 2: 13, 3: 11, 4: 10, 5: 9 }; }
   if (fs === 'large')  { document.documentElement.classList.add('fs-large');  FONT_SIZE = { 1: 17, 2: 14, 3: 12, 4: 11, 5: 10 }; }
+  const palette = settings.palette || 'sunset';
+  document.documentElement.classList.remove('palette-nordic', 'palette-midnight', 'palette-candystore');
+  if (palette !== 'sunset') document.documentElement.classList.add('palette-' + palette);
   init(base, emergent);
   if (window._tourCheckAutoStart) window._tourCheckAutoStart(settings);
 }).catch(() => {

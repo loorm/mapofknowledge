@@ -4,12 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Notifications — Map of Knowledge</title>
+<link rel="stylesheet" href="css/palette.css">
 <link rel="stylesheet" href="css/style.css">
+<script>fetch('/api/settings').then(function(r){return r.json();}).then(function(s){var p=s.palette;if(p&&p!=='sunset')document.documentElement.classList.add('palette-'+p);}).catch(function(){});</script>
 <style>
 
 /* ── page overrides ── */
 body {
-  background: linear-gradient(160deg, #F5EAE3 0%, #EDE6F0 55%, #E4EBF5 100%);
+  background: linear-gradient(160deg, var(--panel-a) 0%, var(--panel-b) 55%, var(--panel-c) 100%);
   overflow: auto;
   min-height: 100vh;
 }
