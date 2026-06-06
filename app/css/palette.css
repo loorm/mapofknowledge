@@ -275,6 +275,10 @@ html.palette-midnight .ctrl-card {
 html.palette-midnight #tooltip {
   background: rgba(0,4,16,0.96);
 }
+html.palette-midnight {
+  --notif-card-bg:       rgba(200,210,240,0.07);
+  --notif-card-bg-hover: rgba(200,210,240,0.12);
+}
 
 
 /* ═══════════════════════════════════════════
@@ -327,6 +331,20 @@ html.palette-candystore {
   --overlay:    rgba(0,0,0,0.65);
   --node-alpha: 0.14;
 }
+
+/* Candystore: notification icon blobs → vivid solid colours */
+html.palette-candystore .notif-icon.amber   { background: #FFD000; }
+html.palette-candystore .notif-icon.sage    { background: #18C018; }
+html.palette-candystore .notif-icon.lavender { background: #7040E0; }
+html.palette-candystore .notif-icon.terra   { background: var(--accent); }
+html.palette-candystore .notif-icon svg     { color: #fff; }
+html.palette-candystore .notif-tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 700;
+}
+html.palette-candystore .notif-unread-dot { background: var(--accent); }
 
 /* Candystore: ALL semantic colours get full saturation — no more pastels */
 
