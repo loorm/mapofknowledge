@@ -234,20 +234,30 @@ No "In conclusion" — just the insight.`,
 
 // ── Ask anything ─────────────────────────────────────────────────────────────
 async function answerQuestion(nodeLabel, knobitTitle, phase, question, context) {
+  const practiceRule = phase === 'practice'
+    ? `\n\nPRACTICE PHASE — CRITICAL RULE: The learner is actively working on a practice problem. You must NEVER reveal, confirm, or strongly hint at the answer, even if asked directly. Instead offer a guiding question, point back to the relevant concept, or suggest a thinking approach. The learner must reach the answer themselves.`
+    : '';
+
   const msg = await client.messages.create({
-    model: SONNET,
-    max_tokens: 400,
+    model: HAIKU,
+    max_tokens: 300,
     system: [{
       type: 'text',
-      text: `You are an expert adaptive tutor in the Map of Knowledge platform.
-Answer off-script questions clearly, staying relevant to the topic.
-2–5 sentences unless the question genuinely requires more.`,
+      text: `You are a focused learning assistant inside the Map of Knowledge platform.
+You help the learner with exactly one concept:
+  Knobit: "${knobitTitle}"
+  Topic: "${nodeLabel}"
+
+Rules:
+1. Only answer questions relevant to this knobit or topic. If the question is clearly off-topic, reply warmly: "This chat is here to help you with '${knobitTitle}'. Happy to answer any questions about that!"
+2. Be concise: 2–4 sentences. Never repeat what is already in the context.
+3. No preamble — go straight to the helpful content.${practiceRule}`,
       cache_control: { type: 'ephemeral' },
     }],
     messages: [{
       role: 'user',
-      content: `Topic: "${nodeLabel}" — Knobit: "${knobitTitle}" — Phase: ${phase}
-Context: "${context}"
+      content: `Phase: ${phase}
+Recent content: "${context}"
 Question: "${question}"`,
     }],
   });
