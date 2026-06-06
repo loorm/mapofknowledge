@@ -52,14 +52,14 @@
       </button>
 
       <div id="nav-dropdown" class="nav-dropdown">
-        <button class="nav-dropdown-item" onclick="window.location='profile.html'">
+        <button class="nav-dropdown-item" onclick="openOverlay('profile.html')">
           <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
             <circle cx="7.5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.2"/>
             <path d="M2 13c0-2.8 2.5-4.5 5.5-4.5s5.5 1.7 5.5 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
           </svg>
           Account
         </button>
-        <button class="nav-dropdown-item" onclick="window.location='notifications.html'">
+        <button class="nav-dropdown-item" onclick="openOverlay('notifications.html')">
           <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
             <path d="M7.5 1.5a4 4 0 0 0-4 4v2.5L2.5 9.5h10l-1-1.5V5.5a4 4 0 0 0-4-4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
             <path d="M6 11.5a1.5 1.5 0 0 0 3 0" stroke="currentColor" stroke-width="1.2"/>
@@ -68,7 +68,7 @@
           <span id="nav-notif-badge"></span>
         </button>
         <div class="nav-dropdown-divider"></div>
-        <button class="nav-dropdown-item" onclick="window.location='settings.html'">
+        <button class="nav-dropdown-item" onclick="openOverlay('settings.html')">
           <img src="images/icon-settings.svg" width="15" height="15" alt="">
           Settings
         </button>
@@ -604,6 +604,13 @@
 
 
 <!-- ════════════════════════════════════════
+     PAGE OVERLAY (profile / settings / notifications)
+     ════════════════════════════════════════ -->
+<div id="page-overlay">
+  <iframe id="page-overlay-frame" src="" title="Page"></iframe>
+</div>
+
+<!-- ════════════════════════════════════════
      QUIT KNOBIT CONFIRMATION MODAL
      ════════════════════════════════════════ -->
 <div id="quit-knobit-modal" style="display:none">
@@ -617,6 +624,16 @@
   </div>
 </div>
 
+<script>
+  window.openOverlay = function (url) {
+    document.getElementById('page-overlay-frame').src = url;
+    document.getElementById('page-overlay').classList.add('open');
+  };
+  window.closeOverlay = function () {
+    document.getElementById('page-overlay').classList.remove('open');
+    document.getElementById('page-overlay-frame').src = '';
+  };
+</script>
 <script src="js/topbar-notif.js"></script>
 <script src="js/tour.js"></script>
 <script src="js/learning.js?v=6"></script>
