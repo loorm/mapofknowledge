@@ -64,51 +64,51 @@
 
 /* ═══════════════════════════════════════════
    NORDIC
-   Cool blue-greys, slate, muted teal accent
+   Crisp white, high-contrast navy, vivid teal
    ═══════════════════════════════════════════ */
 html.palette-nordic {
-  --map-bg:   #0D1B2A;
-  --bg:       #F2F6FA;
-  --panel-a:  #EBF1F7;
-  --panel-b:  #E4EDF6;
-  --panel-c:  #DCE8F4;
-  --glass:    rgba(235,241,247,0.95);
-  --glass-b:  rgba(225,235,248,0.95);
-  --glass-lm: rgba(235,241,247,0.96);
+  --map-bg:   #061220;
+  --bg:       #F8FAFC;
+  --panel-a:  #EEF3F8;
+  --panel-b:  #E5EEF7;
+  --panel-c:  #DAE7F4;
+  --glass:    rgba(238,243,248,0.96);
+  --glass-b:  rgba(225,238,252,0.96);
+  --glass-lm: rgba(238,244,250,0.97);
 
-  --c1: #1A2D40;
-  --c2: #243850;
-  --c3: #3D5A70;
-  --c4: #526B7E;
-  --c5: #6A808E;
-  --c6: #8898A4;
-  --c7: #A4B4BE;
+  --c1: #0D1F30;
+  --c2: #1A3040;
+  --c3: #2E4A60;
+  --c4: #446078;
+  --c5: #5C7890;
+  --c6: #7E96A8;
+  --c7: #A2B8C8;
 
-  --accent:       #3E8FA8;
-  --accent-dark:  #2E7898;
-  --accent-s:     rgba(62,143,168,0.10);
-  --accent-m:     rgba(62,143,168,0.14);
-  --accent-focus: rgba(62,143,168,0.45);
-  --accent-ring:  rgba(62,143,168,0.50);
-  --accent-glow:  rgba(62,143,168,0.55);
+  --accent:       #0080A8;
+  --accent-dark:  #006890;
+  --accent-s:     rgba(0,128,168,0.10);
+  --accent-m:     rgba(0,128,168,0.16);
+  --accent-focus: rgba(0,128,168,0.45);
+  --accent-ring:  rgba(0,128,168,0.55);
+  --accent-glow:  rgba(0,128,168,0.60);
 
-  --i04: rgba(26,45,64,0.04);
-  --i05: rgba(26,45,64,0.05);
-  --i06: rgba(26,45,64,0.06);
-  --i07: rgba(26,45,64,0.07);
-  --i08: rgba(26,45,64,0.08);
-  --i09: rgba(26,45,64,0.09);
-  --i10: rgba(26,45,64,0.10);
-  --i11: rgba(26,45,64,0.11);
-  --i12: rgba(26,45,64,0.12);
-  --i13: rgba(26,45,64,0.13);
-  --i14: rgba(26,45,64,0.14);
-  --i15: rgba(26,45,64,0.15);
-  --i18: rgba(26,45,64,0.18);
-  --i25: rgba(26,45,64,0.25);
+  --i04: rgba(13,31,48,0.04);
+  --i05: rgba(13,31,48,0.05);
+  --i06: rgba(13,31,48,0.06);
+  --i07: rgba(13,31,48,0.07);
+  --i08: rgba(13,31,48,0.09);
+  --i09: rgba(13,31,48,0.10);
+  --i10: rgba(13,31,48,0.12);
+  --i11: rgba(13,31,48,0.13);
+  --i12: rgba(13,31,48,0.14);
+  --i13: rgba(13,31,48,0.16);
+  --i14: rgba(13,31,48,0.18);
+  --i15: rgba(13,31,48,0.20);
+  --i18: rgba(13,31,48,0.24);
+  --i25: rgba(13,31,48,0.32);
 
-  --overlay:    rgba(20,36,52,0.60);
-  --node-alpha: 0.08;
+  --overlay:    rgba(6,18,32,0.65);
+  --node-alpha: 0.10;
 }
 
 
@@ -263,49 +263,51 @@ html.palette-midnight #tooltip {
 
 /* ═══════════════════════════════════════════
    CANDYSTORE
-   Clean white, bold contrast, bright accent
+   Lego brick box — pure white, Lego red, black
+   Zero pastels, maximum contrast and pop
    ═══════════════════════════════════════════ */
 html.palette-candystore {
-  --map-bg:   #1A1A2E;
+  --map-bg:   #111111;
   --bg:       #FFFFFF;
-  --panel-a:  #F8F8F8;
-  --panel-b:  #F3F3F3;
-  --panel-c:  #EEEEEE;
-  --glass:    rgba(252,252,252,0.96);
-  --glass-b:  rgba(245,245,245,0.96);
-  --glass-lm: rgba(250,250,250,0.97);
+  --panel-a:  #F2F2F2;
+  --panel-b:  #EBEBEB;
+  --panel-c:  #E2E2E2;
+  --glass:    rgba(250,250,250,0.97);
+  --glass-b:  rgba(242,242,242,0.97);
+  --glass-lm: rgba(248,248,248,0.98);
 
-  --c1: #111111;
-  --c2: #222222;
-  --c3: #555555;
-  --c4: #666666;
-  --c5: #777777;
-  --c6: #909090;
-  --c7: #AAAAAA;
+  --c1: #0A0A0A;
+  --c2: #1A1A1A;
+  --c3: #3A3A3A;
+  --c4: #505050;
+  --c5: #626262;
+  --c6: #808080;
+  --c7: #A0A0A0;
 
-  --accent:       #F04E1A;
-  --accent-dark:  #C83A08;
-  --accent-s:     rgba(240,78,26,0.10);
-  --accent-m:     rgba(240,78,26,0.14);
-  --accent-focus: rgba(240,78,26,0.45);
-  --accent-ring:  rgba(240,78,26,0.50);
-  --accent-glow:  rgba(240,78,26,0.55);
+  --accent:       #C4151C;
+  --accent-dark:  #9E0A10;
+  --accent-s:     rgba(196,21,28,0.10);
+  --accent-m:     rgba(196,21,28,0.16);
+  --accent-focus: rgba(196,21,28,0.50);
+  --accent-ring:  rgba(196,21,28,0.60);
+  --accent-glow:  rgba(196,21,28,0.65);
 
+  /* Boosted opacity for crisp, high-contrast borders */
   --i04: rgba(0,0,0,0.04);
-  --i05: rgba(0,0,0,0.05);
-  --i06: rgba(0,0,0,0.06);
-  --i07: rgba(0,0,0,0.07);
-  --i08: rgba(0,0,0,0.08);
-  --i09: rgba(0,0,0,0.09);
-  --i10: rgba(0,0,0,0.10);
-  --i11: rgba(0,0,0,0.11);
-  --i12: rgba(0,0,0,0.12);
-  --i13: rgba(0,0,0,0.13);
-  --i14: rgba(0,0,0,0.14);
-  --i15: rgba(0,0,0,0.15);
-  --i18: rgba(0,0,0,0.18);
-  --i25: rgba(0,0,0,0.25);
+  --i05: rgba(0,0,0,0.06);
+  --i06: rgba(0,0,0,0.08);
+  --i07: rgba(0,0,0,0.09);
+  --i08: rgba(0,0,0,0.11);
+  --i09: rgba(0,0,0,0.13);
+  --i10: rgba(0,0,0,0.15);
+  --i11: rgba(0,0,0,0.17);
+  --i12: rgba(0,0,0,0.18);
+  --i13: rgba(0,0,0,0.20);
+  --i14: rgba(0,0,0,0.22);
+  --i15: rgba(0,0,0,0.25);
+  --i18: rgba(0,0,0,0.30);
+  --i25: rgba(0,0,0,0.40);
 
-  --overlay:    rgba(0,0,0,0.55);
-  --node-alpha: 0.12;
+  --overlay:    rgba(0,0,0,0.65);
+  --node-alpha: 0.14;
 }

@@ -353,9 +353,9 @@ body {
         </button>
         <button class="st-palette-card" data-value="nordic">
           <div class="st-palette-swatch">
-            <span style="background:#F2F6FA"></span>
-            <span style="background:#3E8FA8"></span>
-            <span style="background:#1A2D40"></span>
+            <span style="background:#F8FAFC"></span>
+            <span style="background:#0080A8"></span>
+            <span style="background:#0D1F30"></span>
           </div>
           <span class="st-palette-name">Nordic</span>
         </button>
@@ -370,8 +370,8 @@ body {
         <button class="st-palette-card" data-value="candystore">
           <div class="st-palette-swatch">
             <span style="background:#FFFFFF"></span>
-            <span style="background:#F04E1A"></span>
-            <span style="background:#111111"></span>
+            <span style="background:#C4151C"></span>
+            <span style="background:#0A0A0A"></span>
           </div>
           <span class="st-palette-name">Candystore</span>
         </button>
@@ -397,8 +397,8 @@ body {
 
   </div>
 
-  <button class="settings-save-btn" onclick="window.location='index.html'">
-    Save &amp; return to map
+  <button class="settings-save-btn" onclick="if(window.parent!==window&&typeof window.parent.closeOverlay==='function'){window.parent.closeOverlay();}">
+    Save settings
   </button>
 
 </main>
@@ -530,12 +530,20 @@ body {
     palettePicker.querySelectorAll('.st-palette-card').forEach(function(b) {
       b.classList.toggle('active', b === btn);
     });
+    const palVal = btn.dataset.value;
     document.documentElement.classList.remove('palette-nordic', 'palette-midnight', 'palette-candystore');
-    if (btn.dataset.value !== 'sunset') document.documentElement.classList.add('palette-' + btn.dataset.value);
+    if (palVal !== 'sunset') document.documentElement.classList.add('palette-' + palVal);
+    // Propagate to parent frame (map page) immediately — settings runs as an overlay iframe
+    try {
+      if (window.parent !== window && window.parent.document) {
+        window.parent.document.documentElement.classList.remove('palette-nordic', 'palette-midnight', 'palette-candystore');
+        if (palVal !== 'sunset') window.parent.document.documentElement.classList.add('palette-' + palVal);
+      }
+    } catch(e) {}
     fetch('/api/settings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: 'palette', value: btn.dataset.value }),
+      body: JSON.stringify({ key: 'palette', value: palVal }),
     });
   });
 
