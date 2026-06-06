@@ -316,8 +316,6 @@ body {
   <div class="settings-section" id="filters">
     <div class="settings-section-label">Map filters</div>
 
-    <div id="sf-preset-list"></div>
-
     <div id="sf-custom-section" style="display:none">
       <div class="sf-custom-label">Your custom maps</div>
       <div id="sf-custom-list"></div>
@@ -346,67 +344,38 @@ body {
   });
 
   /* ── Filter settings ── */
-  var PRESET_FILTERS = [
-    { id: 'my-knowledge',            label: 'My Knowledge',               color: '#9B8FB5' },
-    { id: 'estonian-basic-school',   label: 'Estonian Basic School 2023', color: '#8BAD7E' },
-    { id: 'aws-solutions-architect', label: 'AWS Solutions Architect',    color: '#6BA8C4' },
-    { id: 'b-driving-licence',       label: 'B-Category Driving Licence', color: '#D4A85A' },
-    { id: 'abrsm-grade5-music',      label: 'ABRSM Grade 5 Music Theory', color: '#C48FA0' },
-  ];
-  var CUSTOM_COLORS = ['#A0C4B0', '#C4A0B0', '#A0B0C4', '#C4B4A0', '#B0A0C4'];
-
-  function sfGetHidden() {
-    try { return JSON.parse(localStorage.getItem('kq_filter_hidden') || '[]'); }
-    catch(e) { return []; }
-  }
-  function sfSetHidden(arr) { localStorage.setItem('kq_filter_hidden', JSON.stringify(arr)); }
-
-  /* Render preset filter rows */
-  var sfPresetList = document.getElementById('sf-preset-list');
-  var sfHidden = sfGetHidden();
-  PRESET_FILTERS.forEach(function(f, i) {
-    var isOn = sfHidden.indexOf(f.id) === -1;
-    var row = document.createElement('div');
-    row.className = 'sf-filter-row';
-    if (i > 0) row.style.marginTop = '6px';
-    row.innerHTML =
-      '<span class="sf-color-dot" style="background:' + f.color + '"></span>' +
-      '<span class="sf-filter-label">' + f.label + '</span>' +
-      '<button class="st-toggle' + (isOn ? ' on' : '') + '" data-filter-id="' + f.id + '" aria-label="Toggle ' + f.label + '">' +
-      '<div class="st-toggle-thumb"></div></button>';
-    sfPresetList.appendChild(row);
-  });
-  sfPresetList.addEventListener('click', function(e) {
-    var btn = e.target.closest('.st-toggle');
-    if (!btn) return;
-    var fid = btn.dataset.filterId;
-    var isOn = btn.classList.toggle('on');
-    var h = sfGetHidden();
-    if (isOn) { var idx = h.indexOf(fid); if (idx !== -1) h.splice(idx, 1); }
-    else { if (h.indexOf(fid) === -1) h.push(fid); }
-    sfSetHidden(h);
-  });
-
-  /* Render user's custom maps from API */
+  /* Render custom maps from API */
   var COLOR_MAP = { terra: 'rgba(196,130,106,0.70)', sage: 'rgba(139,173,126,0.70)', amber: 'rgba(196,165,90,0.70)', lavender: 'rgba(155,143,181,0.70)' };
+  var _isAdmin = false;
+
   function sfRenderCustom(subsets) {
     var section = document.getElementById('sf-custom-section');
     var list    = document.getElementById('sf-custom-list');
     list.innerHTML = '';
-    var own = subsets.filter(function(s) { return s.type === 'personal'; });
-    section.style.display = own.length ? '' : 'none';
-    own.forEach(function(s) {
+    // Show all maps the user owns (personal) plus public ones they can manage (admins)
+    var shown = subsets.filter(function(s) { return s.type === 'personal' || (_isAdmin && s.type === 'public'); });
+    section.style.display = shown.length ? '' : 'none';
+    shown.forEach(function(s) {
       var dot = COLOR_MAP[s.icon_color] || COLOR_MAP.terra;
+      var isPublic = s.type === 'public';
       var row = document.createElement('div');
       row.className = 'sf-filter-row';
+      var adminControls = _isAdmin
+        ? '<button class="sf-publish-btn" data-subset-id="' + s.id + '" data-public="' + isPublic + '" title="' + (isPublic ? 'Make private' : 'Make public') + '" style="font-size:11px;padding:2px 8px;border-radius:6px;border:1px solid rgba(58,48,40,0.14);background:' + (isPublic ? 'rgba(94,154,94,0.12)' : 'rgba(58,48,40,0.06)') + ';color:' + (isPublic ? '#2E7A2E' : '#6E6358') + ';cursor:pointer;margin-right:6px;font-family:inherit">' + (isPublic ? 'Public' : 'Private') + '</button>'
+        : '';
       row.innerHTML =
         '<span class="sf-color-dot" style="background:' + dot + '"></span>' +
-        '<span class="sf-filter-label">' + s.name + '</span>' +
+        '<span class="sf-filter-label">' + s.name + (isPublic ? ' <span style="font-size:10px;color:#2E7A2E;font-weight:700">PUBLIC</span>' : '') + '</span>' +
         '<span style="font-size:11px;color:#B0A496;margin-right:8px">' + s.node_count + ' nodes</span>' +
+        adminControls +
         '<button class="sf-delete-btn" data-subset-id="' + s.id + '" title="Delete">✕</button>';
       list.appendChild(row);
     });
   }
+
+  fetch('/auth/me').then(function(r) { return r.json(); }).then(function(u) {
+    _isAdmin = u && (u.role === 'admin' || u.role === 'super_admin');
+  }).catch(function() {});
 
   fetch('/api/subsets')
     .then(function(r) { return r.json(); })
@@ -414,13 +383,26 @@ body {
     .catch(function() {});
 
   document.getElementById('sf-custom-list').addEventListener('click', function(e) {
-    var btn = e.target.closest('.sf-delete-btn');
-    if (!btn) return;
-    var sid = btn.dataset.subsetId;
-    if (!confirm('Delete this custom map?')) return;
-    fetch('/api/subsets/' + sid, { method: 'DELETE' })
-      .then(function() { btn.closest('.sf-filter-row').remove(); })
-      .catch(function() { alert('Could not delete.'); });
+    var del = e.target.closest('.sf-delete-btn');
+    if (del) {
+      var sid = del.dataset.subsetId;
+      if (!confirm('Delete this map? This cannot be undone.')) return;
+      fetch('/api/subsets/' + sid, { method: 'DELETE' })
+        .then(function() { del.closest('.sf-filter-row').remove(); })
+        .catch(function() { alert('Could not delete.'); });
+    }
+    var pub = e.target.closest('.sf-publish-btn');
+    if (pub) {
+      var sid = pub.dataset.subsetId;
+      var makePublic = pub.dataset.public !== 'true';
+      fetch('/api/subsets/' + sid + '/publish', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ publish: makePublic }),
+      }).then(function() {
+        fetch('/api/subsets').then(function(r) { return r.json(); }).then(sfRenderCustom);
+      }).catch(function() { alert('Could not update.'); });
+    }
   });
 
   /* ── Font size picker ── */
