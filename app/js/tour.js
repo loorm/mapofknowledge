@@ -149,39 +149,12 @@
     _spot.classList.add('visible');
   }
 
-  function _positionTip(rect, position) {
+  function _positionTip() {
     var TW = 340, M = 18;
     var vw = window.innerWidth, vh = window.innerHeight;
-    var TH = 340; // conservative tooltip height estimate
-    var left, top;
-
-    if (position === 'bottom-center') {
-      left = (vw - TW) / 2;
-      top  = vh - TH - 20;
-    } else if (!rect || position === 'center-right') {
-      left = Math.min(vw * 0.52, vw - TW - M);
-      top  = 90;
-    } else if (position === 'overlay-center') {
-      left = (vw - TW) / 2;
-      top  = 90;
-    } else if (position === 'right') {
-      left = rect.right + M;
-      top  = rect.top > vh / 2 ? Math.max(70, rect.bottom - TH) : Math.max(70, rect.top);
-    } else if (position === 'left') {
-      left = rect.left - TW - M;
-      top  = rect.top > vh / 2 ? Math.max(70, rect.bottom - TH) : Math.max(70, rect.top);
-    } else if (position === 'bottom-left') {
-      left = Math.max(M, rect.left);
-      top  = rect.bottom + M;
-    } else {
-      left = (vw - TW) / 2;
-      top  = rect.bottom + M;
-    }
-
-    // Clamp so tooltip never runs off bottom
+    var left = Math.round((vw - TW) / 2);
+    var top  = Math.max(M, Math.round(vh / 2 - 185));
     left = Math.max(M, Math.min(left, vw - TW - M));
-    top  = Math.max(70, Math.min(top, vh - TH - M));
-
     _tip.style.left = left + 'px';
     _tip.style.top  = top  + 'px';
   }
@@ -206,12 +179,12 @@
         var el2   = s.target ? document.querySelector(s.target) : null;
         var rect2 = el2 ? el2.getBoundingClientRect() : null;
         _positionSpot(rect2, s.padding || 0);
-        _positionTip(rect2, s.position);
+        _positionTip();
       }, 380);
     }
 
     _positionSpot(rect, s.padding || 0);
-    _positionTip(rect, s.position);
+    _positionTip();
 
     // Progress dots
     var dots = '';

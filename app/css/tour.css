@@ -20,14 +20,28 @@
   position: fixed;
   z-index: 9001;
   border-radius: 10px;
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.62);
   pointer-events: none;
   transition: left 0.35s cubic-bezier(.4,0,.2,1),
               top  0.35s cubic-bezier(.4,0,.2,1),
               width  0.35s cubic-bezier(.4,0,.2,1),
               height 0.35s cubic-bezier(.4,0,.2,1);
 }
-.tour-spotlight.visible { display: block; }
+.tour-spotlight.visible {
+  display: block;
+  animation: tour-spot-pulse 2s ease-in-out infinite;
+}
+
+@keyframes tour-spot-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.62),
+                0 0 0 2px rgba(196,130,106,0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.62),
+                0 0 0 7px rgba(196,130,106,0.80),
+                0 0 22px 4px rgba(196,130,106,0.35);
+  }
+}
 
 /* Tooltip card */
 .tour-tooltip {
