@@ -408,6 +408,28 @@ function init(data, emergentData) {
 
   // ── Sidebar ────────────────────────────────────────────────────────────────
   const sidebar = document.getElementById("sidebar");
+
+  // Flash hint text when disabled learn/test buttons are hovered or clicked
+  (function () {
+    var hint = document.getElementById('sb-inactive-hint');
+    function flashHint(btn) {
+      if (!btn || !btn.disabled || !hint) return;
+      hint.classList.remove('flash');
+      void hint.offsetWidth; // force reflow to restart animation
+      hint.classList.add('flash');
+    }
+    function wireFlash(sel) {
+      var btn = document.querySelector(sel);
+      if (!btn) return;
+      btn.addEventListener('mouseenter', function () { flashHint(btn); });
+      btn.addEventListener('click',      function () { flashHint(btn); });
+    }
+    wireFlash('.sb-learn-btn');
+    wireFlash('.sb-test-btn');
+    document.addEventListener('animationend', function (e) {
+      if (e.target === hint) hint.classList.remove('flash');
+    });
+  }());
   document.getElementById("sb-close").addEventListener("click", () => {
     closeSidebar();
     resetHighlight();
