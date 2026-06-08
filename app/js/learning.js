@@ -529,7 +529,7 @@
     if (!visual || !visual.url) return;
     var html;
     if (visual.type === 'image') {
-      html = '<img class="lm-visual-img" src="' + _escHtml(visual.url) + '" alt="' + _escHtml(visual.caption || '') + '" loading="lazy">' +
+      html = '<img class="lm-visual-img" src="' + _escHtml(visual.url) + '" alt="' + _escHtml(visual.caption || '') + '" loading="lazy" onerror="this.closest(\'.block-visual\').style.display=\'none\'">' +
              (visual.caption ? '<div class="lm-visual-caption">' + _escHtml(visual.caption) + '</div>' : '');
     } else if (visual.type === 'video') {
       html = '<a class="lm-visual-video" href="' + _escHtml(visual.url) + '" target="_blank" rel="noopener">' +

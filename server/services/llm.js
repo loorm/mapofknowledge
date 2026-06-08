@@ -24,10 +24,11 @@ geometric or structural patterns, or anything where "what does this look like?" 
 Skip for abstract philosophical concepts, purely definitional content, or cases where images add nothing.
 
 If a visual is warranted:
-1. Search for an existing image — prefer Wikimedia Commons (direct file URLs like https://upload.wikimedia.org/...).
+1. Search Wikimedia Commons for a relevant image. Return the Commons file page URL in the format
+   https://commons.wikimedia.org/wiki/File:EXACT_FILENAME — never construct upload.wikimedia.org URLs yourself.
    Hard rule: reject any image with a visible copyright notice, watermark, company logo, or © mark.
    Default to one image; add a second only if it carries distinct instructional value the first doesn't.
-2. If no clean image found: search YouTube for a short instructional video. Return the full YouTube URL.
+2. If no clean Wikimedia image found: search YouTube for a short instructional video. Return the full YouTube URL.
 3. If nothing found: set visual to null.`;
 
 // Finds and parses the first complete {...} JSON object in a string,
@@ -44,6 +45,30 @@ function _extractJSON(text) {
     }
   }
   throw new Error('No JSON object found');
+}
+
+// Resolves a commons.wikimedia.org/wiki/File:... page URL to a direct image URL
+// via the Wikimedia API. Returns the direct URL or null on failure.
+async function _resolveWikimediaUrl(url) {
+  const match = url.match(/commons\.wikimedia\.org\/wiki\/File:(.+?)(?:\?.*)?$/i);
+  if (!match) return url;
+  const filename = decodeURIComponent(match[1]);
+  try {
+    const apiUrl = 'https://commons.wikimedia.org/w/api.php?action=query' +
+      '&titles=File:' + encodeURIComponent(filename) +
+      '&prop=imageinfo&iiprop=url&format=json&origin=*';
+    const resp = await fetch(apiUrl, {
+      headers: { 'User-Agent': 'MapOfKnowledge/1.0 (educational platform)' },
+      signal: AbortSignal.timeout(5000),
+    });
+    const data = await resp.json();
+    const pages = data.query?.pages;
+    if (!pages) return null;
+    const page = Object.values(pages)[0];
+    return page?.imageinfo?.[0]?.url || null;
+  } catch {
+    return null;
+  }
 }
 
 async function _callWithWebSearch(config) {
@@ -173,11 +198,21 @@ Output ONLY a single JSON object — no markdown fences, no reasoning, no commen
 
   const fullText = resp.content.filter(b => b.type === 'text').map(b => b.text).join('');
   if (!fullText) return { text: '', visual: null };
+
+  let result;
   try {
-    return _extractJSON(fullText);
+    result = _extractJSON(fullText);
   } catch {
     return { text: fullText.trim(), visual: null };
   }
+
+  if (result.visual?.type === 'image' && result.visual?.url) {
+    const resolved = await _resolveWikimediaUrl(result.visual.url);
+    if (resolved) result.visual.url = resolved;
+    else result.visual = null;
+  }
+
+  return result;
 }
 
 // ── Explain phase — ADAPT the current byte ───────────────────────────────────
