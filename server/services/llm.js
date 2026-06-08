@@ -30,6 +30,22 @@ If a visual is warranted:
 2. If no clean image found: search YouTube for a short instructional video. Return the full YouTube URL.
 3. If nothing found: set visual to null.`;
 
+// Finds and parses the first complete {...} JSON object in a string,
+// ignoring any surrounding prose or reasoning text Claude may output.
+function _extractJSON(text) {
+  let depth = 0, start = -1;
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] === '{') {
+      if (depth === 0) start = i;
+      depth++;
+    } else if (text[i] === '}') {
+      depth--;
+      if (depth === 0 && start !== -1) return JSON.parse(text.slice(start, i + 1));
+    }
+  }
+  throw new Error('No JSON object found');
+}
+
 async function _callWithWebSearch(config) {
   const messages = [...config.messages];
   for (let i = 0; i < 5; i++) {
@@ -128,7 +144,7 @@ Write the OPENING explanation (byte 1). Introduce the core concept clearly and s
 
 ${VIZ_INSTRUCTIONS}
 
-Respond with a single JSON object — no markdown fences:
+Output ONLY a single JSON object — no markdown fences, no reasoning, no commentary outside the JSON:
 {"text":"your explanation","visual":{"type":"image","url":"...","caption":"..."}|{"type":"video","url":"...","caption":"..."}|null}`;
   } else {
     prompt = `Teaching knobit "${knobitTitle}" within topic "${nodeLabel}".
@@ -143,7 +159,7 @@ Write the NEXT step (byte ${byteIndex + 1}). Cover a new aspect or go one level 
 
 ${VIZ_INSTRUCTIONS}
 
-Respond with a single JSON object — no markdown fences:
+Output ONLY a single JSON object — no markdown fences, no reasoning, no commentary outside the JSON:
 {"text":"your explanation","visual":{"type":"image","url":"...","caption":"..."}|{"type":"video","url":"...","caption":"..."}|null}`;
   }
 
@@ -158,7 +174,7 @@ Respond with a single JSON object — no markdown fences:
   const fullText = resp.content.filter(b => b.type === 'text').map(b => b.text).join('');
   if (!fullText) return { text: '', visual: null };
   try {
-    return parseJSON(fullText.trim());
+    return _extractJSON(fullText);
   } catch {
     return { text: fullText.trim(), visual: null };
   }
