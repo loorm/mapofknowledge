@@ -888,3 +888,56 @@
   background: var(--lm-accent-soft);
   border-color: var(--lm-accent);
 }
+
+/* ── Fullscreen button (in kn-nav) ── */
+.lm-fs-btn {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  background: var(--i07);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--c4); flex-shrink: 0;
+  transition: background 0.14s, color 0.14s;
+  margin-left: 4px;
+}
+.lm-fs-btn:hover { background: var(--i13); color: var(--c2); }
+
+/* ── Fullscreen tip strip ── */
+.lm-fs-tip {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px;
+  background: var(--lm-accent-soft);
+  border-bottom: 1px solid var(--i09);
+  animation: lm-tip-in 0.3s ease-out;
+  flex-shrink: 0;
+}
+@keyframes lm-tip-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.lm-fs-tip-text {
+  flex: 1;
+  font-size: 12px;
+  color: var(--c3);
+  line-height: 1.4;
+}
+.lm-fs-tip-action {
+  font-size: 12px; font-weight: 600;
+  color: var(--lm-accent);
+  background: none; border: none; cursor: pointer;
+  font-family: inherit; padding: 0; white-space: nowrap;
+  text-decoration: underline;
+}
+.lm-fs-tip-close {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: none; border: none; cursor: pointer;
+  color: var(--c6); font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.12s;
+}
+.lm-fs-tip-close:hover { background: var(--i09); }

@@ -85,10 +85,17 @@
     showLmView('lm-path');
     var overlay = document.getElementById('learning-mode');
     if (overlay) overlay.classList.add('active');
+
+    // Show one-time fullscreen tip
+    if (!localStorage.getItem('lm_fs_tip_shown')) {
+      var tip = document.getElementById('lm-fs-tip');
+      if (tip) tip.style.display = '';
+    }
   };
 
   window.closeLearningMode = function () {
     _knobitStarted = false;
+    if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
     var overlay = document.getElementById('learning-mode');
     if (overlay) overlay.classList.remove('active');
     // Restore search box — always, whether hidden by learning or test mode
@@ -98,6 +105,43 @@
     _node   = null;
     KNOBITS = [];
   };
+
+  /* ─── Fullscreen ─────────────────────────────────────────────── */
+  function _updateFsBtn() {
+    var enter = document.getElementById('lm-fs-icon-enter');
+    var exit  = document.getElementById('lm-fs-icon-exit');
+    var btn   = document.getElementById('lm-fs-btn');
+    var isFs  = !!document.fullscreenElement;
+    if (enter) enter.style.display = isFs ? 'none' : '';
+    if (exit)  exit.style.display  = isFs ? '' : 'none';
+    if (btn) {
+      var key = isFs ? 'lm.fullscreen_exit' : 'lm.fullscreen_enter';
+      btn.title = window.t ? window.t(key) : (isFs ? 'Exit fullscreen' : 'Enter fullscreen');
+      btn.setAttribute('data-i18n-title', key);
+    }
+  }
+
+  window._enterLmFullscreen = function () {
+    var el = document.getElementById('learning-mode') || document.documentElement;
+    if (el.requestFullscreen) el.requestFullscreen().catch(function () {});
+    window._dismissFsTip();
+  };
+
+  window._toggleLmFullscreen = function () {
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(function () {});
+    } else {
+      window._enterLmFullscreen();
+    }
+  };
+
+  window._dismissFsTip = function () {
+    localStorage.setItem('lm_fs_tip_shown', '1');
+    var tip = document.getElementById('lm-fs-tip');
+    if (tip) tip.style.display = 'none';
+  };
+
+  document.addEventListener('fullscreenchange', _updateFsBtn);
 
   /* ─── View switching ──────────────────────────────────────────── */
   window.showLmView = function (id) {

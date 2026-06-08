@@ -381,6 +381,21 @@
         <span class="kn-chip locked-chip" id="chip-practice"    data-phase="practice"    data-i18n="phase.practice">Practice</span>
         <span class="kn-chip locked-chip" id="chip-meaning"     data-phase="meaning"     data-i18n="phase.meaning">Meaning</span>
       </div>
+      <button id="lm-fs-btn" class="lm-fs-btn" data-i18n-title="lm.fullscreen_enter" title="Enter fullscreen" onclick="window._toggleLmFullscreen()">
+        <svg id="lm-fs-icon-enter" width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M1 4.5V1h3.5M8.5 1H12v3.5M12 8.5V12H8.5M4.5 12H1V8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <svg id="lm-fs-icon-exit" width="13" height="13" viewBox="0 0 13 13" fill="none" style="display:none">
+          <path d="M4.5 1V4.5H1M12 4.5H8.5V1M8.5 12V8.5H12M1 8.5H4.5V12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- one-time fullscreen tip -->
+    <div id="lm-fs-tip" class="lm-fs-tip" style="display:none">
+      <span class="lm-fs-tip-text" data-i18n="lm.fullscreen_tip">For best focus, learn in fullscreen — it hides all distractions.</span>
+      <button class="lm-fs-tip-action" onclick="window._enterLmFullscreen()" data-i18n="lm.fullscreen_enter">Enter fullscreen</button>
+      <button class="lm-fs-tip-close" onclick="window._dismissFsTip()">✕</button>
     </div>
 
     <!-- scrollable block stream -->
