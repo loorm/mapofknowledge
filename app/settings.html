@@ -136,6 +136,18 @@
   <!-- APPEARANCE -->
   <div class="settings-section">
     <div class="settings-section-label" data-i18n="settings.appearance">Appearance</div>
+
+    <div class="settings-row">
+      <div class="settings-row-text">
+        <div class="settings-row-label" data-i18n="settings.language">Language</div>
+        <div class="settings-row-desc" data-i18n="settings.language_desc">Choose the display language for the app.</div>
+      </div>
+      <div class="st-picker" id="language-picker">
+        <button class="st-picker-btn active" data-value="en">English</button>
+        <button class="st-picker-btn" data-value="et">Eesti</button>
+      </div>
+    </div>
+
     <div class="settings-row settings-row-column">
       <div class="settings-row-label" data-i18n="settings.colour_palette">Colour palette</div>
       <div class="st-palette-grid" id="palette-picker">
@@ -393,6 +405,34 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ key: 'map_animation', value: btn.dataset.value }),
+    });
+  });
+
+  /* ── Language picker ── */
+  const langPicker = document.getElementById('language-picker');
+
+  fetch('/api/settings')
+    .then(r => r.json())
+    .then(s => {
+      const val = s.ui_locale || 'en';
+      langPicker.querySelectorAll('.st-picker-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.value === val);
+      });
+    }).catch(() => {});
+
+  langPicker.addEventListener('click', function(e) {
+    const btn = e.target.closest('.st-picker-btn');
+    if (!btn) return;
+    langPicker.querySelectorAll('.st-picker-btn').forEach(function(b) {
+      b.classList.toggle('active', b === btn);
+    });
+    const locale = btn.dataset.value;
+    window._uiLocale = locale === 'en' ? null : locale;
+    window.reloadStrings && window.reloadStrings();
+    fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: 'ui_locale', value: locale }),
     });
   });
 
