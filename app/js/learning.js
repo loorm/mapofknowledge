@@ -91,11 +91,14 @@
       var tip = document.getElementById('lm-fs-tip');
       if (tip) tip.style.display = '';
     }
+
+    _ambientStart();
   };
 
   window.closeLearningMode = function () {
     _knobitStarted = false;
     if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
+    _ambientStop();
     var overlay = document.getElementById('learning-mode');
     if (overlay) overlay.classList.remove('active');
     // Restore search box — always, whether hidden by learning or test mode
@@ -142,6 +145,82 @@
   };
 
   document.addEventListener('fullscreenchange', _updateFsBtn);
+
+  /* ─── Ambient sound ───────────────────────────────────────────── */
+  var _ambientFadeTimer = null;
+
+  function _ambientEnabled() {
+    // Default: on. Disabled only if user explicitly set 'off'.
+    return !(window._loadedSettings && window._loadedSettings.ambient_sound === 'off');
+  }
+
+  function _ambientMuted() {
+    return localStorage.getItem('lm_ambient_muted') === '1';
+  }
+
+  function _updateAmbientBtn() {
+    var on  = document.getElementById('lm-ambient-icon-on');
+    var off = document.getElementById('lm-ambient-icon-off');
+    var btn = document.getElementById('lm-ambient-btn');
+    var muted = _ambientMuted();
+    if (on)  on.style.display  = muted ? 'none' : '';
+    if (off) off.style.display = muted ? '' : 'none';
+    if (btn) {
+      var key = muted ? 'lm.ambient_on' : 'lm.ambient_off';
+      btn.title = window.t ? window.t(key) : (muted ? 'Play café ambience' : 'Mute café ambience');
+      btn.setAttribute('data-i18n-title', key);
+    }
+  }
+
+  function _ambientFadeTo(audio, targetVol, duration, onDone) {
+    clearInterval(_ambientFadeTimer);
+    var steps = 20;
+    var interval = duration / steps;
+    var step = (targetVol - audio.volume) / steps;
+    _ambientFadeTimer = setInterval(function () {
+      var next = audio.volume + step;
+      if ((step > 0 && next >= targetVol) || (step < 0 && next <= targetVol)) {
+        audio.volume = targetVol;
+        clearInterval(_ambientFadeTimer);
+        if (onDone) onDone();
+      } else {
+        audio.volume = next;
+      }
+    }, interval);
+  }
+
+  function _ambientStart() {
+    if (!_ambientEnabled() || _ambientMuted()) { _updateAmbientBtn(); return; }
+    var audio = document.getElementById('lm-ambient');
+    if (!audio) { _updateAmbientBtn(); return; }
+    audio.volume = 0;
+    audio.play().catch(function () {});
+    _ambientFadeTo(audio, 0.35, 2000);
+    _updateAmbientBtn();
+  }
+
+  function _ambientStop() {
+    var audio = document.getElementById('lm-ambient');
+    if (!audio || audio.paused) return;
+    _ambientFadeTo(audio, 0, 1500, function () { audio.pause(); audio.currentTime = 0; });
+  }
+
+  window._toggleAmbient = function () {
+    var muted = _ambientMuted();
+    localStorage.setItem('lm_ambient_muted', muted ? '0' : '1');
+    var audio = document.getElementById('lm-ambient');
+    if (!audio) { _updateAmbientBtn(); return; }
+    if (!muted) {
+      // muting now
+      _ambientFadeTo(audio, 0, 800, function () { audio.pause(); });
+    } else {
+      // unmuting
+      audio.volume = 0;
+      audio.play().catch(function () {});
+      _ambientFadeTo(audio, 0.35, 1000);
+    }
+    _updateAmbientBtn();
+  };
 
   /* ─── View switching ──────────────────────────────────────────── */
   window.showLmView = function (id) {

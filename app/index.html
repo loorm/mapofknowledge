@@ -381,6 +381,17 @@
         <span class="kn-chip locked-chip" id="chip-practice"    data-phase="practice"    data-i18n="phase.practice">Practice</span>
         <span class="kn-chip locked-chip" id="chip-meaning"     data-phase="meaning"     data-i18n="phase.meaning">Meaning</span>
       </div>
+      <button id="lm-ambient-btn" class="lm-fs-btn" data-i18n-title="lm.ambient_off" title="Mute café ambience" onclick="window._toggleAmbient()">
+        <svg id="lm-ambient-icon-on" width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M2 4.5h2l3-3v9l-3-3H2V4.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+          <path d="M9 4.5c.7.5 1 1.2 1 2s-.3 1.5-1 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        <svg id="lm-ambient-icon-off" width="13" height="13" viewBox="0 0 13 13" fill="none" style="display:none">
+          <path d="M2 4.5h2l3-3v9l-3-3H2V4.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+          <line x1="9" y1="4" x2="12" y2="7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          <line x1="12" y1="4" x2="9" y2="7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </button>
       <button id="lm-fs-btn" class="lm-fs-btn" data-i18n-title="lm.fullscreen_enter" title="Enter fullscreen" onclick="window._toggleLmFullscreen()">
         <svg id="lm-fs-icon-enter" width="13" height="13" viewBox="0 0 13 13" fill="none">
           <path d="M1 4.5V1h3.5M8.5 1H12v3.5M12 8.5V12H8.5M4.5 12H1V8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
@@ -390,6 +401,7 @@
         </svg>
       </button>
     </div>
+    <audio id="lm-ambient" loop src="/audio/cafe-ambience.mp3" preload="none"></audio>
 
     <!-- one-time fullscreen tip -->
     <div id="lm-fs-tip" class="lm-fs-tip" style="display:none">
