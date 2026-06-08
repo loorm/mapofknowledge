@@ -186,7 +186,7 @@
         _starting = false;
         _removeLoadingBlock();
         _appendBlock({ type: 'byte', content: d.text || '' });
-        _appendVisual(d.visual);
+        _appendVisualLoader(d.text);
         _setButtonRow('explain-options');
       }).catch(function () {
         _starting = false;
@@ -283,6 +283,7 @@
     _showLoadingBlock();
     // action mapping: 'ok' → advance (undefined), 'no' → 'rephrase', 'simpler'/'complex' → pass through
     var action = opt === 'ok' ? undefined : (opt === 'no' ? 'rephrase' : opt);
+    var wantVisual = (opt === 'ok');
     apiInteract({
       phase:        'explain',
       action:       action,
@@ -292,7 +293,7 @@
     }).then(function (d) {
       _removeLoadingBlock();
       _appendBlock({ type: 'byte', content: d.text || '' });
-      _appendVisual(d.visual);
+      if (wantVisual) _appendVisualLoader(d.text);
       _setButtonRow('explain-options');
     }).catch(_onApiError);
   };
@@ -509,6 +510,12 @@
 
     if (block.rawHtml) {
       el.innerHTML = block.rawHtml;
+    } else if (block.type === 'byte' || block.type === 'note') {
+      var safe = (block.content || '')
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<\/p>/gi, '\n')
+        .replace(/<[^>]*>/g, '');
+      el.innerHTML = _escHtml(safe).replace(/\n/g, '<br>');
     } else {
       el.textContent = block.content || '';
     }
@@ -525,20 +532,46 @@
     return el;
   }
 
-  function _appendVisual(visual) {
-    if (!visual || !visual.url) return;
-    var html;
-    if (visual.type === 'image') {
-      html = '<img class="lm-visual-img" src="' + _escHtml(visual.url) + '" alt="' + _escHtml(visual.caption || '') + '" loading="lazy" onerror="this.closest(\'.block-visual\').style.display=\'none\'">' +
-             (visual.caption ? '<div class="lm-visual-caption">' + _escHtml(visual.caption) + '</div>' : '');
-    } else if (visual.type === 'video') {
-      html = '<a class="lm-visual-video" href="' + _escHtml(visual.url) + '" target="_blank" rel="noopener">' +
-             '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="currentColor" stroke-width="1.1"/><path d="M5.5 4.5l5 2.5-5 2.5V4.5z" fill="currentColor"/></svg>' +
-             _escHtml(visual.caption || 'Watch video') + '</a>';
-    } else {
-      return;
-    }
-    _appendBlock({ type: 'visual', rawHtml: html });
+  function _appendVisualLoader(byteText) {
+    if (!byteText) return;
+    var s = document.getElementById('kn-stream');
+    if (!s) return;
+
+    var loaderEl = document.createElement('div');
+    loaderEl.className = 'block block-visual block-visual-loading';
+    loaderEl.innerHTML = '<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>';
+    s.insertBefore(loaderEl, _streamButtonEl || null);
+    _scrollStream();
+
+    apiInteract({ phase: 'explain', action: 'visual', original: byteText })
+      .then(function (d) {
+        if (!loaderEl.parentNode) return;
+        var v = d && d.visual;
+        if (v && v.url) {
+          var html;
+          if (v.type === 'image') {
+            html = '<img class="lm-visual-img" src="' + _escHtml(v.url) + '" alt="' + _escHtml(v.caption || '') + '" loading="lazy" onerror="this.closest(\'.block-visual\').style.display=\'none\'">' +
+                   (v.caption ? '<div class="lm-visual-caption">' + _escHtml(v.caption) + '</div>' : '');
+          } else if (v.type === 'video') {
+            html = '<a class="lm-visual-video" href="' + _escHtml(v.url) + '" target="_blank" rel="noopener">' +
+                   '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="currentColor" stroke-width="1.1"/><path d="M5.5 4.5l5 2.5-5 2.5V4.5z" fill="currentColor"/></svg>' +
+                   _escHtml(v.caption || 'Watch video') + '</a>';
+          } else {
+            html = null;
+          }
+          if (html) {
+            loaderEl.className = 'block block-visual';
+            loaderEl.innerHTML = html;
+          } else {
+            loaderEl.parentNode.removeChild(loaderEl);
+          }
+        } else {
+          loaderEl.parentNode.removeChild(loaderEl);
+        }
+        _scrollStream();
+      }).catch(function () {
+        if (loaderEl.parentNode) loaderEl.parentNode.removeChild(loaderEl);
+      });
   }
 
   function _showLoadingBlock() {

@@ -18,7 +18,7 @@ const SONNET = 'claude-sonnet-4-6';
 
 const LANG_NAMES = { et: 'Estonian (Eesti keel)' };
 
-const VIZ_INSTRUCTIONS = `After writing the explanation, decide whether a visual would enhance understanding.
+const VIZ_INSTRUCTIONS = `Decide whether a visual would enhance understanding of this explanation.
 Visualize when the concept involves spatial relationships, physical mechanisms, staged processes,
 geometric or structural patterns, or anything where "what does this look like?" is a natural question.
 Skip for abstract philosophical concepts, purely definitional content, or cases where images add nothing.
@@ -154,23 +154,14 @@ Typically 5–12 knobits, progressing from foundational to nuanced.`,
   return parseJSON(msg.content[0].text.trim());
 }
 
-// ── Explain phase — ADVANCE to next byte ("I understand") ────────────────────
-// previousContent is what was shown in the previous byte so the LLM can
-// build on it without repeating itself.
-// Returns { text: string, visual: { type, url, caption } | null }
-async function generateExplainByte(nodeLabel, knobitTitle, byteIndex, previousContent, locale) {
+// ── Explain phase — text only (fast, no web search) ──────────────────────────
+async function generateExplainByteText(nodeLabel, knobitTitle, byteIndex, previousContent, locale) {
   let prompt;
-
   if (byteIndex === 0 || !previousContent) {
     prompt = `Teaching knobit "${knobitTitle}" within topic "${nodeLabel}".
 
 Write the OPENING explanation (byte 1). Introduce the core concept clearly and simply.
-2–4 sentences. Plain prose — no headings, no bullet points.${langText(locale)}
-
-${VIZ_INSTRUCTIONS}
-
-Output ONLY a single JSON object — no markdown fences, no reasoning, no commentary outside the JSON:
-{"text":"your explanation","visual":{"type":"image","url":"...","caption":"..."}|{"type":"video","url":"...","caption":"..."}|null}`;
+2–4 sentences. Plain prose — no headings, no bullet points. Plain text only, no HTML tags. Use \\n for line breaks.${langText(locale)}`;
   } else {
     prompt = `Teaching knobit "${knobitTitle}" within topic "${nodeLabel}".
 
@@ -180,30 +171,47 @@ ${previousContent}
 """
 
 Write the NEXT step (byte ${byteIndex + 1}). Cover a new aspect or go one level deeper. Do NOT repeat or paraphrase what was already explained.
-2–4 sentences. Plain prose — no headings, no bullet points.${langText(locale)}
+2–4 sentences. Plain prose — no headings, no bullet points. Plain text only, no HTML tags. Use \\n for line breaks.${langText(locale)}`;
+  }
+
+  const msg = await client.messages.create({
+    model: SONNET,
+    max_tokens: 300,
+    system: TUTOR_SYSTEM,
+    messages: [{ role: 'user', content: prompt }],
+  });
+  return msg.content[0].text.trim();
+}
+
+// ── Explain phase — visual only (deferred, uses web search) ──────────────────
+// Returns { visual: { type, url, caption } | null }
+async function generateExplainByteVisual(nodeLabel, knobitTitle, byteText, locale) {
+  const prompt = `A learner studying "${knobitTitle}" (part of "${nodeLabel}") just read this explanation:
+"""
+${byteText}
+"""
 
 ${VIZ_INSTRUCTIONS}
 
 Output ONLY a single JSON object — no markdown fences, no reasoning, no commentary outside the JSON:
-{"text":"your explanation","visual":{"type":"image","url":"...","caption":"..."}|{"type":"video","url":"...","caption":"..."}|null}`;
-  }
+{"visual":{"type":"image","url":"...","caption":"..."}|{"type":"video","url":"...","caption":"..."}|null}`;
 
   const resp = await _callWithWebSearch({
     model: SONNET,
-    max_tokens: 800,
+    max_tokens: 500,
     tools: [{ type: 'web_search_20250305', name: 'web_search' }],
     system: TUTOR_SYSTEM,
     messages: [{ role: 'user', content: prompt }],
   });
 
   const fullText = resp.content.filter(b => b.type === 'text').map(b => b.text).join('');
-  if (!fullText) return { text: '', visual: null };
+  if (!fullText) return { visual: null };
 
   let result;
   try {
     result = _extractJSON(fullText);
   } catch {
-    return { text: fullText.trim(), visual: null };
+    return { visual: null };
   }
 
   if (result.visual?.type === 'image' && result.visual?.url) {
@@ -212,7 +220,7 @@ Output ONLY a single JSON object — no markdown fences, no reasoning, no commen
     else result.visual = null;
   }
 
-  return result;
+  return { visual: result.visual || null };
 }
 
 // ── Explain phase — ADAPT the current byte ───────────────────────────────────
@@ -473,7 +481,8 @@ Return JSON with:
 module.exports = {
   generateOverview,
   generateKnobits,
-  generateExplainByte,
+  generateExplainByteText,
+  generateExplainByteVisual,
   generateRephrase,
   generateDemonstrate,
   generatePractice,

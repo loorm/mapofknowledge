@@ -395,8 +395,10 @@ router.post('/learn/interact', async (req, res) => {
     if (phase === 'explain') {
       if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
         result = { text: await llm.generateRephrase(nodeLabel, title, original, action, locale) };
+      } else if (action === 'visual') {
+        result = await llm.generateExplainByteVisual(nodeLabel, title, original, locale);
       } else {
-        result = await llm.generateExplainByte(nodeLabel, title, byteIndex, original, locale);
+        result = { text: await llm.generateExplainByteText(nodeLabel, title, byteIndex, original, locale) };
       }
     } else if (phase === 'demonstrate') {
       result = { demonstrate: await llm.generateDemonstrate(nodeLabel, title, byteIndex, locale) };
