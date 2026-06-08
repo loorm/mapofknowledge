@@ -155,12 +155,12 @@ Respond with a single JSON object — no markdown fences:
     messages: [{ role: 'user', content: prompt }],
   });
 
-  const lastText = resp.content.filter(b => b.type === 'text').pop();
-  if (!lastText) return { text: '', visual: null };
+  const fullText = resp.content.filter(b => b.type === 'text').map(b => b.text).join('');
+  if (!fullText) return { text: '', visual: null };
   try {
-    return parseJSON(lastText.text.trim());
+    return parseJSON(fullText.trim());
   } catch {
-    return { text: lastText.text.trim(), visual: null };
+    return { text: fullText.trim(), visual: null };
   }
 }
 
