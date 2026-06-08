@@ -100,6 +100,16 @@
 
     <div class="settings-row">
       <div class="settings-row-text">
+        <div class="settings-row-label" data-i18n="settings.ambient_sound">Café ambience</div>
+        <div class="settings-row-desc" data-i18n="settings.ambient_sound_desc">Plays soft background café sounds while learning to help with focus.</div>
+      </div>
+      <button class="st-toggle on" id="ambient-toggle" aria-label="Toggle café ambience">
+        <div class="st-toggle-thumb"></div>
+      </button>
+    </div>
+
+    <div class="settings-row">
+      <div class="settings-row-text">
         <div class="settings-row-label" data-i18n="settings.font_size">Font size</div>
         <div class="settings-row-desc" data-i18n="settings.font_size_desc">Adjust text size across the app.</div>
       </div>
@@ -408,6 +418,30 @@
   ssToggle.addEventListener('click', function () {
     const isOn = this.classList.toggle('on');
     localStorage.setItem('screensaver_enabled', isOn ? 'true' : 'false');
+  });
+
+  /* ── Ambient sound toggle ── */
+  const ambientToggle = document.getElementById('ambient-toggle');
+
+  // Default: on (absent key = on)
+  if (window._loadedSettings && window._loadedSettings.ambient_sound === 'off') {
+    ambientToggle.classList.remove('on');
+  } else if (!window._loadedSettings) {
+    // Settings haven't loaded yet — defer check
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window._loadedSettings && window._loadedSettings.ambient_sound === 'off') {
+        ambientToggle.classList.remove('on');
+      }
+    });
+  }
+
+  ambientToggle.addEventListener('click', function () {
+    const isOn = this.classList.toggle('on');
+    fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: 'ambient_sound', value: isOn ? 'on' : 'off' }),
+    });
   });
 </script>
 <script src="js/topbar-notif.js"></script>
