@@ -1,7 +1,7 @@
 require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 
 const express  = require('express');
-const session  = require('express-session');
+const cookieSession = require('cookie-session');
 const passport = require('passport');
 const path     = require('path');
 
@@ -15,18 +15,21 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// ── Session (memory store — acceptable for MVP) ───────────────────────────────
-app.use(session({
+// ── Session (cookie-based — survives server restarts) ─────────────────────────
+app.use(cookieSession({
+  name: 'session',
   secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    // Apache terminates TLS; Node sees plain HTTP on port 3000
-    secure: false,
-    httpOnly: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  },
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  httpOnly: true,
+  secure: false, // Apache terminates TLS; Node sees plain HTTP on port 3000
 }));
+
+// Passport 0.7+ requires these methods; cookie-session doesn't provide them
+app.use((req, res, next) => {
+  if (req.session && !req.session.regenerate) req.session.regenerate = cb => cb();
+  if (req.session && !req.session.save) req.session.save = cb => cb();
+  next();
+});
 
 app.use(passport.initialize());
 app.use(passport.session());
