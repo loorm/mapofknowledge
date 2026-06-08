@@ -41,12 +41,12 @@
         <line x1="8.5" y1="8.5" x2="11.5" y2="11.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
       </svg>
       <input id="search-box" type="text" placeholder="Search knowledge…" data-i18n-placeholder="placeholder.search_knowledge" />
-      <button id="search-clear" class="search-clear" title="Clear" style="display:none">✕</button>
+      <button id="search-clear" class="search-clear" data-i18n-title="btn.clear" title="Clear" style="display:none">✕</button>
       <div id="search-dropdown" class="search-dropdown"></div>
     </div>
 
     <div class="topbar-burger-wrap">
-      <button class="topbar-icon-btn topbar-burger" id="nav-menu" title="Menu">
+      <button class="topbar-icon-btn topbar-burger" id="nav-menu" data-i18n-title="btn.menu" title="Menu">
         <svg width="16" height="14" viewBox="0 0 16 14" fill="none">
           <path d="M1 1h14M1 7h14M1 13h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
@@ -184,14 +184,14 @@
   <div class="fp-header">
     <span class="fp-title" data-i18n="label.filter">Filter</span>
     <div style="display:flex;align-items:center;gap:2px">
-      <a class="fp-settings-link" href="settings.html#filters" title="Manage filters">
+      <a class="fp-settings-link" href="settings.html#filters" data-i18n-title="link.manage_filters" title="Manage filters">
         <svg width="12" height="12" viewBox="0 0 12 12">
           <path fill="currentColor" fill-rule="evenodd"
             d="M9.38 4.77 11.14 5.19 11.14 6.81 9.38 7.23 8.76 8.31 9.27 10.04 7.86 10.86 6.63 9.55 5.37 9.55 4.14 10.86 2.73 10.04 3.24 8.31 2.62 7.23 0.86 6.81 0.86 5.19 2.62 4.77 3.24 3.69 2.73 1.96 4.14 1.14 5.37 2.45 6.63 2.45 7.86 1.14 9.27 1.96 8.76 3.69Z
              M7.9 6A1.9 1.9 0 0 0 4.1 6A1.9 1.9 0 0 0 7.9 6Z"/>
         </svg>
       </a>
-      <button id="fp-clear" class="fp-clear hidden" title="Clear filter">✕</button>
+      <button id="fp-clear" class="fp-clear hidden" data-i18n-title="btn.clear_filter" title="Clear filter">✕</button>
     </div>
   </div>
 
@@ -212,18 +212,18 @@
      BOTTOM-RIGHT ZOOM
      ════════════════════════════════════════ -->
 <div id="ctrl-zoom" class="ctrl-card">
-  <button class="ctrl-btn" id="zoom-in" title="Zoom in">+</button>
+  <button class="ctrl-btn" id="zoom-in" data-i18n-title="btn.zoom_in" title="Zoom in">+</button>
   <div class="ctrl-divider"></div>
-  <button class="ctrl-btn" id="zoom-out" title="Zoom out">−</button>
+  <button class="ctrl-btn" id="zoom-out" data-i18n-title="btn.zoom_out" title="Zoom out">−</button>
   <div class="ctrl-divider"></div>
-  <button class="ctrl-btn" id="tilt-more" title="Tilt toward edge-on">
+  <button class="ctrl-btn" id="tilt-more" data-i18n-title="btn.tilt_more" title="Tilt toward edge-on">
     <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
       <ellipse cx="7.5" cy="10" rx="5.5" ry="2" stroke="currentColor" stroke-width="1.2"/>
       <ellipse cx="7.5" cy="7"  rx="5.5" ry="2" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 2"/>
       <path d="M7.5 4V1M6 2.5l1.5-1.5 1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </button>
-  <button class="ctrl-btn" id="tilt-less" title="Tilt back toward top-down">
+  <button class="ctrl-btn" id="tilt-less" data-i18n-title="btn.tilt_less" title="Tilt back toward top-down">
     <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
       <ellipse cx="7.5" cy="5"  rx="5.5" ry="2" stroke="currentColor" stroke-width="1.2"/>
       <ellipse cx="7.5" cy="8"  rx="5.5" ry="2" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 2"/>
@@ -238,7 +238,7 @@
      ════════════════════════════════════════ -->
 <aside id="sidebar">
 
-  <button id="sb-close" title="Close panel">
+  <button id="sb-close" data-i18n-title="btn.close_panel" title="Close panel">
     <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
       <path d="M1 1l9 9M10 1L1 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
     </svg>
@@ -292,7 +292,7 @@
         <path d="M2 4.5L7.5 2l5.5 2.5v4c0 2.5-2.3 4.5-5.5 5.5C4.3 13 2 11 2 8.5v-4z" stroke="white" stroke-width="1.2" stroke-linejoin="round"/>
         <path d="M5.5 7.5l1.5 1.5 2.5-2.5" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <span class="sb-learn-label">Learn this</span>
+      <span class="sb-learn-label" data-i18n="btn.learn_this">Learn this</span>
     </button>
 
     <p class="sb-inactive-hint" id="sb-inactive-hint" data-i18n="sidebar.inactive_hint">
@@ -322,7 +322,7 @@
   <!-- ── VIEW 1: LEARNING PATH ─────────────────── -->
   <div id="lm-path" class="lm-view">
     <div class="lm-path-header">
-      <button class="lm-back-btn" onclick="closeLearningMode()" title="Back to map">
+      <button class="lm-back-btn" onclick="closeLearningMode()" data-i18n-title="btn.back_to_map" title="Back to map">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <circle cx="8" cy="3.5" r="1.8" stroke="currentColor" stroke-width="1.2"/>
           <circle cx="2.5" cy="12" r="1.8" stroke="currentColor" stroke-width="1.2"/>
@@ -454,7 +454,7 @@
   <!-- ── VIEW 1: TESTING PATH ─────────────────── -->
   <div id="tm-path" class="lm-view">
     <div class="lm-path-header">
-      <button class="lm-back-btn" onclick="closeTestingMode()" title="Back to map">
+      <button class="lm-back-btn" onclick="closeTestingMode()" data-i18n-title="btn.back_to_map" title="Back to map">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <circle cx="8" cy="3.5" r="1.8" stroke="currentColor" stroke-width="1.2"/>
           <circle cx="2.5" cy="12" r="1.8" stroke="currentColor" stroke-width="1.2"/>
