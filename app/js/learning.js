@@ -186,6 +186,7 @@
         _starting = false;
         _removeLoadingBlock();
         _appendBlock({ type: 'byte', content: d.text || '' });
+        _appendVisual(d.visual);
         _setButtonRow('explain-options');
       }).catch(function () {
         _starting = false;
@@ -291,6 +292,7 @@
     }).then(function (d) {
       _removeLoadingBlock();
       _appendBlock({ type: 'byte', content: d.text || '' });
+      _appendVisual(d.visual);
       _setButtonRow('explain-options');
     }).catch(_onApiError);
   };
@@ -521,6 +523,22 @@
     });
     _scrollStream();
     return el;
+  }
+
+  function _appendVisual(visual) {
+    if (!visual || !visual.url) return;
+    var html;
+    if (visual.type === 'image') {
+      html = '<img class="lm-visual-img" src="' + _escHtml(visual.url) + '" alt="' + _escHtml(visual.caption || '') + '" loading="lazy">' +
+             (visual.caption ? '<div class="lm-visual-caption">' + _escHtml(visual.caption) + '</div>' : '');
+    } else if (visual.type === 'video') {
+      html = '<a class="lm-visual-video" href="' + _escHtml(visual.url) + '" target="_blank" rel="noopener">' +
+             '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="currentColor" stroke-width="1.1"/><path d="M5.5 4.5l5 2.5-5 2.5V4.5z" fill="currentColor"/></svg>' +
+             _escHtml(visual.caption || 'Watch video') + '</a>';
+    } else {
+      return;
+    }
+    _appendBlock({ type: 'visual', rawHtml: html });
   }
 
   function _showLoadingBlock() {

@@ -396,7 +396,7 @@ router.post('/learn/interact', async (req, res) => {
       if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
         result = { text: await llm.generateRephrase(nodeLabel, title, original, action, locale) };
       } else {
-        result = { text: await llm.generateExplainByte(nodeLabel, title, byteIndex, original, locale) };
+        result = await llm.generateExplainByte(nodeLabel, title, byteIndex, original, locale);
       }
     } else if (phase === 'demonstrate') {
       result = { demonstrate: await llm.generateDemonstrate(nodeLabel, title, byteIndex, locale) };
