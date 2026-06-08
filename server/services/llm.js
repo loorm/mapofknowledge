@@ -98,6 +98,29 @@ function langJson(locale) {
   return `\n\nIMPORTANT: Write all text content in ${name}. Keep JSON field names in English.`;
 }
 
+const PROFILE_INSTRUCTION = `Instructional relevance first. Use the profile where it makes bytes, examples, demonstration or practice tasks feel more natural — never to force a connection that isn't there. Age shapes vocabulary and analogy choice. Cultural background anchors examples in familiar territory (an Estonian and a Cairo-based learner studying fermentation will recognize different reference points — use the right ones). Learning needs adjust format and pace. Interests apply when a genuine bridge exists; if it would feel like a stretch, ignore it. Default rule: would a thoughtful human tutor who knew this person naturally reach for this example? If yes, use it. If not, don't.`;
+
+const HATE = /\b(nazi|white.suprem|nigger|faggot|kike|slut|whore|chink|spic)\b/i;
+
+function profileBlock(profile) {
+  if (!profile) return '';
+  const safe = v => (v && !HATE.test(String(v))) ? v : null;
+  const parts = [];
+  if (profile.birth_year) {
+    const age = new Date().getFullYear() - profile.birth_year;
+    if (age > 5 && age < 120) parts.push(`Age: ${age}`);
+  }
+  const loc  = safe(profile.location);            if (loc)  parts.push(`Language/location: ${loc}`);
+  const cult = safe(profile.cultural_background); if (cult) parts.push(`Cultural background: ${cult}`);
+  const abt  = safe(profile.about);               if (abt)  parts.push(`Learning needs: ${abt}`);
+  const interests = (profile.interests || []).filter(s => !HATE.test(s));
+  if (interests.length) parts.push(`Interests: ${interests.join(', ')}`);
+  const values = (profile.values || []).filter(s => !HATE.test(s));
+  if (values.length) parts.push(`Values: ${values.join(', ')}`);
+  if (!parts.length) return '';
+  return `\n\nLearner profile: ${parts.join('. ')}.\n${PROFILE_INSTRUCTION}`;
+}
+
 const TUTOR_SYSTEM = [
   {
     type: 'text',
@@ -155,13 +178,13 @@ Typically 5–12 knobits, progressing from foundational to nuanced.`,
 }
 
 // ── Explain phase — text only (fast, no web search) ──────────────────────────
-async function generateExplainByteText(nodeLabel, knobitTitle, byteIndex, previousContent, locale) {
+async function generateExplainByteText(nodeLabel, knobitTitle, byteIndex, previousContent, locale, profile) {
   let prompt;
   if (byteIndex === 0 || !previousContent) {
     prompt = `Teaching knobit "${knobitTitle}" within topic "${nodeLabel}".
 
 Write the OPENING explanation (byte 1). Introduce the core concept clearly and simply.
-2–4 sentences. Plain prose — no headings, no bullet points. Plain text only, no HTML tags. Use \\n for line breaks.${langText(locale)}`;
+2–4 sentences. Plain prose — no headings, no bullet points. Plain text only, no HTML tags. Use \\n for line breaks.${profileBlock(profile)}${langText(locale)}`;
   } else {
     prompt = `Teaching knobit "${knobitTitle}" within topic "${nodeLabel}".
 
@@ -171,7 +194,7 @@ ${previousContent}
 """
 
 Write the NEXT step (byte ${byteIndex + 1}). Cover a new aspect or go one level deeper. Do NOT repeat or paraphrase what was already explained.
-2–4 sentences. Plain prose — no headings, no bullet points. Plain text only, no HTML tags. Use \\n for line breaks.${langText(locale)}`;
+2–4 sentences. Plain prose — no headings, no bullet points. Plain text only, no HTML tags. Use \\n for line breaks.${profileBlock(profile)}${langText(locale)}`;
   }
 
   const msg = await client.messages.create({
@@ -268,7 +291,7 @@ Write the replacement paragraph only — 2–4 sentences, no headings.${langText
 }
 
 // ── Demonstrate phase ─────────────────────────────────────────────────────────
-async function generateDemonstrate(nodeLabel, knobitTitle, exampleIndex, locale) {
+async function generateDemonstrate(nodeLabel, knobitTitle, exampleIndex, locale, profile) {
   const msg = await client.messages.create({
     model: SONNET,
     max_tokens: 350,
@@ -282,14 +305,14 @@ Respond with valid JSON, two fields only:
 - "body": a step-by-step worked example (2–5 sentences)
 - "whatIDid": 1 sentence naming the key technique or insight used
 
-No markdown fences. Just the JSON object.${langJson(locale)}`,
+No markdown fences. Just the JSON object.${profileBlock(profile)}${langJson(locale)}`,
     }],
   });
   return parseJSON(msg.content[0].text.trim());
 }
 
 // ── Practice phase ────────────────────────────────────────────────────────────
-async function generatePractice(nodeLabel, knobitTitle, problemIndex, locale) {
+async function generatePractice(nodeLabel, knobitTitle, problemIndex, locale, profile) {
   const difficulty = problemIndex === 0 ? 'straightforward' : problemIndex === 1 ? 'moderate' : 'challenging';
   const msg = await client.messages.create({
     model: SONNET,
@@ -304,7 +327,7 @@ Respond with valid JSON, two fields only:
 - "question": the problem statement (1–3 sentences)
 - "expected": the correct answer (brief — a number, term, or short phrase)
 
-No markdown fences. Just the JSON object.${langJson(locale)}`,
+No markdown fences. Just the JSON object.${profileBlock(profile)}${langJson(locale)}`,
     }],
   });
   return parseJSON(msg.content[0].text.trim());
