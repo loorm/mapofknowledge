@@ -16,6 +16,20 @@ function parseJSON(text) {
 const HAIKU  = 'claude-haiku-4-5';
 const SONNET = 'claude-sonnet-4-6';
 
+const LANG_NAMES = { et: 'Estonian (Eesti keel)' };
+
+function langText(locale) {
+  if (!locale || locale === 'en') return '';
+  const name = LANG_NAMES[locale] || locale;
+  return `\n\nIMPORTANT: Write your entire response in ${name}.`;
+}
+
+function langJson(locale) {
+  if (!locale || locale === 'en') return '';
+  const name = LANG_NAMES[locale] || locale;
+  return `\n\nIMPORTANT: Write all text content in ${name}. Keep JSON field names in English.`;
+}
+
 const TUTOR_SYSTEM = [
   {
     type: 'text',
@@ -28,7 +42,7 @@ Respond only with the content requested — no preamble, no headings.`,
 ];
 
 // ── Overview ──────────────────────────────────────────────────────────────────
-async function generateOverview(nodeLabel, domain, level) {
+async function generateOverview(nodeLabel, domain, level, locale) {
   const msg = await client.messages.create({
     model: HAIKU,
     max_tokens: 200,
@@ -37,7 +51,7 @@ async function generateOverview(nodeLabel, domain, level) {
       role: 'user',
       content: `Write exactly 2 sentences describing "${nodeLabel}" (a level-${level} concept in ${domain}).
 First sentence: what it is. Second sentence: why it matters or where it shows up.
-No headings, no bullet points — just the 2 sentences.`,
+No headings, no bullet points — just the 2 sentences.${langText(locale)}`,
     }],
   });
   return msg.content[0].text.trim();
@@ -75,14 +89,14 @@ Typically 5–12 knobits, progressing from foundational to nuanced.`,
 // ── Explain phase — ADVANCE to next byte ("I understand") ────────────────────
 // previousContent is what was shown in the previous byte so the LLM can
 // build on it without repeating itself.
-async function generateExplainByte(nodeLabel, knobitTitle, byteIndex, previousContent) {
+async function generateExplainByte(nodeLabel, knobitTitle, byteIndex, previousContent, locale) {
   let prompt;
 
   if (byteIndex === 0 || !previousContent) {
     prompt = `You are teaching knobit "${knobitTitle}" within the topic "${nodeLabel}".
 
 Write the OPENING explanation (byte 1). Introduce the core concept clearly and simply.
-2–4 sentences. Plain prose — no headings, no bullet points.`;
+2–4 sentences. Plain prose — no headings, no bullet points.${langText(locale)}`;
   } else {
     prompt = `You are teaching knobit "${knobitTitle}" within the topic "${nodeLabel}".
 
@@ -92,7 +106,7 @@ ${previousContent}
 """
 
 Now write the NEXT step (byte ${byteIndex + 1}). Advance the explanation — cover a new aspect, go one level deeper, or add a concrete application. Do NOT repeat or paraphrase what was already explained. Build forward.
-2–4 sentences. Plain prose — no headings, no bullet points.`;
+2–4 sentences. Plain prose — no headings, no bullet points.${langText(locale)}`;
   }
 
   const msg = await client.messages.create({
@@ -109,7 +123,7 @@ Now write the NEXT step (byte ${byteIndex + 1}). Advance the explanation — cov
 //   'rephrase' — "I don't understand": step back, explain from first principles
 //   'simpler'  — "Too simplistic": rephrase with professional/expert language
 //   'complex'  — "Too complex": rephrase with simpler words and analogies
-async function generateRephrase(nodeLabel, knobitTitle, originalByte, mode) {
+async function generateRephrase(nodeLabel, knobitTitle, originalByte, mode, locale) {
   const instructions = {
     rephrase: `The learner did not understand this explanation. Step back further.
 Explain the same concept from first principles — start from something even more basic,
@@ -142,14 +156,14 @@ ${originalByte}
 
 ${instructions}
 
-Write the replacement paragraph only — 2–4 sentences, no headings.`,
+Write the replacement paragraph only — 2–4 sentences, no headings.${langText(locale)}`,
     }],
   });
   return msg.content[0].text.trim();
 }
 
 // ── Demonstrate phase ─────────────────────────────────────────────────────────
-async function generateDemonstrate(nodeLabel, knobitTitle, exampleIndex) {
+async function generateDemonstrate(nodeLabel, knobitTitle, exampleIndex, locale) {
   const msg = await client.messages.create({
     model: HAIKU,
     max_tokens: 350,
@@ -163,14 +177,14 @@ Respond with valid JSON, two fields only:
 - "body": a step-by-step worked example (2–5 sentences)
 - "whatIDid": 1 sentence naming the key technique or insight used
 
-No markdown fences. Just the JSON object.`,
+No markdown fences. Just the JSON object.${langJson(locale)}`,
     }],
   });
   return parseJSON(msg.content[0].text.trim());
 }
 
 // ── Practice phase ────────────────────────────────────────────────────────────
-async function generatePractice(nodeLabel, knobitTitle, problemIndex) {
+async function generatePractice(nodeLabel, knobitTitle, problemIndex, locale) {
   const difficulty = problemIndex === 0 ? 'straightforward' : problemIndex === 1 ? 'moderate' : 'challenging';
   const msg = await client.messages.create({
     model: HAIKU,
@@ -185,14 +199,14 @@ Respond with valid JSON, two fields only:
 - "question": the problem statement (1–3 sentences)
 - "expected": the correct answer (brief — a number, term, or short phrase)
 
-No markdown fences. Just the JSON object.`,
+No markdown fences. Just the JSON object.${langJson(locale)}`,
     }],
   });
   return parseJSON(msg.content[0].text.trim());
 }
 
 // ── Grade a practice answer ───────────────────────────────────────────────────
-async function gradePractice(nodeLabel, knobitTitle, question, expected, userAnswer) {
+async function gradePractice(nodeLabel, knobitTitle, question, expected, userAnswer, locale) {
   const msg = await client.messages.create({
     model: HAIKU,
     max_tokens: 200,
@@ -208,14 +222,14 @@ Respond with valid JSON, two fields only:
 - "correct": boolean (true if the learner captures the essential idea)
 - "feedback": 1–2 sentences — confirm if correct, or explain what's wrong
 
-No markdown fences. Just the JSON object.`,
+No markdown fences. Just the JSON object.${langJson(locale)}`,
     }],
   });
   return parseJSON(msg.content[0].text.trim());
 }
 
 // ── Meaning phase ─────────────────────────────────────────────────────────────
-async function generateMeaning(nodeLabel, knobitTitle) {
+async function generateMeaning(nodeLabel, knobitTitle, locale) {
   const msg = await client.messages.create({
     model: HAIKU,
     max_tokens: 180,
@@ -226,14 +240,14 @@ async function generateMeaning(nodeLabel, knobitTitle) {
 
 Write 2–3 sentences on why this matters in the real world.
 Be concrete: name a profession, product, decision, or daily situation where it directly applies.
-No "In conclusion" — just the insight.`,
+No "In conclusion" — just the insight.${langText(locale)}`,
     }],
   });
   return msg.content[0].text.trim();
 }
 
 // ── Ask anything ─────────────────────────────────────────────────────────────
-async function answerQuestion(nodeLabel, knobitTitle, phase, question, context) {
+async function answerQuestion(nodeLabel, knobitTitle, phase, question, context, locale) {
   const practiceRule = phase === 'practice'
     ? `\n\nPRACTICE PHASE — CRITICAL RULE: The learner is actively working on a practice problem. You must NEVER reveal, confirm, or strongly hint at the answer, even if asked directly. Instead offer a guiding question, point back to the relevant concept, or suggest a thinking approach. The learner must reach the answer themselves.`
     : '';
@@ -258,7 +272,7 @@ Rules:
       role: 'user',
       content: `Phase: ${phase}
 Recent content: "${context}"
-Question: "${question}"`,
+Question: "${question}"${langText(locale)}`,
     }],
   });
   return msg.content[0].text.trim();
@@ -267,7 +281,7 @@ Question: "${question}"`,
 // ── 4-tier knowledge test ─────────────────────────────────────────────────────
 // questionNum: 1-4  history: [{question, answer, correct}]
 // Returns: { question, type: 'open'|'mcq', options?: string[] }
-async function generateTestQuestion(nodeLabel, breadcrumb, questionNum, history) {
+async function generateTestQuestion(nodeLabel, breadcrumb, questionNum, history, locale) {
   const tiers = [
     'Factual (Remember): one question on core terminology or a foundational definition.',
     'Conceptual (Understand): one question asking the learner to explain a mechanism or relationship. No calculations.',
@@ -308,7 +322,7 @@ ${adaptNote}
 ${historyText ? `\nPrevious Q&A:\n${historyText}` : ''}
 
 Generate question ${questionNum}. Choose open or MCQ based on what best tests this tier.
-For MCQ: provide exactly 4 options, one correct. Return JSON only.`,
+For MCQ: provide exactly 4 options, one correct. Return JSON only.${langJson(locale)}`,
     }],
   });
 
@@ -317,7 +331,7 @@ For MCQ: provide exactly 4 options, one correct. Return JSON only.`,
 
 // Evaluate one answer and return feedback.
 // If questionNum === 4, also return final mastery score with breakdown.
-async function evaluateTestAnswer(nodeLabel, breadcrumb, questionNum, question, options, userAnswer, history) {
+async function evaluateTestAnswer(nodeLabel, breadcrumb, questionNum, question, options, userAnswer, history, locale) {
   const isLast = questionNum === 4;
   const allQA = [...history, { question, answer: userAnswer }];
   const historyText = allQA.map((h, i) =>
@@ -344,7 +358,7 @@ Evaluate all four answers. Return JSON with:
 - "correct": boolean (is the current Q4 answer correct?)
 - "feedback": 1-2 sentence feedback on the Q4 answer
 - "finalScore": integer 0-100
-- "scoreBreakdown": string (2-4 sentences explaining the score — what they got right, what they missed)`
+- "scoreBreakdown": string (2-4 sentences explaining the score — what they got right, what they missed)${langJson(locale)}`
         : `Topic: "${nodeLabel}"
 Question: "${question}"
 ${options ? `Options: ${options.map((o, i) => `${i + 1}. ${o}`).join(' | ')}` : ''}
@@ -352,7 +366,7 @@ Answer: "${userAnswer}"
 
 Return JSON with:
 - "correct": boolean
-- "feedback": 1-2 sentences — confirm if correct or explain the right answer briefly`,
+- "feedback": 1-2 sentences — confirm if correct or explain the right answer briefly${langJson(locale)}`,
     }],
   });
 

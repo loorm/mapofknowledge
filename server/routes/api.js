@@ -4,6 +4,18 @@ const db      = require('../db');
 const llm     = require('../services/llm');
 const { notify } = require('../services/notifications');
 
+// ── User locale helper ───────────────────────────────────────────────────────
+async function getUserLocale(userId) {
+  if (!userId) return 'en';
+  try {
+    const [rows] = await db.execute(
+      'SELECT value FROM user_settings WHERE user_id = ? AND key_name = ?',
+      [userId, 'ui_locale']
+    );
+    return (rows.length && rows[0].value) ? rows[0].value : 'en';
+  } catch { return 'en'; }
+}
+
 // ── In-memory map cache (10k+ nodes — cache after first DB load) ─────────────
 let mapCache = null;
 
@@ -69,13 +81,15 @@ router.get('/nodes/:id/overview', async (req, res) => {
     if (!rows.length) return res.status(404).json({ error: 'Node not found' });
     const node = rows[0];
 
-    if (node.overview) return res.json({ overview: node.overview });
+    const locale = await getUserLocale(req.user?.id);
+
+    if (node.overview && locale === 'en') return res.json({ overview: node.overview });
 
     const domain   = await getNodeDomain(node.db_id);
-    const overview = await llm.generateOverview(node.label, domain, node.level);
-    await db.execute(
-      'UPDATE nodes SET overview = ? WHERE external_id = ?', [overview, id]
-    );
+    const overview = await llm.generateOverview(node.label, domain, node.level, locale);
+    if (locale === 'en') {
+      await db.execute('UPDATE nodes SET overview = ? WHERE external_id = ?', [overview, id]);
+    }
     res.json({ overview });
   } catch (err) {
     console.error('[api/nodes/overview]', err.message);
@@ -374,33 +388,32 @@ router.post('/learn/interact', async (req, res) => {
     );
     if (!rows.length) return res.status(404).json({ error: 'Knobit not found' });
     const { title, nodeLabel } = rows[0];
+    const locale = await getUserLocale(req.user?.id);
 
     let result;
 
     if (phase === 'explain') {
       if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
-        // Adapt the CURRENT byte — original holds what was shown
-        result = { text: await llm.generateRephrase(nodeLabel, title, original, action) };
+        result = { text: await llm.generateRephrase(nodeLabel, title, original, action, locale) };
       } else {
-        // Advance forward — original holds the previous byte so LLM can build on it
-        result = { text: await llm.generateExplainByte(nodeLabel, title, byteIndex, original) };
+        result = { text: await llm.generateExplainByte(nodeLabel, title, byteIndex, original, locale) };
       }
     } else if (phase === 'demonstrate') {
-      result = { demonstrate: await llm.generateDemonstrate(nodeLabel, title, byteIndex) };
+      result = { demonstrate: await llm.generateDemonstrate(nodeLabel, title, byteIndex, locale) };
     } else if (phase === 'practice') {
       if (action === 'grade') {
-        result = { grade: await llm.gradePractice(nodeLabel, title, question, expected, userAnswer) };
+        result = { grade: await llm.gradePractice(nodeLabel, title, question, expected, userAnswer, locale) };
       } else {
-        result = { practice: await llm.generatePractice(nodeLabel, title, byteIndex) };
+        result = { practice: await llm.generatePractice(nodeLabel, title, byteIndex, locale) };
       }
     } else if (phase === 'meaning') {
       if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
-        result = { text: await llm.generateRephrase(nodeLabel, title, original, action) };
+        result = { text: await llm.generateRephrase(nodeLabel, title, original, action, locale) };
       } else {
-        result = { text: await llm.generateMeaning(nodeLabel, title) };
+        result = { text: await llm.generateMeaning(nodeLabel, title, locale) };
       }
     } else if (phase === 'ask') {
-      result = { text: await llm.answerQuestion(nodeLabel, title, action || 'general', question, context) };
+      result = { text: await llm.answerQuestion(nodeLabel, title, action || 'general', question, context, locale) };
     } else {
       return res.status(400).json({ error: `Unknown phase: ${phase}` });
     }
@@ -1052,7 +1065,8 @@ router.post('/test/question', async (req, res) => {
     const { db_id, label, level } = nodes[0];
     if (level < 4) return res.status(400).json({ error: 'Test only available for L4 and L5 nodes' });
     const breadcrumb = await getNodeBreadcrumb(db_id);
-    const result = await llm.generateTestQuestion(label, breadcrumb, questionNum, history);
+    const locale = await getUserLocale(req.user?.id);
+    const result = await llm.generateTestQuestion(label, breadcrumb, questionNum, history, locale);
     res.json(result);
   } catch (err) {
     console.error('[api/test/question]', err.message);
@@ -1072,9 +1086,10 @@ router.post('/test/evaluate', async (req, res) => {
     if (!nodes.length) return res.status(404).json({ error: 'Node not found' });
     const { db_id, label } = nodes[0];
     const breadcrumb = await getNodeBreadcrumb(db_id);
+    const locale = await getUserLocale(req.user?.id);
 
     const evaluation = await llm.evaluateTestAnswer(
-      label, breadcrumb, questionNum, question, options, userAnswer, history
+      label, breadcrumb, questionNum, question, options, userAnswer, history, locale
     );
 
     if (questionNum === 4 && evaluation.finalScore !== undefined && passportId) {
