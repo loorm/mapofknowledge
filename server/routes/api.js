@@ -16,6 +16,32 @@ async function getUserLocale(userId) {
   } catch { return 'en'; }
 }
 
+// ── User profile helper ──────────────────────────────────────────────────────
+async function getUserProfile(userId) {
+  if (!userId) return null;
+  try {
+    const [users] = await db.execute('SELECT passport_id FROM users WHERE id = ?', [userId]);
+    if (!users.length || !users[0].passport_id) return null;
+    const passportId = users[0].passport_id;
+    const [[passport]] = await db.execute(
+      'SELECT birth_year, location, cultural_background, about FROM learner_passports WHERE id = ?',
+      [passportId]
+    );
+    const [tags] = await db.execute(
+      'SELECT type, text FROM passport_tags WHERE passport_id = ? ORDER BY sort_order',
+      [passportId]
+    );
+    return {
+      birth_year:          passport?.birth_year || null,
+      location:            passport?.location   || null,
+      cultural_background: passport?.cultural_background || null,
+      about:               passport?.about      || null,
+      interests: tags.filter(t => t.type === 'interest').map(t => t.text),
+      values:    tags.filter(t => t.type === 'value').map(t => t.text),
+    };
+  } catch { return null; }
+}
+
 // ── In-memory map cache (10k+ nodes — cache after first DB load) ─────────────
 let mapCache = null;
 
@@ -388,7 +414,10 @@ router.post('/learn/interact', async (req, res) => {
     );
     if (!rows.length) return res.status(404).json({ error: 'Knobit not found' });
     const { title, nodeLabel } = rows[0];
-    const locale = await getUserLocale(req.user?.id);
+    const [locale, profile] = await Promise.all([
+      getUserLocale(req.user?.id),
+      getUserProfile(req.user?.id),
+    ]);
 
     let result;
 
@@ -398,15 +427,15 @@ router.post('/learn/interact', async (req, res) => {
       } else if (action === 'visual') {
         result = await llm.generateExplainByteVisual(nodeLabel, title, original, locale);
       } else {
-        result = { text: await llm.generateExplainByteText(nodeLabel, title, byteIndex, original, locale) };
+        result = { text: await llm.generateExplainByteText(nodeLabel, title, byteIndex, original, locale, profile) };
       }
     } else if (phase === 'demonstrate') {
-      result = { demonstrate: await llm.generateDemonstrate(nodeLabel, title, byteIndex, locale) };
+      result = { demonstrate: await llm.generateDemonstrate(nodeLabel, title, byteIndex, locale, profile) };
     } else if (phase === 'practice') {
       if (action === 'grade') {
         result = { grade: await llm.gradePractice(nodeLabel, title, question, expected, userAnswer, locale) };
       } else {
-        result = { practice: await llm.generatePractice(nodeLabel, title, byteIndex, locale) };
+        result = { practice: await llm.generatePractice(nodeLabel, title, byteIndex, locale, profile) };
       }
     } else if (phase === 'meaning') {
       if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
