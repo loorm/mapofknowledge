@@ -842,3 +842,49 @@
   transition: opacity 0.13s;
 }
 .quit-modal-cancel:hover { opacity: 0.90; }
+
+/* ── Visual block (image / video link after explain bytes) ── */
+.block-visual {
+  background: transparent;
+  border: none;
+  padding: 0 0 4px;
+  margin-top: -4px;
+  margin-bottom: 10px;
+}
+
+.lm-visual-img {
+  display: block;
+  width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+  border-radius: 10px;
+  border: 1px solid var(--i09);
+  background: var(--i04);
+}
+
+.lm-visual-caption {
+  font-size: 11px;
+  color: var(--c6);
+  margin-top: 5px;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.lm-visual-video {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--i12);
+  background: var(--i04);
+  color: var(--lm-accent);
+  font-size: 13px;
+  font-weight: 550;
+  text-decoration: none;
+  transition: background 0.13s, border-color 0.13s;
+}
+.lm-visual-video:hover {
+  background: var(--lm-accent-soft);
+  border-color: var(--lm-accent);
+}

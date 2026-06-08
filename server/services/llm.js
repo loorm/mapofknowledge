@@ -18,6 +18,33 @@ const SONNET = 'claude-sonnet-4-6';
 
 const LANG_NAMES = { et: 'Estonian (Eesti keel)' };
 
+const VIZ_INSTRUCTIONS = `After writing the explanation, decide whether a visual would enhance understanding.
+Visualize when the concept involves spatial relationships, physical mechanisms, staged processes,
+geometric or structural patterns, or anything where "what does this look like?" is a natural question.
+Skip for abstract philosophical concepts, purely definitional content, or cases where images add nothing.
+
+If a visual is warranted:
+1. Search for an existing image — prefer Wikimedia Commons (direct file URLs like https://upload.wikimedia.org/...).
+   Hard rule: reject any image with a visible copyright notice, watermark, company logo, or © mark.
+   Default to one image; add a second only if it carries distinct instructional value the first doesn't.
+2. If no clean image found: search YouTube for a short instructional video. Return the full YouTube URL.
+3. If nothing found: set visual to null.`;
+
+async function _callWithWebSearch(config) {
+  const messages = [...config.messages];
+  for (let i = 0; i < 5; i++) {
+    const resp = await client.messages.create({ ...config, messages });
+    if (resp.stop_reason !== 'tool_use') return resp;
+    messages.push({ role: 'assistant', content: resp.content });
+    const results = resp.content
+      .filter(b => b.type === 'tool_use')
+      .map(b => ({ type: 'tool_result', tool_use_id: b.id, content: 'No results.' }));
+    if (!results.length) return resp;
+    messages.push({ role: 'user', content: results });
+  }
+  return await client.messages.create({ ...config, messages });
+}
+
 function langText(locale) {
   if (!locale || locale === 'en') return '';
   const name = LANG_NAMES[locale] || locale;
@@ -44,7 +71,7 @@ Respond only with the content requested — no preamble, no headings.`,
 // ── Overview ──────────────────────────────────────────────────────────────────
 async function generateOverview(nodeLabel, domain, level, locale) {
   const msg = await client.messages.create({
-    model: HAIKU,
+    model: SONNET,
     max_tokens: 200,
     system: TUTOR_SYSTEM,
     messages: [{
@@ -89,33 +116,52 @@ Typically 5–12 knobits, progressing from foundational to nuanced.`,
 // ── Explain phase — ADVANCE to next byte ("I understand") ────────────────────
 // previousContent is what was shown in the previous byte so the LLM can
 // build on it without repeating itself.
+// Returns { text: string, visual: { type, url, caption } | null }
 async function generateExplainByte(nodeLabel, knobitTitle, byteIndex, previousContent, locale) {
   let prompt;
 
   if (byteIndex === 0 || !previousContent) {
-    prompt = `You are teaching knobit "${knobitTitle}" within the topic "${nodeLabel}".
+    prompt = `Teaching knobit "${knobitTitle}" within topic "${nodeLabel}".
 
 Write the OPENING explanation (byte 1). Introduce the core concept clearly and simply.
-2–4 sentences. Plain prose — no headings, no bullet points.${langText(locale)}`;
-  } else {
-    prompt = `You are teaching knobit "${knobitTitle}" within the topic "${nodeLabel}".
+2–4 sentences. Plain prose — no headings, no bullet points.${langText(locale)}
 
-The learner understood the previous explanation:
+${VIZ_INSTRUCTIONS}
+
+Respond with a single JSON object — no markdown fences:
+{"text":"your explanation","visual":{"type":"image","url":"...","caption":"..."}|{"type":"video","url":"...","caption":"..."}|null}`;
+  } else {
+    prompt = `Teaching knobit "${knobitTitle}" within topic "${nodeLabel}".
+
+Previous explanation the learner understood:
 """
 ${previousContent}
 """
 
-Now write the NEXT step (byte ${byteIndex + 1}). Advance the explanation — cover a new aspect, go one level deeper, or add a concrete application. Do NOT repeat or paraphrase what was already explained. Build forward.
-2–4 sentences. Plain prose — no headings, no bullet points.${langText(locale)}`;
+Write the NEXT step (byte ${byteIndex + 1}). Cover a new aspect or go one level deeper. Do NOT repeat or paraphrase what was already explained.
+2–4 sentences. Plain prose — no headings, no bullet points.${langText(locale)}
+
+${VIZ_INSTRUCTIONS}
+
+Respond with a single JSON object — no markdown fences:
+{"text":"your explanation","visual":{"type":"image","url":"...","caption":"..."}|{"type":"video","url":"...","caption":"..."}|null}`;
   }
 
-  const msg = await client.messages.create({
-    model: HAIKU,
-    max_tokens: 200,
+  const resp = await _callWithWebSearch({
+    model: SONNET,
+    max_tokens: 800,
+    tools: [{ type: 'web_search_20250305', name: 'web_search' }],
     system: TUTOR_SYSTEM,
     messages: [{ role: 'user', content: prompt }],
   });
-  return msg.content[0].text.trim();
+
+  const lastText = resp.content.filter(b => b.type === 'text').pop();
+  if (!lastText) return { text: '', visual: null };
+  try {
+    return parseJSON(lastText.text.trim());
+  } catch {
+    return { text: lastText.text.trim(), visual: null };
+  }
 }
 
 // ── Explain phase — ADAPT the current byte ───────────────────────────────────
@@ -142,7 +188,7 @@ Same core concept — accessible register.`,
   }[mode] || 'Rewrite this explanation from a different angle.';
 
   const msg = await client.messages.create({
-    model: HAIKU,
+    model: SONNET,
     max_tokens: 200,
     system: TUTOR_SYSTEM,
     messages: [{
@@ -165,7 +211,7 @@ Write the replacement paragraph only — 2–4 sentences, no headings.${langText
 // ── Demonstrate phase ─────────────────────────────────────────────────────────
 async function generateDemonstrate(nodeLabel, knobitTitle, exampleIndex, locale) {
   const msg = await client.messages.create({
-    model: HAIKU,
+    model: SONNET,
     max_tokens: 350,
     system: TUTOR_SYSTEM,
     messages: [{
@@ -187,7 +233,7 @@ No markdown fences. Just the JSON object.${langJson(locale)}`,
 async function generatePractice(nodeLabel, knobitTitle, problemIndex, locale) {
   const difficulty = problemIndex === 0 ? 'straightforward' : problemIndex === 1 ? 'moderate' : 'challenging';
   const msg = await client.messages.create({
-    model: HAIKU,
+    model: SONNET,
     max_tokens: 250,
     system: TUTOR_SYSTEM,
     messages: [{
@@ -208,7 +254,7 @@ No markdown fences. Just the JSON object.${langJson(locale)}`,
 // ── Grade a practice answer ───────────────────────────────────────────────────
 async function gradePractice(nodeLabel, knobitTitle, question, expected, userAnswer, locale) {
   const msg = await client.messages.create({
-    model: HAIKU,
+    model: SONNET,
     max_tokens: 200,
     system: TUTOR_SYSTEM,
     messages: [{
@@ -231,7 +277,7 @@ No markdown fences. Just the JSON object.${langJson(locale)}`,
 // ── Meaning phase ─────────────────────────────────────────────────────────────
 async function generateMeaning(nodeLabel, knobitTitle, locale) {
   const msg = await client.messages.create({
-    model: HAIKU,
+    model: SONNET,
     max_tokens: 180,
     system: TUTOR_SYSTEM,
     messages: [{
@@ -253,7 +299,7 @@ async function answerQuestion(nodeLabel, knobitTitle, phase, question, context, 
     : '';
 
   const msg = await client.messages.create({
-    model: HAIKU,
+    model: SONNET,
     max_tokens: 300,
     system: [{
       type: 'text',
