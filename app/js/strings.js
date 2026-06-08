@@ -33,6 +33,10 @@
       var key = el.getAttribute('data-i18n-placeholder');
       if (_strings[key]) el.placeholder = _strings[key];
     });
+    document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n-title');
+      if (_strings[key]) el.title = _strings[key];
+    });
   }
 
   window.reloadStrings = function () {
