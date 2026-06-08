@@ -785,10 +785,10 @@
       yearOpts += '<option value="' + y + '"' + (String(vals.birth_year) === String(y) ? ' selected' : '') + '>' + y + '</option>';
     }
 
-    // Language dropdown (extend list as platform adds language support)
-    var LANGUAGES = ['English'];
-    var langOpts = '<option value="">—</option>' + LANGUAGES.map(function(l) {
-      return '<option value="' + l + '"' + (vals.location === l ? ' selected' : '') + '>' + l + '</option>';
+    // Language dropdown — value is display name; locale code resolved via LANG_LOCALE map
+    var LANGUAGES = [['English', 'en'], ['Estonian', 'et']];
+    var langOpts = '<option value="">—</option>' + LANGUAGES.map(function(pair) {
+      return '<option value="' + pair[0] + '"' + (vals.location === pair[0] ? ' selected' : '') + '>' + pair[0] + '</option>';
     }).join('');
 
     card.innerHTML = `
@@ -803,7 +803,7 @@
         </div>
         <div class="p-kv-label">${t('label.language')}</div>
         <div class="p-kv-value">
-          <select class="p-edit-input" data-field="location">${langOpts}</select>
+          <select class="p-edit-input" data-field="location" onchange="window._applyLangLocale(this.value)">${langOpts}</select>
         </div>
         <div class="p-kv-label">
           ${t('label.culture')}
@@ -822,6 +822,18 @@
       </div>
       <button class="p-edit-btn primary" onclick="window.saveIdentity()">${t('btn.save')}</button>
       <button class="p-edit-btn" onclick="window.loadProfile()">${t('btn.cancel')}</button>`;
+  };
+
+  window._applyLangLocale = function (langName) {
+    var LANG_LOCALE = { 'English': 'en', 'Estonian': 'et' };
+    var locale = LANG_LOCALE[langName] || 'en';
+    window._uiLocale = locale === 'en' ? null : locale;
+    window.reloadStrings && window.reloadStrings();
+    fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: 'ui_locale', value: locale }),
+    });
   };
 
   window.saveIdentity = function () {
