@@ -112,7 +112,7 @@ router.get('/nodes/:id/overview', async (req, res) => {
     if (node.overview && locale === 'en') return res.json({ overview: node.overview });
 
     const domain   = await getNodeDomain(node.db_id);
-    const overview = await llm.generateOverview(node.label, domain, node.level, locale);
+    const overview = await llm.generateOverview(node.label, domain, node.level, locale, req.user?.id);
     if (locale === 'en') {
       await db.execute('UPDATE nodes SET overview = ? WHERE external_id = ?', [overview, id]);
     }
@@ -421,30 +421,31 @@ router.post('/learn/interact', async (req, res) => {
 
     let result;
 
+    const uid = req.user?.id;
     if (phase === 'explain') {
       if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
-        result = { text: await llm.generateRephrase(nodeLabel, title, original, action, locale) };
+        result = { text: await llm.generateRephrase(nodeLabel, title, original, action, locale, uid) };
       } else if (action === 'visual') {
-        result = await llm.generateExplainByteVisual(nodeLabel, title, original, locale);
+        result = await llm.generateExplainByteVisual(nodeLabel, title, original, locale, uid);
       } else {
-        result = { text: await llm.generateExplainByteText(nodeLabel, title, byteIndex, original, locale, profile) };
+        result = { text: await llm.generateExplainByteText(nodeLabel, title, byteIndex, original, locale, profile, uid) };
       }
     } else if (phase === 'demonstrate') {
-      result = { demonstrate: await llm.generateDemonstrate(nodeLabel, title, byteIndex, locale, profile) };
+      result = { demonstrate: await llm.generateDemonstrate(nodeLabel, title, byteIndex, locale, profile, uid) };
     } else if (phase === 'practice') {
       if (action === 'grade') {
-        result = { grade: await llm.gradePractice(nodeLabel, title, question, expected, userAnswer, locale) };
+        result = { grade: await llm.gradePractice(nodeLabel, title, question, expected, userAnswer, locale, uid) };
       } else {
-        result = { practice: await llm.generatePractice(nodeLabel, title, byteIndex, locale, profile) };
+        result = { practice: await llm.generatePractice(nodeLabel, title, byteIndex, locale, profile, uid) };
       }
     } else if (phase === 'meaning') {
       if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
-        result = { text: await llm.generateRephrase(nodeLabel, title, original, action, locale) };
+        result = { text: await llm.generateRephrase(nodeLabel, title, original, action, locale, uid) };
       } else {
-        result = { text: await llm.generateMeaning(nodeLabel, title, locale) };
+        result = { text: await llm.generateMeaning(nodeLabel, title, locale, uid) };
       }
     } else if (phase === 'ask') {
-      result = { text: await llm.answerQuestion(nodeLabel, title, action || 'general', question, context, locale) };
+      result = { text: await llm.answerQuestion(nodeLabel, title, action || 'general', question, context, locale, uid) };
     } else {
       return res.status(400).json({ error: `Unknown phase: ${phase}` });
     }
@@ -1097,7 +1098,7 @@ router.post('/test/question', async (req, res) => {
     if (level < 4) return res.status(400).json({ error: 'Test only available for L4 and L5 nodes' });
     const breadcrumb = await getNodeBreadcrumb(db_id);
     const locale = await getUserLocale(req.user?.id);
-    const result = await llm.generateTestQuestion(label, breadcrumb, questionNum, history, locale);
+    const result = await llm.generateTestQuestion(label, breadcrumb, questionNum, history, locale, req.user?.id);
     res.json(result);
   } catch (err) {
     console.error('[api/test/question]', err.message);
@@ -1120,7 +1121,7 @@ router.post('/test/evaluate', async (req, res) => {
     const locale = await getUserLocale(req.user?.id);
 
     const evaluation = await llm.evaluateTestAnswer(
-      label, breadcrumb, questionNum, question, options, userAnswer, history, locale
+      label, breadcrumb, questionNum, question, options, userAnswer, history, locale, req.user?.id
     );
 
     if (questionNum === 4 && evaluation.finalScore !== undefined && passportId) {
@@ -1147,6 +1148,40 @@ router.post('/test/evaluate', async (req, res) => {
   } catch (err) {
     console.error('[api/test/evaluate]', err.message);
     res.status(500).json({ error: 'Evaluation failed' });
+  }
+});
+
+// ── Admin: token usage per user ───────────────────────────────────────────────
+router.get('/admin/token-usage', async (req, res) => {
+  if (!req.user || !['admin', 'super_admin'].includes(req.user.role)) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+  try {
+    const [totals] = await db.execute(`
+      SELECT u.id, u.email, u.role,
+             SUM(t.input_tokens)  AS input_tokens,
+             SUM(t.output_tokens) AS output_tokens,
+             SUM(t.input_tokens + t.output_tokens) AS total_tokens,
+             COUNT(*)             AS call_count,
+             MAX(t.created_at)    AS last_call
+      FROM token_usage t
+      JOIN users u ON t.user_id = u.id
+      GROUP BY u.id
+      ORDER BY total_tokens DESC
+    `);
+    const [byType] = await db.execute(`
+      SELECT u.email, t.call_type,
+             SUM(t.input_tokens + t.output_tokens) AS tokens,
+             COUNT(*) AS calls
+      FROM token_usage t
+      JOIN users u ON t.user_id = u.id
+      GROUP BY u.id, t.call_type
+      ORDER BY u.email, tokens DESC
+    `);
+    res.json({ totals, byType });
+  } catch (err) {
+    console.error('[api/admin/token-usage]', err.message);
+    res.status(500).json({ error: 'Failed to fetch token usage' });
   }
 });
 
