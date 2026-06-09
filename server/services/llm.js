@@ -1,6 +1,15 @@
 const Anthropic = require('@anthropic-ai/sdk');
+const db        = require('../db');
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+function _logUsage(userId, callType, usage, model) {
+  if (!userId || !usage) return;
+  db.execute(
+    'INSERT INTO token_usage (user_id, call_type, input_tokens, output_tokens, model) VALUES (?, ?, ?, ?, ?)',
+    [userId, callType, usage.input_tokens || 0, usage.output_tokens || 0, model]
+  ).catch(() => {});
+}
 
 // LLMs sometimes wrap JSON in markdown fences despite instructions.
 // Strip them before parsing.
@@ -133,7 +142,7 @@ Respond only with the content requested — no preamble, no headings.`,
 ];
 
 // ── Overview ──────────────────────────────────────────────────────────────────
-async function generateOverview(nodeLabel, domain, level, locale) {
+async function generateOverview(nodeLabel, domain, level, locale, userId) {
   const msg = await client.messages.create({
     model: SONNET,
     max_tokens: 200,
@@ -145,6 +154,7 @@ First sentence: what it is. Second sentence: why it matters or where it shows up
 No headings, no bullet points — just the 2 sentences.${langText(locale)}`,
     }],
   });
+  _logUsage(userId, 'overview', msg.usage, SONNET);
   return msg.content[0].text.trim();
 }
 
@@ -178,7 +188,7 @@ Typically 5–12 knobits, progressing from foundational to nuanced.`,
 }
 
 // ── Explain phase — text only (fast, no web search) ──────────────────────────
-async function generateExplainByteText(nodeLabel, knobitTitle, byteIndex, previousContent, locale, profile) {
+async function generateExplainByteText(nodeLabel, knobitTitle, byteIndex, previousContent, locale, profile, userId) {
   let prompt;
   if (byteIndex === 0 || !previousContent) {
     prompt = `Teaching knobit "${knobitTitle}" within topic "${nodeLabel}".
@@ -203,12 +213,13 @@ Write the NEXT step (byte ${byteIndex + 1}). Cover a new aspect or go one level 
     system: TUTOR_SYSTEM,
     messages: [{ role: 'user', content: prompt }],
   });
+  _logUsage(userId, 'explain_text', msg.usage, SONNET);
   return msg.content[0].text.trim();
 }
 
 // ── Explain phase — visual only (deferred, uses web search) ──────────────────
 // Returns { visual: { type, url, caption } | null }
-async function generateExplainByteVisual(nodeLabel, knobitTitle, byteText, locale) {
+async function generateExplainByteVisual(nodeLabel, knobitTitle, byteText, locale, userId) {
   const prompt = `A learner studying "${knobitTitle}" (part of "${nodeLabel}") just read this explanation:
 """
 ${byteText}
@@ -243,6 +254,7 @@ Output ONLY a single JSON object — no markdown fences, no reasoning, no commen
     else result.visual = null;
   }
 
+  _logUsage(userId, 'explain_visual', resp.usage, SONNET);
   return { visual: result.visual || null };
 }
 
@@ -251,7 +263,7 @@ Output ONLY a single JSON object — no markdown fences, no reasoning, no commen
 //   'rephrase' — "I don't understand": step back, explain from first principles
 //   'simpler'  — "Too simplistic": rephrase with professional/expert language
 //   'complex'  — "Too complex": rephrase with simpler words and analogies
-async function generateRephrase(nodeLabel, knobitTitle, originalByte, mode, locale) {
+async function generateRephrase(nodeLabel, knobitTitle, originalByte, mode, locale, userId) {
   const instructions = {
     rephrase: `The learner did not understand this explanation. Step back further.
 Explain the same concept from first principles — start from something even more basic,
@@ -287,11 +299,12 @@ ${instructions}
 Write the replacement paragraph only — 2–4 sentences, no headings.${langText(locale)}`,
     }],
   });
+  _logUsage(userId, 'rephrase', msg.usage, SONNET);
   return msg.content[0].text.trim();
 }
 
 // ── Demonstrate phase ─────────────────────────────────────────────────────────
-async function generateDemonstrate(nodeLabel, knobitTitle, exampleIndex, locale, profile) {
+async function generateDemonstrate(nodeLabel, knobitTitle, exampleIndex, locale, profile, userId) {
   const msg = await client.messages.create({
     model: SONNET,
     max_tokens: 350,
@@ -308,11 +321,12 @@ Respond with valid JSON, two fields only:
 No markdown fences. Just the JSON object.${profileBlock(profile)}${langJson(locale)}`,
     }],
   });
+  _logUsage(userId, 'demonstrate', msg.usage, SONNET);
   return parseJSON(msg.content[0].text.trim());
 }
 
 // ── Practice phase ────────────────────────────────────────────────────────────
-async function generatePractice(nodeLabel, knobitTitle, problemIndex, locale, profile) {
+async function generatePractice(nodeLabel, knobitTitle, problemIndex, locale, profile, userId) {
   const difficulty = problemIndex === 0 ? 'straightforward' : problemIndex === 1 ? 'moderate' : 'challenging';
   const msg = await client.messages.create({
     model: SONNET,
@@ -330,11 +344,12 @@ Respond with valid JSON, two fields only:
 No markdown fences. Just the JSON object.${profileBlock(profile)}${langJson(locale)}`,
     }],
   });
+  _logUsage(userId, 'practice', msg.usage, SONNET);
   return parseJSON(msg.content[0].text.trim());
 }
 
 // ── Grade a practice answer ───────────────────────────────────────────────────
-async function gradePractice(nodeLabel, knobitTitle, question, expected, userAnswer, locale) {
+async function gradePractice(nodeLabel, knobitTitle, question, expected, userAnswer, locale, userId) {
   const msg = await client.messages.create({
     model: SONNET,
     max_tokens: 200,
@@ -353,11 +368,12 @@ Respond with valid JSON, two fields only:
 No markdown fences. Just the JSON object.${langJson(locale)}`,
     }],
   });
+  _logUsage(userId, 'grade_practice', msg.usage, SONNET);
   return parseJSON(msg.content[0].text.trim());
 }
 
 // ── Meaning phase ─────────────────────────────────────────────────────────────
-async function generateMeaning(nodeLabel, knobitTitle, locale) {
+async function generateMeaning(nodeLabel, knobitTitle, locale, userId) {
   const msg = await client.messages.create({
     model: SONNET,
     max_tokens: 180,
@@ -371,11 +387,12 @@ Be concrete: name a profession, product, decision, or daily situation where it d
 No "In conclusion" — just the insight.${langText(locale)}`,
     }],
   });
+  _logUsage(userId, 'meaning', msg.usage, SONNET);
   return msg.content[0].text.trim();
 }
 
 // ── Ask anything ─────────────────────────────────────────────────────────────
-async function answerQuestion(nodeLabel, knobitTitle, phase, question, context, locale) {
+async function answerQuestion(nodeLabel, knobitTitle, phase, question, context, locale, userId) {
   const practiceRule = phase === 'practice'
     ? `\n\nPRACTICE PHASE — CRITICAL RULE: The learner is actively working on a practice problem. You must NEVER reveal, confirm, or strongly hint at the answer, even if asked directly. Instead offer a guiding question, point back to the relevant concept, or suggest a thinking approach. The learner must reach the answer themselves.`
     : '';
@@ -403,13 +420,14 @@ Recent content: "${context}"
 Question: "${question}"${langText(locale)}`,
     }],
   });
+  _logUsage(userId, 'ask', msg.usage, SONNET);
   return msg.content[0].text.trim();
 }
 
 // ── 4-tier knowledge test ─────────────────────────────────────────────────────
 // questionNum: 1-4  history: [{question, answer, correct}]
 // Returns: { question, type: 'open'|'mcq', options?: string[] }
-async function generateTestQuestion(nodeLabel, breadcrumb, questionNum, history, locale) {
+async function generateTestQuestion(nodeLabel, breadcrumb, questionNum, history, locale, userId) {
   const tiers = [
     'Factual (Remember): one question on core terminology or a foundational definition.',
     'Conceptual (Understand): one question asking the learner to explain a mechanism or relationship. No calculations.',
@@ -454,12 +472,13 @@ For MCQ: provide exactly 4 options, one correct. Return JSON only.${langJson(loc
     }],
   });
 
+  _logUsage(userId, 'test_question', msg.usage, SONNET);
   return parseJSON(msg.content[0].text.trim());
 }
 
 // Evaluate one answer and return feedback.
 // If questionNum === 4, also return final mastery score with breakdown.
-async function evaluateTestAnswer(nodeLabel, breadcrumb, questionNum, question, options, userAnswer, history, locale) {
+async function evaluateTestAnswer(nodeLabel, breadcrumb, questionNum, question, options, userAnswer, history, locale, userId) {
   const isLast = questionNum === 4;
   const allQA = [...history, { question, answer: userAnswer }];
   const historyText = allQA.map((h, i) =>
@@ -498,6 +517,7 @@ Return JSON with:
     }],
   });
 
+  _logUsage(userId, 'test_evaluate', msg.usage, SONNET);
   return parseJSON(msg.content[0].text.trim());
 }
 
