@@ -14,15 +14,15 @@
    ═══════════════════════════════════════════════════════════════ */
 
 const CONTINENTS = {
-  "Mathematics":      "#378ADD",
-  "Philosophy":       "#9F8FE8",
-  "Social Sciences":  "#EF9F27",
-  "Medicine":         "#E2614A",
-  "Humanities":       "#2BBFA0",
-  "Arts":             "#D4537E",
-  "Applied Sciences": "#7ABF3C",
-  "Natural Sciences": "#5BC8D8",
-  "Skills & Crafts":  "#C4A55A"
+  "0":   "#378ADD",  // Mathematics
+  "184": "#9F8FE8",  // Philosophy
+  "196": "#EF9F27",  // Social Sciences
+  "206": "#E2614A",  // Medicine
+  "247": "#2BBFA0",  // Humanities
+  "253": "#D4537E",  // Arts
+  "264": "#7ABF3C",  // Applied Sciences
+  "274": "#5BC8D8",  // Natural Sciences
+  "500": "#C4A55A",  // Skills & Crafts
 };
 
 const FADE = 0.25;
@@ -135,11 +135,12 @@ function init(data, emergentData) {
       visited.add(cur);
       cur = parentOf[cur];
     }
-    return allNodes[cur] ? allNodes[cur].label : "Unknown";
+    return cur; // external_id of the L1 ancestor
   }
   Object.values(allNodes).forEach(n => {
-    n.continent = getContinent(n.id);
-    n.color = CONTINENTS[n.continent] || "#888";
+    n.continentId = getContinent(n.id);
+    n.continent   = allNodes[n.continentId] ? allNodes[n.continentId].label : "Unknown";
+    n.color = CONTINENTS[n.continentId] || "#888";
   });
 
   const hasHiddenChildren = id => (childrenOf[id] || []).some(cid => allNodes[cid].level >= 5);
@@ -247,7 +248,7 @@ function init(data, emergentData) {
   });
 
   Object.values(allNodes).forEach(n => {
-    const seed = continentSeeds[n.continent];
+    const seed = continentSeeds[n.continentId];
     if (seed) {
       const scatter = n.level === 1 ? 0 : n.level === 2 ? 60 : n.level === 3 ? 120 : n.level === 4 ? 160 : 190;
       n.x = seed.x + (Math.random() - 0.5) * scatter;
@@ -279,8 +280,8 @@ function init(data, emergentData) {
     .force("charge",  d3.forceManyBody().strength(d => d.level === 1 ? -2500 : d.level === 2 ? -300 : d.level === 3 ? -80 : d.level === 4 ? -25 : -10).distanceMax(600))
     .force("center",  d3.forceCenter(w/2, h/2).strength(0.05))
     .force("collide", d3.forceCollide().radius(d => nodeRadius(d) + 4).strength(0.8))
-    .force("x",       d3.forceX(d => continentSeeds[d.continent] ? continentSeeds[d.continent].x : w/2).strength(d => d.level === 1 ? 0.3 : 0.06))
-    .force("y",       d3.forceY(d => continentSeeds[d.continent] ? continentSeeds[d.continent].y : h/2).strength(d => d.level === 1 ? 0.3 : 0.06))
+    .force("x",       d3.forceX(d => continentSeeds[d.continentId] ? continentSeeds[d.continentId].x : w/2).strength(d => d.level === 1 ? 0.3 : 0.06))
+    .force("y",       d3.forceY(d => continentSeeds[d.continentId] ? continentSeeds[d.continentId].y : h/2).strength(d => d.level === 1 ? 0.3 : 0.06))
     .alphaDecay(simPreset.alphaDecay)
     .velocityDecay(simPreset.velocityDecay)
     .on("tick", ticked);
@@ -313,7 +314,7 @@ function init(data, emergentData) {
     link = link.enter().append("line")
       .attr("stroke", d => {
         const src = allNodes[typeof d.source === "object" ? d.source.id : d.source];
-        return src ? (CONTINENTS[src.continent] || "#444") : "#444";
+        return src ? (CONTINENTS[src.continentId] || "#444") : "#444";
       })
       .attr("stroke-opacity", d => {
         const src = allNodes[typeof d.source === "object" ? d.source.id : d.source];
@@ -969,7 +970,7 @@ function init(data, emergentData) {
         const tgtId = typeof d.target === 'object' ? d.target.id : d.target;
         if (!nodePassesActive(srcId) || !nodePassesActive(tgtId)) return '#585858';
         const src = allNodes[srcId];
-        return src ? (CONTINENTS[src.continent] || '#444') : '#444';
+        return src ? (CONTINENTS[src.continentId] || '#444') : '#444';
       })
       .attr('stroke-opacity', d => {
         const srcId = typeof d.source === 'object' ? d.source.id : d.source;
