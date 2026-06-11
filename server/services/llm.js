@@ -581,6 +581,59 @@ function streamAnswerQuestion(nodeLabel, knobitTitle, phase, question, context, 
   }, userId, 'ask', onChunk);
 }
 
+function streamTestQuestion(nodeLabel, breadcrumb, questionNum, history, locale, userId, onChunk) {
+  const tiers = [
+    'Factual (Remember): one question on core terminology or a foundational definition.',
+    'Conceptual (Understand): one question asking the learner to explain a mechanism or relationship. No calculations.',
+    'Procedural (Apply): one question requiring step-by-step execution with specific numbers/inputs.',
+    'Analytical (Evaluate): one question presenting a scenario or anomaly to diagnose or critique.',
+  ];
+  const correctCount = history.filter(function (h) { return h.correct; }).length;
+  const lastWasWrong = history.length > 0 && !history[history.length - 1].correct;
+  const adaptNote = questionNum === 4 && correctCount >= 3
+    ? 'The learner has done very well. Make this question genuinely expert-level.'
+    : lastWasWrong ? 'The previous answer was incorrect. Adjust difficulty slightly downward.' : '';
+  const historyText = history.map(function (h, i) {
+    return `Q${i + 1}: ${h.question}\nAnswer: ${h.answer}\nCorrect: ${h.correct}`;
+  }).join('\n\n');
+  return _streamText({
+    model: SONNET,
+    max_tokens: 400,
+    system: [{
+      type: 'text',
+      text: `You are a knowledge diagnostic examiner. You generate exactly one question per tier of a 4-tier framework.\nReturn ONLY valid JSON with these fields:\n- "question": the question text (string)\n- "type": "open" or "mcq"\n- "options": array of 4 strings if type is "mcq", omit if "open"\nDo not add any explanation outside the JSON.`,
+      cache_control: { type: 'ephemeral' },
+    }],
+    messages: [{
+      role: 'user',
+      content: `Topic: "${nodeLabel}" (${breadcrumb})\nTier ${questionNum}: ${tiers[questionNum - 1]}\n${adaptNote}\n${historyText ? `\nPrevious Q&A:\n${historyText}` : ''}\n\nGenerate question ${questionNum}. Choose open or MCQ based on what best tests this tier.\nFor MCQ: provide exactly 4 options, one correct. Return JSON only.${langJson(locale)}`,
+    }],
+  }, userId, 'test_question', onChunk);
+}
+
+function streamTestEvaluate(nodeLabel, breadcrumb, questionNum, question, options, userAnswer, history, locale, userId, onChunk) {
+  const isLast = questionNum === 4;
+  const allQA = [...history, { question, answer: userAnswer }];
+  const historyText = allQA.map(function (h, i) {
+    return `Q${i + 1}: ${h.question}\nAnswer: ${h.answer}`;
+  }).join('\n\n');
+  return _streamText({
+    model: SONNET,
+    max_tokens: isLast ? 600 : 300,
+    system: [{
+      type: 'text',
+      text: `You are a knowledge diagnostic evaluator. Return ONLY valid JSON. No text outside the JSON object.`,
+      cache_control: { type: 'ephemeral' },
+    }],
+    messages: [{
+      role: 'user',
+      content: isLast
+        ? `Topic: "${nodeLabel}" (${breadcrumb})\n\nFull Q&A:\n${historyText}\n\nEvaluate all four answers. Return JSON with:\n- "correct": boolean (is the current Q4 answer fully correct?)\n- "partial": boolean (true if Q4 shows real understanding but is incomplete or imprecise; always false for MCQ)\n- "feedback": 1-2 sentence feedback on the Q4 answer\n- "finalScore": integer 0-100\n- "scoreBreakdown": string (2-4 sentences explaining the score — what they got right, what they missed)${langJson(locale)}`
+        : `Topic: "${nodeLabel}"\nQuestion: "${question}"\n${options ? `Options: ${options.map(function (o, i) { return `${i + 1}. ${o}`; }).join(' | ')}` : ''}\nAnswer: "${userAnswer}"\n\nReturn JSON with:\n- "correct": boolean — true only if fully and precisely correct\n- "partial": boolean — true if the answer shows real understanding but is incomplete or imprecise (only for open questions; always false for MCQ)\n- "feedback": 1-2 sentences — confirm if correct, note what's missing if partial, or explain the right answer if wrong${langJson(locale)}`,
+    }],
+  }, userId, 'test_evaluate', onChunk);
+}
+
 module.exports = {
   generateOverview,
   generateKnobits,
@@ -598,4 +651,6 @@ module.exports = {
   streamRephrase,
   streamMeaning,
   streamAnswerQuestion,
+  streamTestQuestion,
+  streamTestEvaluate,
 };
