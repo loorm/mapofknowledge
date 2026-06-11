@@ -450,18 +450,18 @@ router.post('/learn/interact', async (req, res) => {
       let streamFn;
       if (phase === 'explain' && action !== 'visual') {
         if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
-          streamFn = (cb) => llm.streamRephrase(nodeLabel, title, original, action, locale, uid, cb);
+          streamFn = (cb) => llm.streamRephrase(nodeLabel, title, original, action, locale, profile, uid, cb);
         } else {
           streamFn = (cb) => llm.streamExplainByteText(nodeLabel, title, byteIndex, original, locale, profile, uid, cb);
         }
       } else if (phase === 'meaning') {
         if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
-          streamFn = (cb) => llm.streamRephrase(nodeLabel, title, original, action, locale, uid, cb);
+          streamFn = (cb) => llm.streamRephrase(nodeLabel, title, original, action, locale, profile, uid, cb);
         } else {
           streamFn = (cb) => llm.streamMeaning(nodeLabel, title, locale, uid, cb);
         }
       } else if (phase === 'ask') {
-        streamFn = (cb) => llm.streamAnswerQuestion(nodeLabel, title, action || 'general', question, context, locale, uid, cb);
+        streamFn = (cb) => llm.streamAnswerQuestion(nodeLabel, title, action || 'general', question, context, locale, profile, uid, cb);
       }
       if (streamFn) return _runStream(streamFn, res);
     }
@@ -470,7 +470,7 @@ router.post('/learn/interact', async (req, res) => {
 
     if (phase === 'explain') {
       if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
-        result = { text: await llm.generateRephrase(nodeLabel, title, original, action, locale, uid) };
+        result = { text: await llm.generateRephrase(nodeLabel, title, original, action, locale, profile, uid) };
       } else if (action === 'visual') {
         result = await llm.generateExplainByteVisual(nodeLabel, title, original, locale, uid);
       } else {
@@ -486,12 +486,12 @@ router.post('/learn/interact', async (req, res) => {
       }
     } else if (phase === 'meaning') {
       if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
-        result = { text: await llm.generateRephrase(nodeLabel, title, original, action, locale, uid) };
+        result = { text: await llm.generateRephrase(nodeLabel, title, original, action, locale, profile, uid) };
       } else {
         result = { text: await llm.generateMeaning(nodeLabel, title, locale, uid) };
       }
     } else if (phase === 'ask') {
-      result = { text: await llm.answerQuestion(nodeLabel, title, action || 'general', question, context, locale, uid) };
+      result = { text: await llm.answerQuestion(nodeLabel, title, action || 'general', question, context, locale, profile, uid) };
     } else {
       return res.status(400).json({ error: `Unknown phase: ${phase}` });
     }
