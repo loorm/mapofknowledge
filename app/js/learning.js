@@ -53,6 +53,63 @@
     });
   }
 
+  // Streaming variant: calls the same endpoint with stream:true.
+  // Calls onChunk(text) for each token. Returns a Promise that resolves when done.
+  function apiInteractStream(params, onChunk) {
+    var knobit = KNOBITS[CURRENT_KNOBIT_IDX];
+    if (!knobit) return Promise.reject(new Error('No knobit'));
+    var body = Object.assign({ knobitId: knobit.id, stream: true }, params);
+    return fetch('/api/learn/interact', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(body),
+    }).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      if (!r.body) throw new Error('No stream');
+      var reader  = r.body.getReader();
+      var decoder = new TextDecoder();
+      var buf     = '';
+      function pump() {
+        return reader.read().then(function (result) {
+          if (result.done) return;
+          buf += decoder.decode(result.value, { stream: true });
+          var lines = buf.split('\n');
+          buf = lines.pop();
+          for (var i = 0; i < lines.length; i++) {
+            var line = lines[i].trim();
+            if (!line.startsWith('data: ')) continue;
+            var data = line.slice(6);
+            if (data === '[DONE]') return;
+            try {
+              var obj = JSON.parse(data);
+              if (obj.error) throw new Error('stream-error');
+              if (obj.t) onChunk(obj.t);
+            } catch (e) {
+              if (e.message === 'stream-error') throw e;
+            }
+          }
+          return pump();
+        });
+      }
+      return pump();
+    });
+  }
+
+  // Create an initially-empty block that will be filled by streaming tokens.
+  // Returns { el, block } where block.content is kept in sync with _streamBlocks.
+  function _appendLiveBlock(type) {
+    var block = { type: type, content: '' };
+    var el = _appendBlock(block);
+    return { el: el, block: block };
+  }
+
+  function _updateLiveBlock(el, block, text) {
+    block.content = text;
+    if (!el) return;
+    el.innerHTML = _escHtml(text).replace(/\n/g, '<br>');
+    _scrollStream();
+  }
+
   function apiComplete(knobitId) {
     return fetch('/api/learn/knobit/' + knobitId + '/complete', { method: 'POST' })
       .catch(function () {});
@@ -309,17 +366,20 @@
   function _fetchInitialExplain() {
     _retryFn = _fetchInitialExplain;
     _showLoadingBlock();
-    apiInteract({ phase: 'explain', byteIndex: 0, priorChoices: [] })
-      .then(function (d) {
-        _starting = false; _retryFn = null;
-        _removeLoadingBlock();
-        _appendBlock({ type: 'byte', content: d.text || '' });
-        _appendVisualLoader(d.text);
-        _setButtonRow('explain-options');
-      }).catch(function () {
-        _starting = false;
-        _onApiError();
-      });
+    var live = null, fullText = '';
+    apiInteractStream({ phase: 'explain', byteIndex: 0, priorChoices: [] }, function (chunk) {
+      fullText += chunk;
+      if (!live) { _removeLoadingBlock(); live = _appendLiveBlock('byte'); }
+      _updateLiveBlock(live.el, live.block, fullText);
+    }).then(function () {
+      _starting = false; _retryFn = null;
+      if (!live) { _removeLoadingBlock(); _appendBlock({ type: 'byte', content: fullText }); }
+      _appendVisualLoader(fullText);
+      _setButtonRow('explain-options');
+    }).catch(function () {
+      _starting = false;
+      _onApiError();
+    });
   }
 
   /* ─── Phase chip management ───────────────────────────────────── */
@@ -413,10 +473,18 @@
     var wantVisual = (opt === 'ok');
     var capturedContent = lastContent, capturedAction = action, capturedWantVisual = wantVisual;
     _retryFn = function () {
+      var live2 = null, fullText2 = '';
       _showLoadingBlock();
-      apiInteract({ phase: 'explain', action: capturedAction, byteIndex: _byteIdx, priorChoices: _priorChoices, original: capturedContent })
-        .then(function (d) { _retryFn = null; _removeLoadingBlock(); _appendBlock({ type: 'byte', content: d.text || '' }); if (capturedWantVisual) _appendVisualLoader(d.text); _setButtonRow('explain-options'); })
-        .catch(_onApiError);
+      apiInteractStream({ phase: 'explain', action: capturedAction, byteIndex: _byteIdx, priorChoices: _priorChoices, original: capturedContent }, function (chunk) {
+        fullText2 += chunk;
+        if (!live2) { _removeLoadingBlock(); live2 = _appendLiveBlock('byte'); }
+        _updateLiveBlock(live2.el, live2.block, fullText2);
+      }).then(function () {
+        _retryFn = null;
+        if (!live2) { _removeLoadingBlock(); _appendBlock({ type: 'byte', content: fullText2 }); }
+        if (capturedWantVisual) _appendVisualLoader(fullText2);
+        _setButtonRow('explain-options');
+      }).catch(_onApiError);
     };
     _retryFn();
   };
@@ -537,13 +605,16 @@
   function _fetchMeaning() {
     _retryFn = _fetchMeaning;
     _showLoadingBlock();
-    apiInteract({ phase: 'meaning' })
-      .then(function (d) {
-        _retryFn = null;
-        _removeLoadingBlock();
-        _appendBlock({ type: 'meaning', content: d.text || '' });
-        _setButtonRow('meaning-options');
-      }).catch(_onApiError);
+    var live = null, fullText = '';
+    apiInteractStream({ phase: 'meaning' }, function (chunk) {
+      fullText += chunk;
+      if (!live) { _removeLoadingBlock(); live = _appendLiveBlock('meaning'); }
+      _updateLiveBlock(live.el, live.block, fullText);
+    }).then(function () {
+      _retryFn = null;
+      if (!live) { _removeLoadingBlock(); _appendBlock({ type: 'meaning', content: fullText }); }
+      _setButtonRow('meaning-options');
+    }).catch(_onApiError);
   }
 
   window.meaningOpt = function (opt) {
@@ -556,10 +627,17 @@
     _lockButtons();
     var capturedOpt = opt, capturedContent = _getLastContent(['meaning']);
     _retryFn = function () {
+      var live2 = null, fullText2 = '';
       _showLoadingBlock();
-      apiInteract({ phase: 'meaning', action: capturedOpt, original: capturedContent })
-        .then(function (d) { _retryFn = null; _removeLoadingBlock(); _appendBlock({ type: 'meaning', content: d.text || '' }); _setButtonRow('meaning-options'); })
-        .catch(_onApiError);
+      apiInteractStream({ phase: 'meaning', action: capturedOpt, original: capturedContent }, function (chunk) {
+        fullText2 += chunk;
+        if (!live2) { _removeLoadingBlock(); live2 = _appendLiveBlock('meaning'); }
+        _updateLiveBlock(live2.el, live2.block, fullText2);
+      }).then(function () {
+        _retryFn = null;
+        if (!live2) { _removeLoadingBlock(); _appendBlock({ type: 'meaning', content: fullText2 }); }
+        _setButtonRow('meaning-options');
+      }).catch(_onApiError);
     };
     _retryFn();
   };
@@ -606,10 +684,18 @@
     _appendBlock({ type: 'user', content: q });
     var capturedQ = q, capturedContext = _streamBlocks.slice(-3).map(function (b) { return b.content || ''; }).join(' '), capturedPhase = _phase;
     _retryFn = function () {
+      var live2 = null, fullText2 = '';
       _showLoadingBlock();
-      apiInteract({ phase: 'ask', action: capturedPhase, question: capturedQ, context: capturedContext })
-        .then(function (d) { _retryFn = null; _removeLoadingBlock(); _appendBlock({ type: 'note', content: d.text || '' }); if (capturedPhase === 'explain') _setButtonRow('explain-options'); if (capturedPhase === 'meaning') _setButtonRow('meaning-options'); })
-        .catch(_onApiError);
+      apiInteractStream({ phase: 'ask', action: capturedPhase, question: capturedQ, context: capturedContext }, function (chunk) {
+        fullText2 += chunk;
+        if (!live2) { _removeLoadingBlock(); live2 = _appendLiveBlock('note'); }
+        _updateLiveBlock(live2.el, live2.block, fullText2);
+      }).then(function () {
+        _retryFn = null;
+        if (!live2) { _removeLoadingBlock(); _appendBlock({ type: 'note', content: fullText2 }); }
+        if (capturedPhase === 'explain') _setButtonRow('explain-options');
+        if (capturedPhase === 'meaning') _setButtonRow('meaning-options');
+      }).catch(_onApiError);
     };
     _retryFn();
   };

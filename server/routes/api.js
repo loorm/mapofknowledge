@@ -402,6 +402,25 @@ router.post('/nodes/:id/learn', async (req, res) => {
   }
 });
 
+// ── SSE helper: pipe an llm text stream to an SSE response ──────────────────
+async function _pipeStream(streamInfo, res) {
+  res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('X-Accel-Buffering', 'no');
+  res.flushHeaders();
+  try {
+    for await (const chunk of streamInfo.textStream) {
+      res.write('data: ' + JSON.stringify({ t: chunk }) + '\n\n');
+    }
+    await streamInfo.usage;
+  } catch (err) {
+    console.error('[stream]', err.message);
+    res.write('data: ' + JSON.stringify({ error: true }) + '\n\n');
+  }
+  res.write('data: [DONE]\n\n');
+  res.end();
+}
+
 // ── LLM learning interactions ────────────────────────────────────────────────
 router.post('/learn/interact', async (req, res) => {
   const {
@@ -409,6 +428,7 @@ router.post('/learn/interact', async (req, res) => {
     byteIndex = 0, answer, priorChoices = [],
     original = '', question = '', expected = '', userAnswer = '',
     context = '',
+    stream: wantStream = false,
   } = req.body;
 
   try {
@@ -425,9 +445,31 @@ router.post('/learn/interact', async (req, res) => {
       getUserProfile(req.user?.id),
     ]);
 
+    const uid = req.user?.id;
+
+    // ── Streaming branch: text-only phases ──────────────────────────────────
+    if (wantStream) {
+      let streamInfo;
+      if (phase === 'explain' && action !== 'visual') {
+        if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
+          streamInfo = llm.streamRephrase(nodeLabel, title, original, action, locale, uid);
+        } else {
+          streamInfo = llm.streamExplainByteText(nodeLabel, title, byteIndex, original, locale, profile, uid);
+        }
+      } else if (phase === 'meaning') {
+        if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
+          streamInfo = llm.streamRephrase(nodeLabel, title, original, action, locale, uid);
+        } else {
+          streamInfo = llm.streamMeaning(nodeLabel, title, locale, uid);
+        }
+      } else if (phase === 'ask') {
+        streamInfo = llm.streamAnswerQuestion(nodeLabel, title, action || 'general', question, context, locale, uid);
+      }
+      if (streamInfo) return _pipeStream(streamInfo, res);
+    }
+
     let result;
 
-    const uid = req.user?.id;
     if (phase === 'explain') {
       if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
         result = { text: await llm.generateRephrase(nodeLabel, title, original, action, locale, uid) };
