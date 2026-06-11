@@ -42,27 +42,33 @@ async function getUserProfile(userId) {
   } catch { return null; }
 }
 
-// ── In-memory map cache (10k+ nodes — cache after first DB load) ─────────────
-let mapCache = null;
+// ── In-memory map cache per locale (10k+ nodes — cache after first DB load) ───
+const mapCaches = {};
 
 router.get('/map', async (req, res) => {
   try {
-    if (mapCache) return res.json(mapCache);
+    const locale = req.user?.locale || 'en';
+    if (mapCaches[locale]) return res.json(mapCaches[locale]);
 
-    const [baseNodes] = await db.execute(
-      `SELECT external_id AS id, label, level
-       FROM nodes WHERE layer = 'foundational' AND is_active = 1`
-    );
+    const translatedNodeSql = (layer) =>
+      locale === 'en'
+        ? [`SELECT external_id AS id, label, level
+            FROM nodes WHERE layer = ? AND is_active = 1`, [layer]]
+        : [`SELECT n.external_id AS id, COALESCE(tr.label, n.label) AS label, n.level
+            FROM nodes n
+            LEFT JOIN node_translations tr
+              ON tr.node_external_id = n.external_id AND tr.locale = ?
+            WHERE n.layer = ? AND n.is_active = 1`, [locale, layer]];
+
+    const [baseNodes]     = await db.execute(...translatedNodeSql('foundational'));
+    const [emergentNodes] = await db.execute(...translatedNodeSql('emergent'));
+
     const [baseEdges] = await db.execute(
       `SELECT s.external_id AS source, t.external_id AS target
        FROM edges e
        JOIN nodes s ON e.source_node_id = s.id
        JOIN nodes t ON e.target_node_id = t.id
        WHERE e.edge_type = 'hierarchy'`
-    );
-    const [emergentNodes] = await db.execute(
-      `SELECT external_id AS id, label, level
-       FROM nodes WHERE layer = 'emergent' AND is_active = 1`
     );
     const [emergentEdges] = await db.execute(
       `SELECT s.external_id AS source, t.external_id AS target, e.edge_type
@@ -79,21 +85,21 @@ router.get('/map', async (req, res) => {
       edge_type: e.edge_type === 'hierarchy' ? 'hierarchical' : e.edge_type,
     }));
 
-    mapCache = {
+    mapCaches[locale] = {
       base:     { nodes: baseNodes,     edges: baseEdges },
       emergent: { nodes: emergentNodes, edges: mappedEmergentEdges },
     };
 
-    res.json(mapCache);
+    res.json(mapCaches[locale]);
   } catch (err) {
     console.error('[api/map]', err.message);
     res.status(500).json({ error: 'Failed to load map data' });
   }
 });
 
-// Bust cache when migration reruns
+// Bust cache when migration reruns or translations are updated
 router.post('/map/bust-cache', (req, res) => {
-  mapCache = null;
+  Object.keys(mapCaches).forEach(k => delete mapCaches[k]);
   res.json({ ok: true });
 });
 
