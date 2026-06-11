@@ -150,6 +150,8 @@ INSERT INTO ui_strings (key_name, locale, value) VALUES
 ('placeholder.type_answer', 'en', 'Type your answer…'),
 ('placeholder.waiting',     'en', 'Waiting…'),
 ('placeholder.about',       'en', 'Describe your learning needs, preferences, accessibility requirements, or anything else that helps us support your learning.'),
+('placeholder.reflection',  'en', 'Share a short reflection…'),
+('label.reflection_prompt', 'en', 'What did you learn?'),
 ('placeholder.add_interest','en', 'Add interest'),
 ('placeholder.add_value',   'en', 'Add value'),
 ('placeholder.individual_role','en','Role / relationship'),

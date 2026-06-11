@@ -650,6 +650,28 @@
   margin-top: 4px; line-height: 1.3;
 }
 
+.lm-reflection-wrap {
+  width: 100%; max-width: 320px;
+  margin-bottom: 20px;
+}
+.lm-reflection-label {
+  font-size: 11px; font-weight: 600;
+  color: var(--c7); letter-spacing: 0.06em;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.lm-reflection-input {
+  width: 100%; box-sizing: border-box;
+  min-height: 72px; resize: vertical;
+  background: var(--i05); border: 1.5px solid var(--i14);
+  border-radius: 10px; padding: 10px 12px;
+  font-size: 13px; color: var(--c3);
+  font-family: inherit; line-height: 1.5;
+  transition: border-color 0.15s;
+}
+.lm-reflection-input:focus {
+  outline: none; border-color: var(--lm-accent);
+}
+
 .lm-complete-actions {
   display: flex; flex-direction: column; gap: 10px;
   width: 100%; max-width: 320px;
