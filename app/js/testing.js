@@ -326,8 +326,7 @@
 
           var icon     = result.correct ? '✓' : (result.partial ? '~' : '✗');
           var subClass = result.correct ? 'feedback-correct' : (result.partial ? 'feedback-partial' : 'feedback-incorrect');
-          var feedbackText = result.feedback || (result.scoreBreakdown ? result.scoreBreakdown.split('.')[0] + '.' : '');
-          _appendBlock({ type: 'feedback', content: icon + ' ' + feedbackText, subClass: subClass });
+          _appendBlock({ type: 'feedback', content: icon + ' ' + (result.feedback || ''), subClass: subClass });
 
           if (_questionNum === 4) {
             _updateProgressBar();
