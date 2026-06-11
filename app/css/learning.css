@@ -823,8 +823,9 @@
   margin-bottom: 4px;
 }
 
-/* ── Quit confirmation modal ── */
-#quit-knobit-modal {
+/* ── Quit confirmation modals ── */
+#quit-knobit-modal,
+#quit-test-modal {
   position: fixed;
   inset: 0;
   z-index: 400;
