@@ -197,7 +197,7 @@ router.get('/strings', async (req, res) => {
 // ── Most recent in-progress learning path ────────────────────────────────────
 router.get('/learn/resume', async (req, res) => {
   const passportId = req.user?.passport_id;
-  const locale     = req.user?.locale || 'en';
+  const locale     = await getUserLocale(req.user?.id);
   if (!passportId) return res.json({});
 
   try {
@@ -235,7 +235,7 @@ router.get('/nodes/:id/learn-progress', async (req, res) => {
       'SELECT id AS db_id FROM nodes WHERE external_id = ?', [id]
     );
     if (!nodes.length) return res.json({ done: 0, total: 0 });
-    const locale = req.user?.locale || 'en';
+    const locale = await getUserLocale(req.user?.id);
 
     const [[{ total }]] = await db.execute(
       'SELECT COUNT(*) AS total FROM knobits WHERE node_id = ? AND locale = ?',
@@ -345,7 +345,7 @@ router.post('/nodes/:id/knowledge', async (req, res) => {
 // ── Generate / return knobits for a node ─────────────────────────────────────
 router.post('/nodes/:id/learn', async (req, res) => {
   const { id }   = req.params;
-  const locale   = req.user?.locale || 'en';
+  const locale   = await getUserLocale(req.user?.id);
 
   try {
     const [nodes] = await db.execute(
