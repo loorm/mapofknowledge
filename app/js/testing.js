@@ -243,8 +243,9 @@
           correct:  result.correct || false,
         });
 
-        var fb = (result.correct ? '✓ ' : '✗ ') + (result.feedback || '');
-        _appendBlock({ type: 'feedback', content: fb });
+        var icon     = result.correct ? '✓' : (result.partial ? '~' : '✗');
+        var subClass = result.correct ? 'feedback-correct' : (result.partial ? 'feedback-partial' : 'feedback-incorrect');
+        _appendBlock({ type: 'feedback', content: icon + ' ' + (result.feedback || ''), subClass: subClass });
 
         if (_questionNum === 4) {
           _updateProgressBar();
@@ -341,7 +342,7 @@
     _streamBlocks.push(block);
 
     var el = document.createElement('div');
-    el.className = 'block block-' + block.type;
+    el.className = 'block block-' + block.type + (block.subClass ? ' ' + block.subClass : '');
 
     if (block.rawHtml) {
       el.innerHTML = block.rawHtml;

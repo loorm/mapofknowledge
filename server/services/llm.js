@@ -502,7 +502,8 @@ Full Q&A:
 ${historyText}
 
 Evaluate all four answers. Return JSON with:
-- "correct": boolean (is the current Q4 answer correct?)
+- "correct": boolean (is the current Q4 answer fully correct?)
+- "partial": boolean (true if Q4 shows real understanding but is incomplete or imprecise; always false for MCQ)
 - "feedback": 1-2 sentence feedback on the Q4 answer
 - "finalScore": integer 0-100
 - "scoreBreakdown": string (2-4 sentences explaining the score — what they got right, what they missed)${langJson(locale)}`
@@ -512,8 +513,9 @@ ${options ? `Options: ${options.map((o, i) => `${i + 1}. ${o}`).join(' | ')}` : 
 Answer: "${userAnswer}"
 
 Return JSON with:
-- "correct": boolean
-- "feedback": 1-2 sentences — confirm if correct or explain the right answer briefly${langJson(locale)}`,
+- "correct": boolean — true only if fully and precisely correct
+- "partial": boolean — true if the answer shows real understanding but is incomplete or imprecise (only for open questions; always false for MCQ)
+- "feedback": 1-2 sentences — confirm if correct, note what's missing if partial, or explain the right answer if wrong${langJson(locale)}`,
     }],
   });
 
