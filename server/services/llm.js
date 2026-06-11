@@ -523,46 +523,53 @@ Return JSON with:
   return parseJSON(msg.content[0].text.trim());
 }
 
-// ── Text streaming ─────────────────────────────────────────────────────────────
-// Returns { textStream: AsyncIterable<string>, usage: Promise<void> }
-function _openStream(config, userId, callType) {
-  const stream = client.messages.stream(config);
-  const usage  = stream.finalMessage().then(function (msg) {
-    _logUsage(userId, callType, msg.usage, config.model);
-  }).catch(function () {});
-  return { textStream: stream.textStream, usage };
+// ── Text streaming (SDK 0.39.x: create({stream:true}) → Promise<Stream>) ───────
+// Calls onChunk for each text token; resolves when the stream ends.
+async function _streamText(config, userId, callType, onChunk) {
+  const stream = await client.messages.create(Object.assign({}, config, { stream: true }));
+  let inputTokens = 0, outputTokens = 0;
+  for await (const event of stream) {
+    if (event.type === 'content_block_delta' && event.delta && event.delta.type === 'text_delta') {
+      onChunk(event.delta.text);
+    } else if (event.type === 'message_start' && event.message && event.message.usage) {
+      inputTokens = event.message.usage.input_tokens || 0;
+    } else if (event.type === 'message_delta' && event.usage) {
+      outputTokens = event.usage.output_tokens || 0;
+    }
+  }
+  _logUsage(userId, callType, { input_tokens: inputTokens, output_tokens: outputTokens }, config.model);
 }
 
-function streamExplainByteText(nodeLabel, knobitTitle, byteIndex, previousContent, locale, profile, userId) {
+function streamExplainByteText(nodeLabel, knobitTitle, byteIndex, previousContent, locale, profile, userId, onChunk) {
   let prompt;
   if (byteIndex === 0 || !previousContent) {
     prompt = `Teaching knobit "${knobitTitle}" within topic "${nodeLabel}".\n\nWrite the OPENING explanation (byte 1). Introduce the core concept clearly and simply.\n2–4 sentences. Plain prose — no headings, no bullet points. Plain text only, no HTML tags. Use \\n for line breaks.${profileBlock(profile)}${langText(locale)}`;
   } else {
     prompt = `Teaching knobit "${knobitTitle}" within topic "${nodeLabel}".\n\nPrevious explanation the learner understood:\n"""\n${previousContent}\n"""\n\nWrite the NEXT step (byte ${byteIndex + 1}). Cover a new aspect or go one level deeper. Do NOT repeat or paraphrase what was already explained.\n2–4 sentences. Plain prose — no headings, no bullet points. Plain text only, no HTML tags. Use \\n for line breaks.${profileBlock(profile)}${langText(locale)}`;
   }
-  return _openStream({ model: SONNET, max_tokens: 300, system: TUTOR_SYSTEM, messages: [{ role: 'user', content: prompt }] }, userId, 'explain_text');
+  return _streamText({ model: SONNET, max_tokens: 300, system: TUTOR_SYSTEM, messages: [{ role: 'user', content: prompt }] }, userId, 'explain_text', onChunk);
 }
 
-function streamRephrase(nodeLabel, knobitTitle, originalByte, mode, locale, userId) {
+function streamRephrase(nodeLabel, knobitTitle, originalByte, mode, locale, userId, onChunk) {
   const instructions = {
     rephrase: `The learner did not understand this explanation. Step back further.\nExplain the same concept from first principles — start from something even more basic,\nuse a concrete real-world analogy, and build up slowly.\nDo NOT reuse the same wording. A different angle entirely.`,
     simpler:  `The learner found this too simplistic.\nRewrite it with professional, expert-level language. Use precise terminology,\na more formal framing, and the kind of depth an expert or researcher would appreciate.\nSame core concept — elevated register.`,
     complex:  `The learner found this too complex.\nRewrite it using simpler, everyday words. Replace jargon with plain equivalents,\nuse a concrete metaphor or comparison from daily life, and keep sentences short.\nSame core concept — accessible register.`,
   }[mode] || 'Rewrite this explanation from a different angle.';
   const prompt = `Topic: "${nodeLabel}" — Knobit: "${knobitTitle}"\n\nCurrent explanation:\n"""\n${originalByte}\n"""\n\n${instructions}\n\nWrite the replacement paragraph only — 2–4 sentences, no headings.${langText(locale)}`;
-  return _openStream({ model: SONNET, max_tokens: 200, system: TUTOR_SYSTEM, messages: [{ role: 'user', content: prompt }] }, userId, 'rephrase');
+  return _streamText({ model: SONNET, max_tokens: 200, system: TUTOR_SYSTEM, messages: [{ role: 'user', content: prompt }] }, userId, 'rephrase', onChunk);
 }
 
-function streamMeaning(nodeLabel, knobitTitle, locale, userId) {
+function streamMeaning(nodeLabel, knobitTitle, locale, userId, onChunk) {
   const prompt = `Topic: "${nodeLabel}" — Knobit: "${knobitTitle}"\n\nWrite 2–3 sentences on why this matters in the real world.\nBe concrete: name a profession, product, decision, or daily situation where it directly applies.\nNo "In conclusion" — just the insight.${langText(locale)}`;
-  return _openStream({ model: SONNET, max_tokens: 180, system: TUTOR_SYSTEM, messages: [{ role: 'user', content: prompt }] }, userId, 'meaning');
+  return _streamText({ model: SONNET, max_tokens: 180, system: TUTOR_SYSTEM, messages: [{ role: 'user', content: prompt }] }, userId, 'meaning', onChunk);
 }
 
-function streamAnswerQuestion(nodeLabel, knobitTitle, phase, question, context, locale, userId) {
+function streamAnswerQuestion(nodeLabel, knobitTitle, phase, question, context, locale, userId, onChunk) {
   const practiceRule = phase === 'practice'
     ? `\n\nPRACTICE PHASE — CRITICAL RULE: The learner is actively working on a practice problem. You must NEVER reveal, confirm, or strongly hint at the answer, even if asked directly. Instead offer a guiding question, point back to the relevant concept, or suggest a thinking approach. The learner must reach the answer themselves.`
     : '';
-  return _openStream({
+  return _streamText({
     model: SONNET,
     max_tokens: 300,
     system: [{
@@ -571,7 +578,7 @@ function streamAnswerQuestion(nodeLabel, knobitTitle, phase, question, context, 
       cache_control: { type: 'ephemeral' },
     }],
     messages: [{ role: 'user', content: `Phase: ${phase}\nRecent content: "${context}"\nQuestion: "${question}"${langText(locale)}` }],
-  }, userId, 'ask');
+  }, userId, 'ask', onChunk);
 }
 
 module.exports = {

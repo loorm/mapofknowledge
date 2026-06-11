@@ -402,17 +402,15 @@ router.post('/nodes/:id/learn', async (req, res) => {
   }
 });
 
-// ── SSE helper: pipe an llm text stream to an SSE response ──────────────────
-async function _pipeStream(streamInfo, res) {
+// ── SSE helper: set headers and run an llm streaming call ───────────────────
+async function _runStream(streamFn, res) {
   res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('X-Accel-Buffering', 'no');
   res.flushHeaders();
+  const write = (chunk) => res.write('data: ' + JSON.stringify({ t: chunk }) + '\n\n');
   try {
-    for await (const chunk of streamInfo.textStream) {
-      res.write('data: ' + JSON.stringify({ t: chunk }) + '\n\n');
-    }
-    await streamInfo.usage;
+    await streamFn(write);
   } catch (err) {
     console.error('[stream]', err.message);
     res.write('data: ' + JSON.stringify({ error: true }) + '\n\n');
@@ -449,23 +447,23 @@ router.post('/learn/interact', async (req, res) => {
 
     // ── Streaming branch: text-only phases ──────────────────────────────────
     if (wantStream) {
-      let streamInfo;
+      let streamFn;
       if (phase === 'explain' && action !== 'visual') {
         if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
-          streamInfo = llm.streamRephrase(nodeLabel, title, original, action, locale, uid);
+          streamFn = (cb) => llm.streamRephrase(nodeLabel, title, original, action, locale, uid, cb);
         } else {
-          streamInfo = llm.streamExplainByteText(nodeLabel, title, byteIndex, original, locale, profile, uid);
+          streamFn = (cb) => llm.streamExplainByteText(nodeLabel, title, byteIndex, original, locale, profile, uid, cb);
         }
       } else if (phase === 'meaning') {
         if (action === 'rephrase' || action === 'simpler' || action === 'complex') {
-          streamInfo = llm.streamRephrase(nodeLabel, title, original, action, locale, uid);
+          streamFn = (cb) => llm.streamRephrase(nodeLabel, title, original, action, locale, uid, cb);
         } else {
-          streamInfo = llm.streamMeaning(nodeLabel, title, locale, uid);
+          streamFn = (cb) => llm.streamMeaning(nodeLabel, title, locale, uid, cb);
         }
       } else if (phase === 'ask') {
-        streamInfo = llm.streamAnswerQuestion(nodeLabel, title, action || 'general', question, context, locale, uid);
+        streamFn = (cb) => llm.streamAnswerQuestion(nodeLabel, title, action || 'general', question, context, locale, uid, cb);
       }
-      if (streamInfo) return _pipeStream(streamInfo, res);
+      if (streamFn) return _runStream(streamFn, res);
     }
 
     let result;
