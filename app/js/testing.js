@@ -358,25 +358,43 @@
     _appendPhaseDivider(t('label.result'));
     _appendBlock({ type: 'meaning', content: score + '% — ' + breakdown });
 
-    setTimeout(function () {
-      var correctCount = _history.filter(function (h) { return h.correct; }).length;
-
-      var titleEl = document.querySelector('#testing-mode .lm-complete-title');
-      var s = document.querySelector('#testing-mode .lm-complete-sub');
-      if (titleEl) titleEl.textContent = t('msg.diagnostic_complete');
-      if (s) s.textContent = breakdown;
-
-      var stat = document.querySelector('#testing-mode .lm-complete-stats');
-      if (stat) {
-        var cards = stat.querySelectorAll('.lm-complete-stat');
-        if (cards[0]) cards[0].innerHTML = '<div class="lm-cstat-num">4/4</div><div class="lm-cstat-label">' + t('label.questions_answered') + '</div>';
-        if (cards[1]) cards[1].innerHTML = '<div class="lm-cstat-num">' + score + '%</div><div class="lm-cstat-label">' + t('label.mastery_score') + '</div>';
-        if (cards[2]) cards[2].innerHTML = '<div class="lm-cstat-num">' + correctCount + '/4</div><div class="lm-cstat-label">' + t('label.questions_correct') + '</div>';
-      }
-      _testComplete = true;
-      showTmView('tm-complete');
-    }, 2200);
+    // Pre-populate the complete screen while the user reads the breakdown
+    var correctCount = _history.filter(function (h) { return h.correct; }).length;
+    var titleEl = document.querySelector('#testing-mode .lm-complete-title');
+    var sub     = document.querySelector('#testing-mode .lm-complete-sub');
+    if (titleEl) titleEl.textContent = t('msg.diagnostic_complete');
+    if (sub)     sub.textContent     = breakdown;
+    var stat = document.querySelector('#testing-mode .lm-complete-stats');
+    if (stat) {
+      var cards = stat.querySelectorAll('.lm-complete-stat');
+      if (cards[0]) cards[0].innerHTML = '<div class="lm-cstat-num">4/4</div><div class="lm-cstat-label">' + t('label.questions_answered') + '</div>';
+      if (cards[1]) cards[1].innerHTML = '<div class="lm-cstat-num">' + score + '%</div><div class="lm-cstat-label">' + t('label.mastery_score') + '</div>';
+      if (cards[2]) cards[2].innerHTML = '<div class="lm-cstat-num">' + correctCount + '/4</div><div class="lm-cstat-label">' + t('label.questions_correct') + '</div>';
+    }
+    _testComplete = true;
+    setTimeout(_appendResultsButton, 600);
   }
+
+  function _appendResultsButton() {
+    var s = document.getElementById('tn-stream');
+    if (!s) return;
+    var wrap = document.createElement('div');
+    wrap.className = 'tm-results-btn-wrap';
+    wrap.innerHTML = '<button class="tm-results-btn" onclick="window._goToComplete()">' + t('btn.view_results') + '</button>';
+    wrap.style.opacity   = '0';
+    wrap.style.transform = 'translateY(8px)';
+    s.appendChild(wrap);
+    requestAnimationFrame(function () {
+      wrap.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+      wrap.style.opacity    = '1';
+      wrap.style.transform  = 'translateY(0)';
+    });
+    _scrollStream();
+  }
+
+  window._goToComplete = function () {
+    showTmView('tm-complete');
+  };
 
   /* ─── Progress bar ────────────────────────────────────────────── */
   function _updateProgressBar() {
