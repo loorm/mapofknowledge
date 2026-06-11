@@ -1134,7 +1134,7 @@ async function getNodeBreadcrumb(nodeDbId) {
 
 // ── 4-tier diagnostic: generate question ─────────────────────────────────────
 router.post('/test/question', async (req, res) => {
-  const { nodeId, questionNum, history = [] } = req.body;
+  const { nodeId, questionNum, history = [], stream: wantStream = false } = req.body;
   try {
     const [nodes] = await db.execute(
       'SELECT id AS db_id, label, level FROM nodes WHERE external_id = ?', [nodeId]
@@ -1144,6 +1144,9 @@ router.post('/test/question', async (req, res) => {
     if (level < 4) return res.status(400).json({ error: 'Test only available for L4 and L5 nodes' });
     const breadcrumb = await getNodeBreadcrumb(db_id);
     const locale = await getUserLocale(req.user?.id);
+    if (wantStream) {
+      return _runStream((cb) => llm.streamTestQuestion(label, breadcrumb, questionNum, history, locale, req.user?.id, cb), res);
+    }
     const result = await llm.generateTestQuestion(label, breadcrumb, questionNum, history, locale, req.user?.id);
     res.json(result);
   } catch (err) {
@@ -1154,7 +1157,7 @@ router.post('/test/question', async (req, res) => {
 
 // ── 4-tier diagnostic: evaluate answer ───────────────────────────────────────
 router.post('/test/evaluate', async (req, res) => {
-  const { nodeId, questionNum, question, options, userAnswer, history = [] } = req.body;
+  const { nodeId, questionNum, question, options, userAnswer, history = [], stream: wantStream = false } = req.body;
   const passportId = req.user?.passport_id;
 
   try {
@@ -1165,6 +1168,10 @@ router.post('/test/evaluate', async (req, res) => {
     const { db_id, label } = nodes[0];
     const breadcrumb = await getNodeBreadcrumb(db_id);
     const locale = await getUserLocale(req.user?.id);
+
+    if (wantStream) {
+      return _runStream((cb) => llm.streamTestEvaluate(label, breadcrumb, questionNum, question, options, userAnswer, history, locale, req.user?.id, cb), res);
+    }
 
     const evaluation = await llm.evaluateTestAnswer(
       label, breadcrumb, questionNum, question, options, userAnswer, history, locale, req.user?.id

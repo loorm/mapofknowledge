@@ -33,32 +33,60 @@
   }
 
   /* ─── API helpers ─────────────────────────────────────────────── */
-  function apiQuestion(questionNum, history) {
-    return fetch('/api/test/question', {
+  // Streams raw JSON tokens, accumulates, parses on [DONE].
+  function _apiStream(url, body) {
+    return fetch(url, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ nodeId: _node.id, questionNum: questionNum, history: history }),
+      body:    JSON.stringify(Object.assign({}, body, { stream: true })),
     }).then(function (r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
+      if (!r.body) throw new Error('No stream');
+      var reader  = r.body.getReader();
+      var decoder = new TextDecoder();
+      var buf = '', fullText = '';
+      function pump() {
+        return reader.read().then(function (result) {
+          if (result.done) return JSON.parse(fullText);
+          buf += decoder.decode(result.value, { stream: true });
+          var lines = buf.split('\n');
+          buf = lines.pop();
+          for (var i = 0; i < lines.length; i++) {
+            var line = lines[i].trim();
+            if (!line.startsWith('data: ')) continue;
+            var data = line.slice(6);
+            if (data === '[DONE]') {
+              var s = fullText.trim()
+                .replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '').trim();
+              return JSON.parse(s);
+            }
+            try {
+              var obj = JSON.parse(data);
+              if (obj.error) throw new Error('stream-error');
+              if (obj.t) fullText += obj.t;
+            } catch (e) {
+              if (e.message === 'stream-error') throw e;
+            }
+          }
+          return pump();
+        });
+      }
+      return pump();
     });
   }
 
+  function apiQuestion(questionNum, history) {
+    return _apiStream('/api/test/question', { nodeId: _node.id, questionNum: questionNum, history: history });
+  }
+
   function apiEvaluate(questionNum, question, options, userAnswer, history) {
-    return fetch('/api/test/evaluate', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({
-        nodeId:      _node.id,
-        questionNum: questionNum,
-        question:    question,
-        options:     options || null,
-        userAnswer:  userAnswer,
-        history:     history,
-      }),
-    }).then(function (r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
+    return _apiStream('/api/test/evaluate', {
+      nodeId:      _node.id,
+      questionNum: questionNum,
+      question:    question,
+      options:     options || null,
+      userAnswer:  userAnswer,
+      history:     history,
     });
   }
 
