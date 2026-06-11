@@ -197,7 +197,6 @@ router.get('/strings', async (req, res) => {
 // ── Most recent in-progress learning path ────────────────────────────────────
 router.get('/learn/resume', async (req, res) => {
   const passportId = req.user?.passport_id;
-  const locale     = await getUserLocale(req.user?.id);
   if (!passportId) return res.json({});
 
   try {
@@ -210,12 +209,11 @@ router.get('/learn/resume', async (req, res) => {
        JOIN nodes n ON k.node_id = n.id
        LEFT JOIN knobit_progress kp
               ON k.id = kp.knobit_id AND kp.passport_id = ?
-       WHERE k.locale = ?
        GROUP BY n.id, n.external_id, n.label
        HAVING done > 0 AND done < total
        ORDER BY last_activity DESC
        LIMIT 1`,
-      [passportId, locale]
+      [passportId]
     );
     res.json(rows.length ? rows[0] : {});
   } catch (err) {
@@ -344,8 +342,9 @@ router.post('/nodes/:id/knowledge', async (req, res) => {
 
 // ── Generate / return knobits for a node ─────────────────────────────────────
 router.post('/nodes/:id/learn', async (req, res) => {
-  const { id }   = req.params;
-  const locale   = await getUserLocale(req.user?.id);
+  const { id }      = req.params;
+  const locale      = await getUserLocale(req.user?.id);
+  const passportId  = req.user?.passport_id;
 
   try {
     const [nodes] = await db.execute(
@@ -358,41 +357,51 @@ router.post('/nodes/:id/learn', async (req, res) => {
       return res.status(400).json({ error: 'Learn mode is only available for L5 leaf concepts' });
     }
 
-    // Return cached knobits if they exist
-    const [existing] = await db.execute(
-      `SELECT id, sequence, title
-       FROM knobits WHERE node_id = ? AND locale = ? ORDER BY sequence`,
-      [node.db_id, locale]
+    // Knobits are always stored in English
+    let [knobits] = await db.execute(
+      `SELECT id, sequence, title FROM knobits WHERE node_id = ? ORDER BY sequence`,
+      [node.db_id]
     );
-    if (existing.length) return res.json({ knobits: existing });
 
-    // Generate via LLM
-    const domain     = await getNodeDomain(node.db_id);
-    const breadcrumb = await getNodeBreadcrumb(node.db_id);
-    const generated  = await llm.generateKnobits(node.label, domain, breadcrumb);
-
-    for (const k of generated) {
-      await db.execute(
-        'INSERT INTO knobits (node_id, sequence, locale, title) VALUES (?, ?, ?, ?)',
-        [node.db_id, k.sequence, locale, k.title]
+    if (!knobits.length) {
+      // Generate in English and persist
+      const domain     = await getNodeDomain(node.db_id);
+      const breadcrumb = await getNodeBreadcrumb(node.db_id);
+      const generated  = await llm.generateKnobits(node.label, domain, breadcrumb);
+      for (const k of generated) {
+        await db.execute(
+          'INSERT INTO knobits (node_id, sequence, locale, title) VALUES (?, ?, ?, ?)',
+          [node.db_id, k.sequence, 'en', k.title]
+        );
+      }
+      [knobits] = await db.execute(
+        `SELECT id, sequence, title FROM knobits WHERE node_id = ? ORDER BY sequence`,
+        [node.db_id]
       );
+
+      if (passportId) {
+        await db.execute(
+          `INSERT INTO passport_events
+             (passport_id, event_date, title, institution, result, node_external_id, type, sort_order)
+           VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', NULL, ?, 'activity', 0)`,
+          [passportId, `Started learning: ${node.label}`, id]
+        ).catch(() => {});
+      }
     }
 
-    const [knobits] = await db.execute(
-      `SELECT id, sequence, title
-       FROM knobits WHERE node_id = ? AND locale = ? ORDER BY sequence`,
-      [node.db_id, locale]
-    );
+    // Translate titles for non-English locales
+    if (locale !== 'en') {
+      knobits = await llm.translateKnobitTitles(knobits, locale);
+    }
 
-    // Log learning start event
-    const passportId = req.user?.passport_id;
+    // Attach progress: mark which knobits are already done
     if (passportId) {
-      await db.execute(
-        `INSERT INTO passport_events
-           (passport_id, event_date, title, institution, result, node_external_id, type, sort_order)
-         VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', NULL, ?, 'activity', 0)`,
-        [passportId, `Started learning: ${node.label}`, id]
-      ).catch(() => {});
+      const [progressRows] = await db.execute(
+        `SELECT knobit_id FROM knobit_progress WHERE passport_id = ? AND phase_reached = 'done'`,
+        [passportId]
+      );
+      const doneSet = new Set(progressRows.map(r => r.knobit_id));
+      knobits = knobits.map(k => ({ ...k, done: doneSet.has(k.id) }));
     }
 
     res.json({ knobits });
@@ -525,10 +534,10 @@ router.post('/learn/knobit/:id/complete', async (req, res) => {
       [knobitId]
     );
     if (krow.length) {
-      const { node_id, nodeExtId, nodeLabel, locale, knobitTitle } = krow[0];
+      const { node_id, nodeExtId, nodeLabel, knobitTitle } = krow[0];
       const [[{ total }]] = await db.execute(
-        'SELECT COUNT(*) AS total FROM knobits WHERE node_id = ? AND locale = ?',
-        [node_id, locale]
+        'SELECT COUNT(*) AS total FROM knobits WHERE node_id = ?',
+        [node_id]
       );
       const [[{ done }]] = await db.execute(
         `SELECT COUNT(*) AS done
