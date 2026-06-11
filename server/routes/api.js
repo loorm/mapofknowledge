@@ -48,6 +48,7 @@ const mapCaches = {};
 router.get('/map', async (req, res) => {
   try {
     const locale = await getUserLocale(req.user?.id);
+    console.log('[api/map] user:', req.user?.id, 'locale:', locale, 'cached:', !!mapCaches[locale]);
     if (mapCaches[locale]) return res.json(mapCaches[locale]);
 
     const translatedNodeSql = (layer) =>
