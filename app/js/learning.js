@@ -28,7 +28,9 @@
   var _priorChoices = [];
   var _loading      = false;
   var _starting     = false;   // guard against double-start
-  var _retryFn      = null;    // last failed API call, for retry button
+  var _retryFn          = null;
+  var _autoRetryCount   = 0;
+  var _MAX_AUTO_RETRY   = 3;
   var _pendingPractice = null;
 
   var _PHASES = ['explain', 'demonstrate', 'practice', 'meaning'];
@@ -836,10 +838,18 @@
 
   function _onApiError() {
     _removeLoadingBlock();
-    _appendBlock({ type: 'note', rawHtml:
-      '<span>' + t('msg.connection_error') + '</span>' +
-      (_retryFn ? ' <button class="kn-retry-btn" onclick="window._lmRetry()">' + t('btn.retry') + '</button>' : '')
-    });
+    if (_retryFn && _autoRetryCount < _MAX_AUTO_RETRY) {
+      _autoRetryCount++;
+      _showLoadingBlock();
+      var fn = _retryFn;
+      setTimeout(fn, 2000);
+    } else {
+      _autoRetryCount = 0;
+      _appendBlock({ type: 'note', rawHtml:
+        '<span>' + t('msg.connection_error') + '</span>' +
+        (_retryFn ? ' <button class="kn-retry-btn" onclick="window._lmRetry()">' + t('btn.retry') + '</button>' : '')
+      });
+    }
   }
 
   window._lmRetry = function () {
