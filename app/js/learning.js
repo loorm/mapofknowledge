@@ -126,10 +126,10 @@
     if (_searchWrap) _searchWrap.style.display = 'none';
     _node             = node;
     _crumb            = crumb || '';
-    KNOBITS           = Array.isArray(knobits) && knobits.length ? knobits : [];
-    KNOBIT_TOTAL      = KNOBITS.length;
-    KNOBIT_DONE_COUNT = 0;
-    CURRENT_KNOBIT_IDX = 0;
+    KNOBITS            = Array.isArray(knobits) && knobits.length ? knobits : [];
+    KNOBIT_TOTAL       = KNOBITS.length;
+    KNOBIT_DONE_COUNT  = KNOBITS.filter(function(k) { return k.done; }).length;
+    CURRENT_KNOBIT_IDX = KNOBIT_DONE_COUNT < KNOBIT_TOTAL ? KNOBIT_DONE_COUNT : 0;
 
     // Accent colours from node — set on #learning-mode so CSS palette default wins before a node is chosen
     var hex   = (node && node.color) ? node.color : '#C4826A';

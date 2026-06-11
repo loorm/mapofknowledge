@@ -187,6 +187,26 @@ Typically 5–12 knobits, progressing from foundational to nuanced.`,
   return parseJSON(msg.content[0].text.trim());
 }
 
+// ── Knobit title translation ──────────────────────────────────────────────────
+async function translateKnobitTitles(knobits, targetLocale) {
+  const langName = LANG_NAMES[targetLocale] || targetLocale;
+  const msg = await client.messages.create({
+    model: HAIKU,
+    max_tokens: 600,
+    system: 'You are a translator. Respond only with valid JSON — no markdown fences, no commentary.',
+    messages: [{
+      role: 'user',
+      content: `Translate these knobit titles into ${langName}.
+Keep each translation short (3–8 words), matching the style and concision of the originals.
+Return a JSON array of strings in the same order as the input.
+
+${JSON.stringify(knobits.map(k => k.title))}`,
+    }],
+  });
+  const translated = parseJSON(msg.content[0].text.trim());
+  return knobits.map((k, i) => ({ ...k, title: (Array.isArray(translated) && translated[i]) || k.title }));
+}
+
 // ── Explain phase — text only (fast, no web search) ──────────────────────────
 async function generateExplainByteText(nodeLabel, knobitTitle, byteIndex, previousContent, locale, profile, userId) {
   let prompt;
@@ -649,6 +669,7 @@ function streamTestEvaluate(nodeLabel, breadcrumb, questionNum, question, option
 module.exports = {
   generateOverview,
   generateKnobits,
+  translateKnobitTitles,
   generateExplainByteText,
   generateExplainByteVisual,
   generateRephrase,
