@@ -528,8 +528,6 @@
     var mapBtn = document.querySelector('#testing-mode .lm-complete-btn-primary');
     if (mapBtn) mapBtn.addEventListener('click', window.closeTestingMode);
 
-    var reviewBtn = document.querySelector('#testing-mode .lm-complete-btn-ghost');
-    if (reviewBtn) reviewBtn.addEventListener('click', function () { showTmView('tm-path'); });
   });
 
 })();
