@@ -213,7 +213,7 @@
     _setChip('q' + _questionNum);
 
     var navLabel = document.getElementById('tm-knobit-nav-label');
-    if (navLabel) navLabel.textContent = 'Q' + _questionNum + ' — ' + _tierName(_questionNum);
+    if (navLabel) navLabel.textContent = _node ? _node.label : '';
 
     _showLoadingBlock();
     apiQuestion(_questionNum, _history)
