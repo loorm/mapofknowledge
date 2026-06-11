@@ -384,7 +384,15 @@
   background: var(--i04);
   border: 1px dashed var(--i15);
   font-size: 13px; color: var(--c3); line-height: 1.6;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
 }
+.kn-retry-btn {
+  flex-shrink: 0;
+  padding: 3px 11px; border-radius: 5px; border: 1px solid var(--i25);
+  background: var(--i08); color: var(--c2); font-size: 12px; cursor: pointer;
+}
+.kn-retry-btn:hover { background: var(--i15); }
+.kn-retry-btn:disabled { opacity: 0.4; cursor: default; }
 
 /* ── block content elements ── */
 .block-label {

@@ -225,8 +225,12 @@
         _setAnswerInputState(true, q.type === 'mcq');
       }).catch(function () {
         _questionFetching = false;
+        _questionNum--;
         _removeLoadingBlock();
-        _appendBlock({ type: 'note', content: t('msg.connection_error') });
+        _appendBlock({ type: 'note', rawHtml:
+          '<span>' + t('msg.connection_error') + '</span> ' +
+          '<button class="kn-retry-btn" onclick="window._testRetryQuestion()">' + t('btn.retry') + '</button>'
+        });
       });
   }
 
@@ -242,6 +246,11 @@
     _appendBlock({ type: 'byte', content: text });
     _awaitingAnswer = true;
   }
+
+  window._testRetryQuestion = function () {
+    document.querySelectorAll('.kn-retry-btn').forEach(function (b) { b.disabled = true; });
+    _advanceQuestion();
+  };
 
   window.testSendAsk = function () {
     if (!_awaitingAnswer) return;

@@ -176,6 +176,7 @@ INSERT INTO ui_strings (key_name, locale, value) VALUES
 ('msg.keep_going',          'en', '— keep going!'),
 ('msg.no_content_yet',      'en', 'No content yet.'),
 ('msg.connection_error',    'en', 'Connection error — please try again.'),
+('btn.retry',               'en', 'Retry'),
 ('msg.unit_complete',       'en', 'Unit complete!'),
 ('msg.try_youtube',         'en', 'Try searching YouTube for'),
 ('msg.explained',           'en', 'explained'),
