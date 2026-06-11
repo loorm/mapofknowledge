@@ -13,14 +13,15 @@
 (function () {
 
   /* ─── State ──────────────────────────────────────────────────── */
-  var _node            = null;
-  var _crumb           = '';
-  var _questionNum     = 0;
-  var _history         = [];
-  var _currentQuestion = null;
-  var _loading         = false;
-  var _awaitingAnswer  = false;
-  var _streamBlocks    = [];
+  var _node             = null;
+  var _crumb            = '';
+  var _questionNum      = 0;
+  var _history          = [];
+  var _currentQuestion  = null;
+  var _loading          = false;
+  var _questionFetching = false;
+  var _awaitingAnswer   = false;
+  var _streamBlocks     = [];
 
   var _PHASES = ['q1', 'q2', 'q3', 'q4'];
 
@@ -88,11 +89,16 @@
     if (overlay) overlay.classList.remove('active');
     var sw = _searchWrap || document.querySelector('.topbar-search-wrap');
     if (sw) sw.style.display = '';
-    _searchWrap      = null;
-    _node            = null;
-    _history         = [];
-    _questionNum     = 0;
-    _awaitingAnswer  = false;
+    _searchWrap       = null;
+    _node             = null;
+    _history          = [];
+    _questionNum      = 0;
+    _awaitingAnswer   = false;
+    _questionFetching = false;
+    // Refresh sidebar so tested score hides the "I know this" toggle
+    if (window.MapView && window.MapView.refreshCurrentNodeKnowledge) {
+      window.MapView.refreshCurrentNodeKnowledge();
+    }
   };
 
   /* ─── View switching ──────────────────────────────────────────── */
@@ -131,8 +137,7 @@
 
     [1, 2, 3, 4].forEach(function (num) {
       var item = document.createElement('div');
-      item.className = 'lm-knobit-item';
-      item.style.cursor = 'default';
+      item.className = 'lm-knobit-item tm-path-item';
 
       var numEl = document.createElement('div');
       numEl.className = 'lm-knobit-num';
@@ -159,11 +164,13 @@
 
   /* ─── View 2 — Question flow ──────────────────────────────────── */
   window.startTestKnobit = function () {
-    _questionNum     = 0;
-    _history         = [];
-    _currentQuestion = null;
-    _awaitingAnswer  = false;
-    _streamBlocks    = [];
+    _questionNum      = 0;
+    _history          = [];
+    _currentQuestion  = null;
+    _awaitingAnswer   = false;
+    _streamBlocks     = [];
+    _loading          = false;
+    _questionFetching = false;
 
     var stream = document.getElementById('tn-stream');
     if (stream) stream.innerHTML = '';
@@ -176,6 +183,8 @@
   };
 
   function _advanceQuestion() {
+    if (_questionFetching) return;
+    _questionFetching = true;
     _questionNum++;
     _updateProgressBar();
     _setChip('q' + _questionNum);
@@ -186,11 +195,13 @@
     _showLoadingBlock();
     apiQuestion(_questionNum, _history)
       .then(function (q) {
+        _questionFetching = false;
         _removeLoadingBlock();
         _currentQuestion = q;
         _appendQuestionBlock(q);
         _setAnswerInputState(true, q.type === 'mcq');
       }).catch(function () {
+        _questionFetching = false;
         _removeLoadingBlock();
         _appendBlock({ type: 'note', content: t('msg.connection_error') });
       });

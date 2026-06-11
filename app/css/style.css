@@ -554,10 +554,11 @@ body { background: var(--map-bg); font-family: system-ui, -apple-system, sans-se
 
 @keyframes sb-hint-flash {
   0%   { color: var(--c6); background: transparent; }
-  20%  { color: var(--lm-accent, #C4826A); background: rgba(196,130,106,0.12); border-radius: 6px; }
+  12%  { color: var(--lm-accent, #C4826A); background: rgba(196,130,106,0.20); border-radius: 6px; }
+  55%  { color: var(--lm-accent, #C4826A); background: rgba(196,130,106,0.10); border-radius: 6px; }
   100% { color: var(--c6); background: transparent; }
 }
-.sb-inactive-hint.flash { animation: sb-hint-flash 0.65s ease-out forwards; }
+.sb-inactive-hint.flash { animation: sb-hint-flash 1.5s ease-out forwards; }
 
 /* Loading dots inside the Learn button */
 .sb-learn-dots {
@@ -662,4 +663,52 @@ body { background: var(--map-bg); font-family: system-ui, -apple-system, sans-se
   width: 100%; height: 100%;
   border: none;
 }
+
+/* ── "I know this" confirmation modal ── */
+#know-this-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: var(--overlay);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+#know-this-modal.active { display: flex; }
+.know-modal-box {
+  background: var(--bg);
+  border-radius: 18px;
+  padding: 28px 28px 22px;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 8px 32px var(--i18);
+}
+.know-modal-title {
+  font-size: 17px; font-weight: 700;
+  color: var(--c1); margin-bottom: 10px;
+}
+.know-modal-text {
+  font-size: 14px; color: var(--c3);
+  line-height: 1.65; margin-bottom: 22px;
+}
+.know-modal-btns { display: flex; flex-direction: column; gap: 9px; }
+.know-modal-confirm {
+  padding: 13px;
+  background: linear-gradient(135deg, #6BAF6B 0%, #4E9A4E 100%);
+  border: none; border-radius: 12px;
+  font-size: 14px; font-weight: 600; font-family: inherit;
+  color: #fff; cursor: pointer;
+  transition: opacity 0.13s;
+}
+.know-modal-confirm:hover { opacity: 0.90; }
+.know-modal-cancel {
+  padding: 13px;
+  background: var(--i08);
+  border: none; border-radius: 12px;
+  font-size: 14px; font-weight: 600; font-family: inherit;
+  color: var(--c2); cursor: pointer;
+  transition: background 0.13s;
+}
+.know-modal-cancel:hover { background: var(--i14); }
 

@@ -421,8 +421,8 @@ function init(data, emergentData) {
     function wireFlash(sel) {
       var btn = document.querySelector(sel);
       if (!btn) return;
-      btn.addEventListener('mouseenter', function () { flashHint(btn); });
-      btn.addEventListener('click',      function () { flashHint(btn); });
+      btn.addEventListener('mouseenter',   function () { flashHint(btn); });
+      btn.addEventListener('pointerdown', function () { flashHint(btn); });
     }
     wireFlash('.sb-learn-btn');
     wireFlash('.sb-test-btn');
@@ -430,6 +430,23 @@ function init(data, emergentData) {
       if (e.target === hint) hint.classList.remove('flash');
     });
   }());
+
+  // ── "I know this" confirmation modal ─────────────────────────────────────
+  let _knowThisCallback = null;
+  (function () {
+    var modal   = document.getElementById('know-this-modal');
+    var confirm = document.getElementById('know-modal-confirm');
+    var cancel  = document.getElementById('know-modal-cancel');
+    if (confirm) confirm.addEventListener('click', function () {
+      if (modal) modal.classList.remove('active');
+      if (_knowThisCallback) { _knowThisCallback(); _knowThisCallback = null; }
+    });
+    if (cancel) cancel.addEventListener('click', function () {
+      if (modal) modal.classList.remove('active');
+      _knowThisCallback = null;
+    });
+  }());
+
   document.getElementById("sb-close").addEventListener("click", () => {
     closeSidebar();
     resetHighlight();
@@ -587,8 +604,11 @@ function init(data, emergentData) {
             sbBadge.textContent = sourceLabel[source] || '';
           }
           if (sbToggle) {
-            // Show as 'on' only if self-reported 100%
             sbToggle.classList.toggle('on', percentage >= 100 && source === 'self_reported');
+          }
+          // Test score outranks self-report — hide the toggle entirely
+          if (toggleRow && d.level >= 4 && source === 'tested') {
+            toggleRow.style.display = 'none';
           }
         })
         .catch(() => {});
@@ -605,19 +625,28 @@ function init(data, emergentData) {
       sbToggle._wired = true;
       sbToggle.addEventListener('click', function () {
         const currentId = sidebar._currentNodeId;
-        const currentNode = allNodes[currentId];
         if (!currentId) return;
-        const isOn = sbToggle.classList.toggle('on');
-        const pct  = isOn ? 100 : 0;
-        // Server handles L4→L5 cascade internally
-        fetch(`/api/nodes/${currentId}/knowledge`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ percentage: pct, source: 'self_reported' }),
-        }).then(r => r.json()).then(({ percentage }) => {
-          if (sbPct) sbPct.textContent = `${percentage}%`;
-          if (sbBadge) sbBadge.textContent = percentage >= 100 ? t('label.self_reported') : '';
-        }).catch(() => {});
+        function postKnowledge(pct) {
+          fetch(`/api/nodes/${currentId}/knowledge`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ percentage: pct, source: 'self_reported' }),
+          }).then(r => r.json()).then(({ percentage }) => {
+            if (sbPct)   sbPct.textContent   = `${percentage}%`;
+            if (sbBadge) sbBadge.textContent  = percentage >= 100 ? t('label.self_reported') : '';
+          }).catch(() => {});
+        }
+        if (sbToggle.classList.contains('on')) {
+          sbToggle.classList.remove('on');
+          postKnowledge(0);
+        } else {
+          _knowThisCallback = function () {
+            sbToggle.classList.add('on');
+            postKnowledge(100);
+          };
+          var modal = document.getElementById('know-this-modal');
+          if (modal) modal.classList.add('active');
+        }
       });
     }
     // Always update which node the toggle is acting on
@@ -1228,6 +1257,26 @@ function init(data, emergentData) {
       highlightAndOpen(target);
     },
     closeSidebar:         function()         { closeSidebar(); resetHighlight(); },
+    refreshCurrentNodeKnowledge: function() {
+      const nodeId    = sidebar._currentNodeId;
+      if (!nodeId) return;
+      const sbPctEl   = document.querySelector('.sb-pct');
+      const sbBadgeEl = document.querySelector('.sb-knowledge-badge');
+      const sbToggleEl = document.querySelector('.sb-toggle');
+      const toggleRowEl = document.querySelector('.sb-toggle-row');
+      fetch(`/api/nodes/${nodeId}/knowledge`)
+        .then(r => r.json())
+        .then(({ percentage, source }) => {
+          if (sbPctEl)   sbPctEl.textContent   = `${percentage}%`;
+          if (sbBadgeEl) {
+            const labels = { tested: t('label.tested'), self_reported: t('label.self_reported'), estimated: t('label.estimated') };
+            sbBadgeEl.textContent = labels[source] || '';
+          }
+          if (sbToggleEl) sbToggleEl.classList.toggle('on', percentage >= 100 && source === 'self_reported');
+          if (toggleRowEl && source === 'tested') toggleRowEl.style.display = 'none';
+        })
+        .catch(() => {});
+    },
   };
   // Keep legacy aliases so filters.js / tilt.js / HTML inline calls still work
   window.refreshProgress = window.MapView.refreshProgress;
