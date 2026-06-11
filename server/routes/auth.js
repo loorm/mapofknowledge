@@ -1,7 +1,6 @@
 const express  = require('express');
 const passport = require('passport');
 const { Strategy: GoogleStrategy } = require('passport-google-oauth20');
-const crypto   = require('crypto');
 const db       = require('../db');
 const { notify } = require('../services/notifications');
 const router   = express.Router();
@@ -36,22 +35,12 @@ passport.use(new GoogleStrategy(
           return done(null, false);
         }
 
-        let user = users[0];
+        const user = users[0];
         const isFirstLogin = !user.last_login;
         await conn.execute('UPDATE users SET last_login = NOW() WHERE id = ?', [user.id]);
         if (isFirstLogin) {
           notify(user.id, 'welcome', 'Welcome to the Map of Knowledge!',
             'We\'re glad you\'re here. Start exploring the map and begin your journey of discovery. Happy learning!');
-        }
-        if (!user.passport_id) {
-          const publicId = crypto.randomUUID();
-          const [passResult] = await conn.execute(
-            'INSERT INTO learner_passports (public_id, created_at, updated_at) VALUES (?, NOW(), NOW())',
-            [publicId]
-          );
-          await conn.execute('UPDATE users SET passport_id = ? WHERE id = ?', [passResult.insertId, user.id]);
-          const [[freshUser]] = await conn.execute('SELECT * FROM users WHERE id = ?', [user.id]);
-          user = freshUser;
         }
         done(null, user);
       } finally {
