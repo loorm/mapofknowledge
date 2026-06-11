@@ -20,6 +20,8 @@
   var _currentQuestion  = null;
   var _loading          = false;
   var _questionFetching = false;
+  var _autoRetryCount   = 0;
+  var _MAX_AUTO_RETRY   = 3;
   var _awaitingAnswer   = false;
   var _streamBlocks     = [];
   var _testComplete     = false;
@@ -247,6 +249,7 @@
     apiQuestion(_questionNum, _history)
       .then(function (q) {
         _questionFetching = false;
+        _autoRetryCount = 0;
         _removeLoadingBlock();
         _currentQuestion = q;
         _appendQuestionBlock(q);
@@ -255,10 +258,17 @@
         _questionFetching = false;
         _questionNum--;
         _removeLoadingBlock();
-        _appendBlock({ type: 'note', rawHtml:
-          '<span>' + t('msg.connection_error') + '</span> ' +
-          '<button class="kn-retry-btn" onclick="window._testRetryQuestion()">' + t('btn.retry') + '</button>'
-        });
+        if (_autoRetryCount < _MAX_AUTO_RETRY) {
+          _autoRetryCount++;
+          _showLoadingBlock();
+          setTimeout(_advanceQuestion, 2000);
+        } else {
+          _autoRetryCount = 0;
+          _appendBlock({ type: 'note', rawHtml:
+            '<span>' + t('msg.connection_error') + '</span> ' +
+            '<button class="kn-retry-btn" onclick="window._testRetryQuestion()">' + t('btn.retry') + '</button>'
+          });
+        }
       });
   }
 
@@ -293,32 +303,44 @@
     _showLoadingBlock();
 
     var q = _currentQuestion || {};
-    apiEvaluate(_questionNum, q.question || '', q.options || null, ans, _history)
-      .then(function (result) {
-        _removeLoadingBlock();
+    var capturedQ = q, capturedAns = ans;
+    function doEvaluate() {
+      apiEvaluate(_questionNum, capturedQ.question || '', capturedQ.options || null, capturedAns, _history)
+        .then(function (result) {
+          _autoRetryCount = 0;
+          _removeLoadingBlock();
 
-        _history.push({
-          question: q.question || '',
-          answer:   ans,
-          correct:  result.correct || false,
+          _history.push({
+            question: capturedQ.question || '',
+            answer:   capturedAns,
+            correct:  result.correct || false,
+          });
+
+          var icon     = result.correct ? '✓' : (result.partial ? '~' : '✗');
+          var subClass = result.correct ? 'feedback-correct' : (result.partial ? 'feedback-partial' : 'feedback-incorrect');
+          _appendBlock({ type: 'feedback', content: icon + ' ' + (result.feedback || ''), subClass: subClass });
+
+          if (_questionNum === 4) {
+            _updateProgressBar();
+            setTimeout(function () { _showFinalScore(result); }, 700);
+          } else {
+            setTimeout(_advanceQuestion, 1000);
+          }
+        }).catch(function () {
+          _removeLoadingBlock();
+          if (_autoRetryCount < _MAX_AUTO_RETRY) {
+            _autoRetryCount++;
+            _showLoadingBlock();
+            setTimeout(doEvaluate, 2000);
+          } else {
+            _autoRetryCount = 0;
+            _awaitingAnswer = true;
+            _setAnswerInputState(true, capturedQ.type === 'mcq');
+            _appendBlock({ type: 'note', content: t('msg.connection_error') });
+          }
         });
-
-        var icon     = result.correct ? '✓' : (result.partial ? '~' : '✗');
-        var subClass = result.correct ? 'feedback-correct' : (result.partial ? 'feedback-partial' : 'feedback-incorrect');
-        _appendBlock({ type: 'feedback', content: icon + ' ' + (result.feedback || ''), subClass: subClass });
-
-        if (_questionNum === 4) {
-          _updateProgressBar();
-          setTimeout(function () { _showFinalScore(result); }, 700);
-        } else {
-          setTimeout(_advanceQuestion, 1000);
-        }
-      }).catch(function () {
-        _removeLoadingBlock();
-        _awaitingAnswer = true;
-        _setAnswerInputState(true, q.type === 'mcq');
-        _appendBlock({ type: 'note', content: t('msg.connection_error') });
-      });
+    }
+    doEvaluate();
   };
 
   function _showFinalScore(result) {
