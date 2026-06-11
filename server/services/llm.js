@@ -263,7 +263,7 @@ Output ONLY a single JSON object — no markdown fences, no reasoning, no commen
 //   'rephrase' — "I don't understand": step back, explain from first principles
 //   'simpler'  — "Too simplistic": rephrase with professional/expert language
 //   'complex'  — "Too complex": rephrase with simpler words and analogies
-async function generateRephrase(nodeLabel, knobitTitle, originalByte, mode, locale, userId) {
+async function generateRephrase(nodeLabel, knobitTitle, originalByte, mode, locale, profile, userId) {
   const instructions = {
     rephrase: `The learner did not understand this explanation. Step back further.
 Explain the same concept from first principles — start from something even more basic,
@@ -296,7 +296,7 @@ ${originalByte}
 
 ${instructions}
 
-Write the replacement paragraph only — 2–4 sentences, no headings.${langText(locale)}`,
+Write the replacement paragraph only — 2–4 sentences, no headings.${profileBlock(profile)}${langText(locale)}`,
     }],
   });
   _logUsage(userId, 'rephrase', msg.usage, SONNET);
@@ -392,7 +392,7 @@ No "In conclusion" — just the insight.${langText(locale)}`,
 }
 
 // ── Ask anything ─────────────────────────────────────────────────────────────
-async function answerQuestion(nodeLabel, knobitTitle, phase, question, context, locale, userId) {
+async function answerQuestion(nodeLabel, knobitTitle, phase, question, context, locale, profile, userId) {
   const practiceRule = phase === 'practice'
     ? `\n\nPRACTICE PHASE — CRITICAL RULE: The learner is actively working on a practice problem. You must NEVER reveal, confirm, or strongly hint at the answer, even if asked directly. Instead offer a guiding question, point back to the relevant concept, or suggest a thinking approach. The learner must reach the answer themselves.`
     : '';
@@ -417,7 +417,7 @@ Rules:
       role: 'user',
       content: `Phase: ${phase}
 Recent content: "${context}"
-Question: "${question}"${langText(locale)}`,
+Question: "${question}"${profileBlock(profile)}${langText(locale)}`,
     }],
   });
   _logUsage(userId, 'ask', msg.usage, SONNET);
@@ -457,6 +457,8 @@ Return ONLY valid JSON with these fields:
 - "question": the question text (string)
 - "type": "open" or "mcq"
 - "options": array of 4 strings if type is "mcq", omit if "open"
+- "correctIndex": integer 0–3 indicating which option is correct, if type is "mcq"; omit if "open"
+For MCQ: all four options must be similar in length and specificity. Distractors must be precise and plausible — not vague, not obviously wrong. A test-taker who doesn't know the topic must not be able to identify the correct answer by its style, length, or level of detail.
 Do not add any explanation outside the JSON.`,
       cache_control: { type: 'ephemeral' },
     }],
@@ -468,7 +470,7 @@ ${adaptNote}
 ${historyText ? `\nPrevious Q&A:\n${historyText}` : ''}
 
 Generate question ${questionNum}. Choose open or MCQ based on what best tests this tier.
-For MCQ: provide exactly 4 options, one correct. Return JSON only.${langJson(locale)}`,
+For MCQ: provide exactly 4 options, include correctIndex (0–3). Return JSON only.${langJson(locale)}`,
     }],
   });
 
@@ -502,7 +504,7 @@ Full Q&A:
 ${historyText}
 
 Evaluate all four answers. Return JSON with:
-- "correct": boolean (is the current Q4 answer fully correct?)
+- "correct": boolean — true only if fully and precisely correct. For open questions, do not penalize for omitting valid points beyond what was asked; judge against the question's stated criteria, not against an ideal exhaustive answer.
 - "partial": boolean (true if Q4 shows real understanding but is incomplete or imprecise; always false for MCQ)
 - "feedback": 1-2 sentence feedback on the Q4 answer
 - "finalScore": integer 0-100
@@ -513,7 +515,7 @@ ${options ? `Options: ${options.map((o, i) => `${i + 1}. ${o}`).join(' | ')}` : 
 Answer: "${userAnswer}"
 
 Return JSON with:
-- "correct": boolean — true only if fully and precisely correct
+- "correct": boolean — true only if fully and precisely correct. For open questions, do not penalize for omitting valid points beyond what was asked; judge against the question's stated criteria, not against an ideal exhaustive answer.
 - "partial": boolean — true if the answer shows real understanding but is incomplete or imprecise (only for open questions; always false for MCQ)
 - "feedback": 1-2 sentences — confirm if correct, note what's missing if partial, or explain the right answer if wrong${langJson(locale)}`,
     }],
@@ -550,13 +552,13 @@ function streamExplainByteText(nodeLabel, knobitTitle, byteIndex, previousConten
   return _streamText({ model: SONNET, max_tokens: 300, system: TUTOR_SYSTEM, messages: [{ role: 'user', content: prompt }] }, userId, 'explain_text', onChunk);
 }
 
-function streamRephrase(nodeLabel, knobitTitle, originalByte, mode, locale, userId, onChunk) {
+function streamRephrase(nodeLabel, knobitTitle, originalByte, mode, locale, profile, userId, onChunk) {
   const instructions = {
     rephrase: `The learner did not understand this explanation. Step back further.\nExplain the same concept from first principles — start from something even more basic,\nuse a concrete real-world analogy, and build up slowly.\nDo NOT reuse the same wording. A different angle entirely.`,
     simpler:  `The learner found this too simplistic.\nRewrite it with professional, expert-level language. Use precise terminology,\na more formal framing, and the kind of depth an expert or researcher would appreciate.\nSame core concept — elevated register.`,
     complex:  `The learner found this too complex.\nRewrite it using simpler, everyday words. Replace jargon with plain equivalents,\nuse a concrete metaphor or comparison from daily life, and keep sentences short.\nSame core concept — accessible register.`,
   }[mode] || 'Rewrite this explanation from a different angle.';
-  const prompt = `Topic: "${nodeLabel}" — Knobit: "${knobitTitle}"\n\nCurrent explanation:\n"""\n${originalByte}\n"""\n\n${instructions}\n\nWrite the replacement paragraph only — 2–4 sentences, no headings.${langText(locale)}`;
+  const prompt = `Topic: "${nodeLabel}" — Knobit: "${knobitTitle}"\n\nCurrent explanation:\n"""\n${originalByte}\n"""\n\n${instructions}\n\nWrite the replacement paragraph only — 2–4 sentences, no headings.${profileBlock(profile)}${langText(locale)}`;
   return _streamText({ model: SONNET, max_tokens: 200, system: TUTOR_SYSTEM, messages: [{ role: 'user', content: prompt }] }, userId, 'rephrase', onChunk);
 }
 
@@ -565,7 +567,7 @@ function streamMeaning(nodeLabel, knobitTitle, locale, userId, onChunk) {
   return _streamText({ model: SONNET, max_tokens: 180, system: TUTOR_SYSTEM, messages: [{ role: 'user', content: prompt }] }, userId, 'meaning', onChunk);
 }
 
-function streamAnswerQuestion(nodeLabel, knobitTitle, phase, question, context, locale, userId, onChunk) {
+function streamAnswerQuestion(nodeLabel, knobitTitle, phase, question, context, locale, profile, userId, onChunk) {
   const practiceRule = phase === 'practice'
     ? `\n\nPRACTICE PHASE — CRITICAL RULE: The learner is actively working on a practice problem. You must NEVER reveal, confirm, or strongly hint at the answer, even if asked directly. Instead offer a guiding question, point back to the relevant concept, or suggest a thinking approach. The learner must reach the answer themselves.`
     : '';
@@ -577,7 +579,7 @@ function streamAnswerQuestion(nodeLabel, knobitTitle, phase, question, context, 
       text: `You are a focused learning assistant inside the Map of Knowledge platform.\nYou help the learner with exactly one concept:\n  Knobit: "${knobitTitle}"\n  Topic: "${nodeLabel}"\n\nRules:\n1. Only answer questions relevant to this knobit or topic. If the question is clearly off-topic, reply warmly: "This chat is here to help you with '${knobitTitle}'. Happy to answer any questions about that!"\n2. Be concise: 2–4 sentences. Never repeat what is already in the context.\n3. No preamble — go straight to the helpful content.${practiceRule}`,
       cache_control: { type: 'ephemeral' },
     }],
-    messages: [{ role: 'user', content: `Phase: ${phase}\nRecent content: "${context}"\nQuestion: "${question}"${langText(locale)}` }],
+    messages: [{ role: 'user', content: `Phase: ${phase}\nRecent content: "${context}"\nQuestion: "${question}"${profileBlock(profile)}${langText(locale)}` }],
   }, userId, 'ask', onChunk);
 }
 
@@ -601,12 +603,12 @@ function streamTestQuestion(nodeLabel, breadcrumb, questionNum, history, locale,
     max_tokens: 400,
     system: [{
       type: 'text',
-      text: `You are a knowledge diagnostic examiner. You generate exactly one question per tier of a 4-tier framework.\nReturn ONLY valid JSON with these fields:\n- "question": the question text (string)\n- "type": "open" or "mcq"\n- "options": array of 4 strings if type is "mcq", omit if "open"\nDo not add any explanation outside the JSON.`,
+      text: `You are a knowledge diagnostic examiner. You generate exactly one question per tier of a 4-tier framework.\nReturn ONLY valid JSON with these fields:\n- "question": the question text (string)\n- "type": "open" or "mcq"\n- "options": array of 4 strings if type is "mcq", omit if "open"\n- "correctIndex": integer 0–3 indicating which option is correct, if type is "mcq"; omit if "open"\nFor MCQ: all four options must be similar in length and specificity. Distractors must be precise and plausible — not vague, not obviously wrong. A test-taker who doesn't know the topic must not be able to identify the correct answer by its style, length, or level of detail.\nDo not add any explanation outside the JSON.`,
       cache_control: { type: 'ephemeral' },
     }],
     messages: [{
       role: 'user',
-      content: `Topic: "${nodeLabel}" (${breadcrumb})\nTier ${questionNum}: ${tiers[questionNum - 1]}\n${adaptNote}\n${historyText ? `\nPrevious Q&A:\n${historyText}` : ''}\n\nGenerate question ${questionNum}. Choose open or MCQ based on what best tests this tier.\nFor MCQ: provide exactly 4 options, one correct. Return JSON only.${langJson(locale)}`,
+      content: `Topic: "${nodeLabel}" (${breadcrumb})\nTier ${questionNum}: ${tiers[questionNum - 1]}\n${adaptNote}\n${historyText ? `\nPrevious Q&A:\n${historyText}` : ''}\n\nGenerate question ${questionNum}. Choose open or MCQ based on what best tests this tier.\nFor MCQ: provide exactly 4 options, include correctIndex (0–3). Return JSON only.${langJson(locale)}`,
     }],
   }, userId, 'test_question', onChunk);
 }
@@ -628,8 +630,8 @@ function streamTestEvaluate(nodeLabel, breadcrumb, questionNum, question, option
     messages: [{
       role: 'user',
       content: isLast
-        ? `Topic: "${nodeLabel}" (${breadcrumb})\n\nFull Q&A:\n${historyText}\n\nEvaluate all four answers. Return JSON with:\n- "correct": boolean (is the current Q4 answer fully correct?)\n- "partial": boolean (true if Q4 shows real understanding but is incomplete or imprecise; always false for MCQ)\n- "feedback": 1-2 sentence feedback on the Q4 answer\n- "finalScore": integer 0-100\n- "scoreBreakdown": string (2-4 sentences explaining the score — what they got right, what they missed)${langJson(locale)}`
-        : `Topic: "${nodeLabel}"\nQuestion: "${question}"\n${options ? `Options: ${options.map(function (o, i) { return `${i + 1}. ${o}`; }).join(' | ')}` : ''}\nAnswer: "${userAnswer}"\n\nReturn JSON with:\n- "correct": boolean — true only if fully and precisely correct\n- "partial": boolean — true if the answer shows real understanding but is incomplete or imprecise (only for open questions; always false for MCQ)\n- "feedback": 1-2 sentences — confirm if correct, note what's missing if partial, or explain the right answer if wrong${langJson(locale)}`,
+        ? `Topic: "${nodeLabel}" (${breadcrumb})\n\nFull Q&A:\n${historyText}\n\nEvaluate all four answers. Return JSON with:\n- "correct": boolean — true only if fully and precisely correct. For open questions, do not penalize for omitting valid points beyond what was asked; judge against the question's stated criteria, not against an ideal exhaustive answer.\n- "partial": boolean (true if Q4 shows real understanding but is incomplete or imprecise; always false for MCQ)\n- "feedback": 1-2 sentence feedback on the Q4 answer\n- "finalScore": integer 0-100\n- "scoreBreakdown": string (2-4 sentences explaining the score — what they got right, what they missed)${langJson(locale)}`
+        : `Topic: "${nodeLabel}"\nQuestion: "${question}"\n${options ? `Options: ${options.map(function (o, i) { return `${i + 1}. ${o}`; }).join(' | ')}` : ''}\nAnswer: "${userAnswer}"\n\nReturn JSON with:\n- "correct": boolean — true only if fully and precisely correct. For open questions, do not penalize for omitting valid points beyond what was asked; judge against the question's stated criteria, not against an ideal exhaustive answer.\n- "partial": boolean — true if the answer shows real understanding but is incomplete or imprecise (only for open questions; always false for MCQ)\n- "feedback": 1-2 sentences — confirm if correct, note what's missing if partial, or explain the right answer if wrong${langJson(locale)}`,
     }],
   }, userId, 'test_evaluate', onChunk);
 }

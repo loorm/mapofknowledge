@@ -251,6 +251,14 @@
         _questionFetching = false;
         _autoRetryCount = 0;
         _removeLoadingBlock();
+        if (q.type === 'mcq' && Array.isArray(q.options) && q.options.length === 4 && typeof q.correctIndex === 'number') {
+          var opts = q.options.slice();
+          for (var i = opts.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = opts[i]; opts[i] = opts[j]; opts[j] = tmp;
+          }
+          q = { question: q.question, type: q.type, options: opts };
+        }
         _currentQuestion = q;
         _appendQuestionBlock(q);
         _setAnswerInputState(true, q.type === 'mcq');
