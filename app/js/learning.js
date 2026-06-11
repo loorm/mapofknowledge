@@ -28,6 +28,7 @@
   var _priorChoices = [];
   var _loading      = false;
   var _starting     = false;   // guard against double-start
+  var _retryFn      = null;    // last failed API call, for retry button
   var _pendingPractice = null;
 
   var _PHASES = ['explain', 'demonstrate', 'practice', 'meaning'];
@@ -302,11 +303,15 @@
 
     _setButtonRow('');
     _appendPhaseDivider(t('phase.step_1'));
-    _showLoadingBlock();
+    _fetchInitialExplain();
+  };
 
+  function _fetchInitialExplain() {
+    _retryFn = _fetchInitialExplain;
+    _showLoadingBlock();
     apiInteract({ phase: 'explain', byteIndex: 0, priorChoices: [] })
       .then(function (d) {
-        _starting = false;
+        _starting = false; _retryFn = null;
         _removeLoadingBlock();
         _appendBlock({ type: 'byte', content: d.text || '' });
         _appendVisualLoader(d.text);
@@ -315,7 +320,7 @@
         _starting = false;
         _onApiError();
       });
-  };
+  }
 
   /* ─── Phase chip management ───────────────────────────────────── */
   function _setPhase(phase) {
@@ -403,22 +408,17 @@
     }
 
     var lastContent = _getLastContent(['byte']);
-    _showLoadingBlock();
     // action mapping: 'ok' → advance (undefined), 'no' → 'rephrase', 'simpler'/'complex' → pass through
     var action = opt === 'ok' ? undefined : (opt === 'no' ? 'rephrase' : opt);
     var wantVisual = (opt === 'ok');
-    apiInteract({
-      phase:        'explain',
-      action:       action,
-      byteIndex:    _byteIdx,
-      priorChoices: _priorChoices,
-      original:     lastContent,
-    }).then(function (d) {
-      _removeLoadingBlock();
-      _appendBlock({ type: 'byte', content: d.text || '' });
-      if (wantVisual) _appendVisualLoader(d.text);
-      _setButtonRow('explain-options');
-    }).catch(_onApiError);
+    var capturedContent = lastContent, capturedAction = action, capturedWantVisual = wantVisual;
+    _retryFn = function () {
+      _showLoadingBlock();
+      apiInteract({ phase: 'explain', action: capturedAction, byteIndex: _byteIdx, priorChoices: _priorChoices, original: capturedContent })
+        .then(function (d) { _retryFn = null; _removeLoadingBlock(); _appendBlock({ type: 'byte', content: d.text || '' }); if (capturedWantVisual) _appendVisualLoader(d.text); _setButtonRow('explain-options'); })
+        .catch(_onApiError);
+    };
+    _retryFn();
   };
 
   /* ─── Demonstrate ─────────────────────────────────────────────── */
@@ -430,9 +430,11 @@
   }
 
   function _fetchDemo() {
+    _retryFn = _fetchDemo;
     _showLoadingBlock();
     apiInteract({ phase: 'demonstrate', byteIndex: _demoIdx })
       .then(function (d) {
+        _retryFn = null;
         _removeLoadingBlock();
         var ex   = d.demonstrate || {};
         var html = '<strong>Example ' + (_demoIdx + 1) + '</strong><br>' +
@@ -471,6 +473,7 @@
   }
 
   function _fetchPractice() {
+    _retryFn = _fetchPractice;
     _showLoadingBlock();
     apiInteract({ phase: 'practice', byteIndex: _practiceIdx })
       .then(function (d) {
@@ -487,6 +490,7 @@
           inp.rows        = 2;
           wrapper.appendChild(inp);
         }
+        _retryFn = null;
         _setButtonRow('practice-submit');
       }).catch(_onApiError);
   }
@@ -498,22 +502,16 @@
     if (inp) inp.disabled = true;
     _lockButtons();
     _setButtonRow('');
-    _showLoadingBlock();
 
     var prob = _pendingPractice || {};
-    apiInteract({
-      phase:      'practice',
-      action:     'grade',
-      question:   prob.question   || '',
-      expected:   prob.expected   || '',
-      userAnswer: ans,
-    }).then(function (d) {
-      _removeLoadingBlock();
-      var g  = d.grade || {};
-      var fb = (g.correct ? '✓ ' : '✗ ') + (g.feedback || '');
-      _appendBlock({ type: 'feedback', content: fb });
-      _setButtonRow('practice-next');
-    }).catch(_onApiError);
+    var capturedAns = ans, capturedProb = prob;
+    _retryFn = function () {
+      _showLoadingBlock();
+      apiInteract({ phase: 'practice', action: 'grade', question: capturedProb.question || '', expected: capturedProb.expected || '', userAnswer: capturedAns })
+        .then(function (d) { _retryFn = null; _removeLoadingBlock(); var g = d.grade || {}; _appendBlock({ type: 'feedback', content: (g.correct ? '✓ ' : '✗ ') + (g.feedback || '') }); _setButtonRow('practice-next'); })
+        .catch(_onApiError);
+    };
+    _retryFn();
   };
 
   window.practiceNext = function () {
@@ -533,9 +531,15 @@
   function _enterMeaning() {
     _appendPhaseDivider(t('phase.step_4'));
     _setPhase('meaning');
+    _fetchMeaning();
+  }
+
+  function _fetchMeaning() {
+    _retryFn = _fetchMeaning;
     _showLoadingBlock();
     apiInteract({ phase: 'meaning' })
       .then(function (d) {
+        _retryFn = null;
         _removeLoadingBlock();
         _appendBlock({ type: 'meaning', content: d.text || '' });
         _setButtonRow('meaning-options');
@@ -550,14 +554,14 @@
       return;
     }
     _lockButtons();
-    var lastContent = _getLastContent(['meaning']);
-    _showLoadingBlock();
-    apiInteract({ phase: 'meaning', action: opt, original: lastContent })
-      .then(function (d) {
-        _removeLoadingBlock();
-        _appendBlock({ type: 'meaning', content: d.text || '' });
-        _setButtonRow('meaning-options');
-      }).catch(_onApiError);
+    var capturedOpt = opt, capturedContent = _getLastContent(['meaning']);
+    _retryFn = function () {
+      _showLoadingBlock();
+      apiInteract({ phase: 'meaning', action: capturedOpt, original: capturedContent })
+        .then(function (d) { _retryFn = null; _removeLoadingBlock(); _appendBlock({ type: 'meaning', content: d.text || '' }); _setButtonRow('meaning-options'); })
+        .catch(_onApiError);
+    };
+    _retryFn();
   };
 
   /* ─── Knobit completion ───────────────────────────────────────── */
@@ -600,16 +604,14 @@
     if (inp) inp.value = '';
 
     _appendBlock({ type: 'user', content: q });
-    _showLoadingBlock();
-
-    var context = _streamBlocks.slice(-3).map(function (b) { return b.content || ''; }).join(' ');
-    apiInteract({ phase: 'ask', action: _phase, question: q, context: context })
-      .then(function (d) {
-        _removeLoadingBlock();
-        _appendBlock({ type: 'note', content: d.text || '' });
-        if (_phase === 'explain')  _setButtonRow('explain-options');
-        if (_phase === 'meaning')  _setButtonRow('meaning-options');
-      }).catch(_onApiError);
+    var capturedQ = q, capturedContext = _streamBlocks.slice(-3).map(function (b) { return b.content || ''; }).join(' '), capturedPhase = _phase;
+    _retryFn = function () {
+      _showLoadingBlock();
+      apiInteract({ phase: 'ask', action: capturedPhase, question: capturedQ, context: capturedContext })
+        .then(function (d) { _retryFn = null; _removeLoadingBlock(); _appendBlock({ type: 'note', content: d.text || '' }); if (capturedPhase === 'explain') _setButtonRow('explain-options'); if (capturedPhase === 'meaning') _setButtonRow('meaning-options'); })
+        .catch(_onApiError);
+    };
+    _retryFn();
   };
 
   /* ─── Block stream ────────────────────────────────────────────── */
@@ -748,8 +750,17 @@
 
   function _onApiError() {
     _removeLoadingBlock();
-    _appendBlock({ type: 'note', content: t('msg.connection_error') });
+    _appendBlock({ type: 'note', rawHtml:
+      '<span>' + t('msg.connection_error') + '</span>' +
+      (_retryFn ? ' <button class="kn-retry-btn" onclick="window._lmRetry()">' + t('btn.retry') + '</button>' : '')
+    });
   }
+
+  window._lmRetry = function () {
+    document.querySelectorAll('.kn-retry-btn').forEach(function (b) { b.disabled = true; });
+    var fn = _retryFn; _retryFn = null;
+    if (fn) fn();
+  };
 
   /* ─── Quit guard ──────────────────────────────────────────────── */
   function _quitGuard(callback) {
