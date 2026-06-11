@@ -20,7 +20,7 @@
      ════════════════════════════════════════ -->
 <header id="top-bar">
 
-  <a class="topbar-logo" href="#" onclick="if(typeof tryCloseLearningMode==='function'){tryCloseLearningMode();}else if(typeof closeLearningMode==='function'){closeLearningMode();} return false;">
+  <a class="topbar-logo" href="#" onclick="var _ttm=document.getElementById('testing-mode');if(_ttm&&_ttm.classList.contains('active')){if(typeof tryCloseTestingMode==='function')tryCloseTestingMode();}else if(typeof tryCloseLearningMode==='function'){tryCloseLearningMode();}else if(typeof closeLearningMode==='function'){closeLearningMode();} return false;">
     <div class="topbar-logo-icon">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <circle cx="8" cy="8" r="5.5" stroke="white" stroke-width="1.3"/>
@@ -481,7 +481,7 @@
   <!-- ── VIEW 1: TESTING PATH ─────────────────── -->
   <div id="tm-path" class="lm-view">
     <div class="lm-path-header">
-      <button class="lm-back-btn" onclick="closeTestingMode()" data-i18n-title="btn.back_to_map" title="Back to map">
+      <button class="lm-back-btn" onclick="tryCloseTestingMode()" data-i18n-title="btn.back_to_map" title="Back to map">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <circle cx="8" cy="3.5" r="1.8" stroke="currentColor" stroke-width="1.2"/>
           <circle cx="2.5" cy="12" r="1.8" stroke="currentColor" stroke-width="1.2"/>
@@ -523,7 +523,7 @@
 
     <!-- sub-nav bar -->
     <div class="kn-nav">
-      <button class="kn-nav-back" onclick="showTmView('tm-path')" title="Back to path">
+      <button class="kn-nav-back" onclick="tryLeaveTestQuestion()" title="Back to path">
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
           <path d="M8 2L3 6.5 8 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -621,6 +621,20 @@
     <div class="quit-modal-btns">
       <button class="quit-modal-cancel" id="quit-modal-cancel" data-i18n="btn.keep_learning">Keep learning</button>
       <button class="quit-modal-confirm" id="quit-modal-confirm" data-i18n="btn.yes_quit">Yes, quit</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     QUIT TEST CONFIRMATION MODAL
+     ════════════════════════════════════════ -->
+<div id="quit-test-modal" style="display:none">
+  <div class="quit-modal-box">
+    <div class="quit-modal-title" data-i18n="msg.quit_test_title">Quit this test?</div>
+    <div class="quit-modal-text" data-i18n="msg.quit_test_text">Your progress will be lost. The test can be retaken from the beginning.</div>
+    <div class="quit-modal-btns">
+      <button class="quit-modal-cancel" id="quit-test-cancel" data-i18n="btn.keep_testing">Keep testing</button>
+      <button class="quit-modal-confirm" id="quit-test-confirm" data-i18n="btn.quit_test">Quit test</button>
     </div>
   </div>
 </div>

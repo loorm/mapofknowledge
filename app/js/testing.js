@@ -22,6 +22,8 @@
   var _questionFetching = false;
   var _awaitingAnswer   = false;
   var _streamBlocks     = [];
+  var _testComplete     = false;
+  var _testQuitCallback = null;
 
   var _PHASES = ['q1', 'q2', 'q3', 'q4'];
 
@@ -95,10 +97,30 @@
     _questionNum      = 0;
     _awaitingAnswer   = false;
     _questionFetching = false;
+    _testComplete     = false;
+    _testQuitCallback = null;
     // Refresh sidebar so tested score hides the "I know this" toggle
     if (window.MapView && window.MapView.refreshCurrentNodeKnowledge) {
       window.MapView.refreshCurrentNodeKnowledge();
     }
+  };
+
+  function _tryQuitTest(callback) {
+    if (_questionNum === 0 || _testComplete) {
+      callback();
+      return;
+    }
+    _testQuitCallback = callback;
+    var modal = document.getElementById('quit-test-modal');
+    if (modal) modal.style.display = 'flex';
+  }
+
+  window.tryCloseTestingMode = function () {
+    _tryQuitTest(window.closeTestingMode);
+  };
+
+  window.tryLeaveTestQuestion = function () {
+    _tryQuitTest(function () { showTmView('tm-path'); });
   };
 
   /* ─── View switching ──────────────────────────────────────────── */
@@ -171,6 +193,7 @@
     _streamBlocks     = [];
     _loading          = false;
     _questionFetching = false;
+    _testComplete     = false;
 
     var stream = document.getElementById('tn-stream');
     if (stream) stream.innerHTML = '';
@@ -283,6 +306,7 @@
         if (cards[1]) cards[1].innerHTML = '<div class="lm-cstat-num">' + score + '%</div><div class="lm-cstat-label">' + t('label.mastery_score') + '</div>';
         if (cards[2]) cards[2].innerHTML = '<div class="lm-cstat-num">' + correctCount + '/4</div><div class="lm-cstat-label">' + t('label.questions_correct') + '</div>';
       }
+      _testComplete = true;
       showTmView('tm-complete');
     }, 2200);
   }
@@ -402,6 +426,19 @@
 
     var startBtn = document.querySelector('#testing-mode .lm-start-btn');
     if (startBtn) startBtn.addEventListener('click', window.startTestKnobit);
+
+    var quitTestConfirm = document.getElementById('quit-test-confirm');
+    if (quitTestConfirm) quitTestConfirm.addEventListener('click', function () {
+      var modal = document.getElementById('quit-test-modal');
+      if (modal) modal.style.display = 'none';
+      if (_testQuitCallback) { _testQuitCallback(); _testQuitCallback = null; }
+    });
+    var quitTestCancel = document.getElementById('quit-test-cancel');
+    if (quitTestCancel) quitTestCancel.addEventListener('click', function () {
+      var modal = document.getElementById('quit-test-modal');
+      if (modal) modal.style.display = 'none';
+      _testQuitCallback = null;
+    });
 
     var mapBtn = document.querySelector('#testing-mode .lm-complete-btn-primary');
     if (mapBtn) mapBtn.addEventListener('click', window.closeTestingMode);
