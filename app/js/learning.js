@@ -587,6 +587,8 @@
       var cards = stat.querySelectorAll('.lm-complete-stat');
       if (cards[0]) cards[0].innerHTML = '<div class="lm-stat-num">' + KNOBIT_TOTAL + '</div><div class="lm-stat-label">' + t('label.knobits') + '</div>';
     }
+    var reflInp = document.getElementById('lm-reflection-input');
+    if (reflInp) reflInp.value = '';
     showLmView('lm-complete');
   }
 
@@ -781,8 +783,19 @@
     var startBtn = document.querySelector('.lm-start-btn');
     if (startBtn) startBtn.addEventListener('click', window.startKnobit);
 
-    var mapBtn = document.querySelector('.lm-complete-btn-primary');
-    if (mapBtn) mapBtn.addEventListener('click', window.closeLearningMode);
+    var mapBtn = document.getElementById('lm-back-to-map-btn');
+    if (mapBtn) mapBtn.addEventListener('click', function () {
+      var inp  = document.getElementById('lm-reflection-input');
+      var text = inp ? inp.value.trim() : '';
+      if (text) {
+        fetch('/api/profile/reflections', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ text: text }),
+        }).catch(function () {});
+      }
+      window.closeLearningMode();
+    });
 
     var reviewBtn = document.querySelector('.lm-complete-btn-ghost');
     if (reviewBtn) reviewBtn.addEventListener('click', function () { showLmView('lm-path'); });
