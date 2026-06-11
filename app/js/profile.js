@@ -18,7 +18,7 @@
 
   function fmtDate(d) {
     if (!d) return '';
-    try { return new Date(d).toLocaleDateString('en-GB', { year: 'numeric', month: 'short' }); }
+    try { return new Date(d).toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' }); }
     catch { return String(d).substring(0, 7); }
   }
 
