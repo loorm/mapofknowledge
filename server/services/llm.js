@@ -523,6 +523,57 @@ Return JSON with:
   return parseJSON(msg.content[0].text.trim());
 }
 
+// ── Text streaming ─────────────────────────────────────────────────────────────
+// Returns { textStream: AsyncIterable<string>, usage: Promise<void> }
+function _openStream(config, userId, callType) {
+  const stream = client.messages.stream(config);
+  const usage  = stream.finalMessage().then(function (msg) {
+    _logUsage(userId, callType, msg.usage, config.model);
+  }).catch(function () {});
+  return { textStream: stream.textStream, usage };
+}
+
+function streamExplainByteText(nodeLabel, knobitTitle, byteIndex, previousContent, locale, profile, userId) {
+  let prompt;
+  if (byteIndex === 0 || !previousContent) {
+    prompt = `Teaching knobit "${knobitTitle}" within topic "${nodeLabel}".\n\nWrite the OPENING explanation (byte 1). Introduce the core concept clearly and simply.\n2–4 sentences. Plain prose — no headings, no bullet points. Plain text only, no HTML tags. Use \\n for line breaks.${profileBlock(profile)}${langText(locale)}`;
+  } else {
+    prompt = `Teaching knobit "${knobitTitle}" within topic "${nodeLabel}".\n\nPrevious explanation the learner understood:\n"""\n${previousContent}\n"""\n\nWrite the NEXT step (byte ${byteIndex + 1}). Cover a new aspect or go one level deeper. Do NOT repeat or paraphrase what was already explained.\n2–4 sentences. Plain prose — no headings, no bullet points. Plain text only, no HTML tags. Use \\n for line breaks.${profileBlock(profile)}${langText(locale)}`;
+  }
+  return _openStream({ model: SONNET, max_tokens: 300, system: TUTOR_SYSTEM, messages: [{ role: 'user', content: prompt }] }, userId, 'explain_text');
+}
+
+function streamRephrase(nodeLabel, knobitTitle, originalByte, mode, locale, userId) {
+  const instructions = {
+    rephrase: `The learner did not understand this explanation. Step back further.\nExplain the same concept from first principles — start from something even more basic,\nuse a concrete real-world analogy, and build up slowly.\nDo NOT reuse the same wording. A different angle entirely.`,
+    simpler:  `The learner found this too simplistic.\nRewrite it with professional, expert-level language. Use precise terminology,\na more formal framing, and the kind of depth an expert or researcher would appreciate.\nSame core concept — elevated register.`,
+    complex:  `The learner found this too complex.\nRewrite it using simpler, everyday words. Replace jargon with plain equivalents,\nuse a concrete metaphor or comparison from daily life, and keep sentences short.\nSame core concept — accessible register.`,
+  }[mode] || 'Rewrite this explanation from a different angle.';
+  const prompt = `Topic: "${nodeLabel}" — Knobit: "${knobitTitle}"\n\nCurrent explanation:\n"""\n${originalByte}\n"""\n\n${instructions}\n\nWrite the replacement paragraph only — 2–4 sentences, no headings.${langText(locale)}`;
+  return _openStream({ model: SONNET, max_tokens: 200, system: TUTOR_SYSTEM, messages: [{ role: 'user', content: prompt }] }, userId, 'rephrase');
+}
+
+function streamMeaning(nodeLabel, knobitTitle, locale, userId) {
+  const prompt = `Topic: "${nodeLabel}" — Knobit: "${knobitTitle}"\n\nWrite 2–3 sentences on why this matters in the real world.\nBe concrete: name a profession, product, decision, or daily situation where it directly applies.\nNo "In conclusion" — just the insight.${langText(locale)}`;
+  return _openStream({ model: SONNET, max_tokens: 180, system: TUTOR_SYSTEM, messages: [{ role: 'user', content: prompt }] }, userId, 'meaning');
+}
+
+function streamAnswerQuestion(nodeLabel, knobitTitle, phase, question, context, locale, userId) {
+  const practiceRule = phase === 'practice'
+    ? `\n\nPRACTICE PHASE — CRITICAL RULE: The learner is actively working on a practice problem. You must NEVER reveal, confirm, or strongly hint at the answer, even if asked directly. Instead offer a guiding question, point back to the relevant concept, or suggest a thinking approach. The learner must reach the answer themselves.`
+    : '';
+  return _openStream({
+    model: SONNET,
+    max_tokens: 300,
+    system: [{
+      type: 'text',
+      text: `You are a focused learning assistant inside the Map of Knowledge platform.\nYou help the learner with exactly one concept:\n  Knobit: "${knobitTitle}"\n  Topic: "${nodeLabel}"\n\nRules:\n1. Only answer questions relevant to this knobit or topic. If the question is clearly off-topic, reply warmly: "This chat is here to help you with '${knobitTitle}'. Happy to answer any questions about that!"\n2. Be concise: 2–4 sentences. Never repeat what is already in the context.\n3. No preamble — go straight to the helpful content.${practiceRule}`,
+      cache_control: { type: 'ephemeral' },
+    }],
+    messages: [{ role: 'user', content: `Phase: ${phase}\nRecent content: "${context}"\nQuestion: "${question}"${langText(locale)}` }],
+  }, userId, 'ask');
+}
+
 module.exports = {
   generateOverview,
   generateKnobits,
@@ -536,4 +587,8 @@ module.exports = {
   answerQuestion,
   generateTestQuestion,
   evaluateTestAnswer,
+  streamExplainByteText,
+  streamRephrase,
+  streamMeaning,
+  streamAnswerQuestion,
 };
