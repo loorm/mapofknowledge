@@ -1170,7 +1170,54 @@ router.post('/test/evaluate', async (req, res) => {
     const locale = await getUserLocale(req.user?.id);
 
     if (wantStream) {
-      return _runStream((cb) => llm.streamTestEvaluate(label, breadcrumb, questionNum, question, options, userAnswer, history, locale, req.user?.id, cb), res);
+      res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('X-Accel-Buffering', 'no');
+      res.flushHeaders();
+      let fullText = '';
+      const write = (chunk) => {
+        fullText += chunk;
+        res.write('data: ' + JSON.stringify({ t: chunk }) + '\n\n');
+      };
+      try {
+        await llm.streamTestEvaluate(label, breadcrumb, questionNum, question, options, userAnswer, history, locale, req.user?.id, write);
+      } catch (err) {
+        console.error('[stream/test/evaluate]', err.message);
+        res.write('data: ' + JSON.stringify({ error: true }) + '\n\n');
+      }
+      res.write('data: [DONE]\n\n');
+      res.end();
+
+      // Q4 post-processing after response is sent
+      if (questionNum === 4 && passportId) {
+        try {
+          const cleaned = fullText.trim()
+            .replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '').trim();
+          const evaluation = JSON.parse(cleaned);
+          if (evaluation.finalScore !== undefined) {
+            await db.execute(
+              `INSERT INTO user_node_knowledge
+                 (passport_id, node_external_id, percentage, source, updated_at)
+               VALUES (?, ?, ?, 'tested', NOW())
+               ON DUPLICATE KEY UPDATE
+                 percentage = VALUES(percentage), source = 'tested', updated_at = NOW()`,
+              [passportId, nodeId, evaluation.finalScore]
+            );
+            updateAncestorKnowledge(passportId, nodeId).catch(() => {});
+            await db.execute(
+              `INSERT INTO passport_events
+                 (passport_id, event_date, title, institution, result, node_external_id, type, sort_order)
+               VALUES (?, CURDATE(), ?, 'Map of Knowledge · KaiQ Platform', ?, ?, 'assessment', 0)`,
+              [passportId, `Knowledge test: ${label}`, `Score: ${evaluation.finalScore}%`, nodeId]
+            );
+            notify(req.user?.id, 'test_result', `Test result: ${label}`,
+              `You scored ${evaluation.finalScore}% on the knowledge diagnostic.`);
+          }
+        } catch (e) {
+          console.error('[api/test/evaluate] Q4 post-stream error', e.message);
+        }
+      }
+      return;
     }
 
     const evaluation = await llm.evaluateTestAnswer(
