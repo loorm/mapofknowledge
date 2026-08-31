@@ -20,6 +20,7 @@ if (missingEnvVars.length) {
 }
 
 const express  = require('express');
+const helmet   = require('helmet');
 const cookieSession = require('cookie-session');
 const passport = require('passport');
 const path     = require('path');
@@ -34,6 +35,42 @@ const webauthnRouter = require('./routes/webauthn');
 const requireAuth = require('./middleware/requireAuth');
 
 const app = express();
+
+// Security headers — deliberately only the 4 discussed and approved
+// 2026-09-01, everything else helmet would add by default is explicitly
+// turned off below rather than shipped silently:
+//   - X-Frame-Options: 'sameorigin' (not helmet's other option, 'deny') —
+//     app/index.html's #page-overlay-frame embeds profile/settings/
+//     notifications/help/account/custom-map as same-origin iframes, which
+//     'deny' would break.
+//   - X-Content-Type-Options: nosniff
+//   - Referrer-Policy: no-referrer (helmet's default)
+//   - Strict-Transport-Security: safe to enable — plain HTTP already 301s
+//     to HTTPS at the Apache level (verified 2026-09-01), so this only
+//     skips that round-trip on repeat visits, nothing more.
+// Content-Security-Policy is OFF for now — the default policy would break
+// gtag.js, the Cloudflare Turnstile widget, Google Fonts, and the inline
+// <script> blocks on every page; it needs a real allowlist pass as its own
+// follow-up, not a blind default. Cross-Origin-Opener-Policy/-Resource-
+// Policy, Origin-Agent-Cluster, X-Powered-By removal, and the rest of
+// helmet's bundle are also off — not discussed yet, revisit deliberately
+// rather than accepting them as a side effect of adding helmet.
+app.use(helmet({
+  contentSecurityPolicy: false,
+  frameguard: { action: 'sameorigin' },
+  hsts: true,
+  noSniff: true,
+  referrerPolicy: true,
+  crossOriginOpenerPolicy: false,
+  crossOriginResourcePolicy: false,
+  crossOriginEmbedderPolicy: false,
+  originAgentCluster: false,
+  xssFilter: false,
+  dnsPrefetchControl: false,
+  ieNoOpen: false,
+  permittedCrossDomainPolicies: false,
+  hidePoweredBy: false,
+}));
 
 // Node listens on a Unix socket (Apache proxies to it via .htaccess), so
 // req.socket.remoteAddress has no meaningful value on its own — trust the
