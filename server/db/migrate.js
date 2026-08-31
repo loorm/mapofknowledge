@@ -238,6 +238,34 @@ async function run() {
       console.log('  · users.avatar_url already exists');
     }
 
+    // learner_whois — single point-of-truth learner context for every LLM
+    // call (Anne + every knobit-generation step + tests), replacing the old
+    // mix of a full passport-text render (Anne only), a small profileBlock
+    // (some generation calls), and nothing at all (others). Append-only —
+    // never UPDATE/DELETE an existing row — so the history of how a
+    // learner's assessment evolved is preserved; "the current entry" is
+    // just the newest row per passport_id. core_text is computed instantly
+    // in JS from passport fields; narrative_text is a single LLM call fed
+    // the full passport PLUS the prior narrative, so it reads as one
+    // continuously-updated dossier rather than being rewritten from scratch
+    // every time. See server/services/whois.js.
+    await conn.execute(`
+      CREATE TABLE IF NOT EXISTS learner_whois (
+        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        passport_id     BIGINT UNSIGNED NOT NULL,
+        core_text       TEXT            NOT NULL,
+        narrative_text  TEXT            NOT NULL,
+        trigger_reason  VARCHAR(64)     NOT NULL,
+        created_at      DATETIME        NOT NULL DEFAULT NOW(),
+        PRIMARY KEY (id),
+        KEY idx_whois_passport_created (passport_id, created_at),
+        CONSTRAINT fk_whois_passport
+          FOREIGN KEY (passport_id) REFERENCES learner_passports (id)
+          ON DELETE CASCADE
+      )
+    `);
+    console.log('  · learner_whois table ready');
+
     // ── 2. Check if already migrated ─────────────────────────────────────────
     const [[{ cnt }]] = await conn.execute('SELECT COUNT(*) AS cnt FROM nodes');
     if (cnt > 0) {
