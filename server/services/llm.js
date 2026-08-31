@@ -1293,7 +1293,7 @@ async function generateWhoisNarrative(passportRenderedText, priorNarrative, user
     : '';
   const msg = await client.messages.create({
     model: SONNET,
-    max_tokens: 700,
+    max_tokens: 1000,
     system: [{
       type: 'text',
       text: `You maintain a single, continuously-updated dossier on a learner using the Map of Knowledge platform, read by every other AI tutor/assistant on the platform before it interacts with them. Write roughly 400-600 tokens of dense, genuinely useful prose — not a data dump of the fields you're given, but real synthesis: learning patterns, apparent strengths and gaps, what topics/domains they're actually engaged with right now, how they seem to respond to different kinds of content, anything notable from their own reflections, and what a tutor should keep in mind when teaching them. Be concrete and specific, never generic praise or platitudes. If the learner has very little history yet, say so briefly rather than padding with speculation. Plain prose, no headings, no bullet points.`,
