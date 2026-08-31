@@ -1,5 +1,24 @@
 require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 
+// ── Required environment variables — fail loudly at startup, not silently.
+// Must run before any route module is required: auth.js registers Google's
+// OAuth strategy at require-time using GOOGLE_CLIENT_ID/SECRET/BASE_URL, and
+// SESSION_SECRET used to fall back to a hardcoded public string if unset,
+// which would have made every session cookie forgeable — there is no safe
+// default for it, so a missing value must stop the server, not degrade it.
+const REQUIRED_ENV_VARS = [
+  'SESSION_SECRET',
+  'DB_HOST', 'DB_USER', 'DB_PASS', 'DB_NAME',
+  'ANTHROPIC_API_KEY',
+  'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'BASE_URL',
+];
+const missingEnvVars = REQUIRED_ENV_VARS.filter(name => !process.env[name]);
+if (missingEnvVars.length) {
+  console.error(`FATAL: missing required environment variable(s): ${missingEnvVars.join(', ')}`);
+  console.error('Set these in .env before starting the server — refusing to start with broken/insecure configuration.');
+  process.exit(1);
+}
+
 const express  = require('express');
 const cookieSession = require('cookie-session');
 const passport = require('passport');
@@ -29,7 +48,7 @@ app.use(express.urlencoded({ extended: false }));
 // ── Session (cookie-based — survives server restarts) ─────────────────────────
 app.use(cookieSession({
   name: 'session',
-  secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
+  secret: process.env.SESSION_SECRET,
   maxAge: 7 * 24 * 60 * 60 * 1000,
   httpOnly: true,
   secure: false, // Apache terminates TLS; Node sees plain HTTP on port 3000
