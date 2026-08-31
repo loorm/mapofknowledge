@@ -277,7 +277,13 @@ passport.serializeUser((user, done) => done(null, user.id));
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const [rows] = await db.execute('SELECT * FROM users WHERE id = ?', [id]);
+    // Only the columns actually read from req.user anywhere in the app —
+    // was SELECT * before, which attached password_hash, password_reset_token,
+    // google_id-equivalent linked flags, etc. to req.user on every request.
+    const [rows] = await db.execute(
+      'SELECT id, email, passport_id, role, email_verified FROM users WHERE id = ?',
+      [id]
+    );
     done(null, rows[0] || false);
   } catch (err) {
     done(err);

@@ -52,6 +52,7 @@ app.use(cookieSession({
   maxAge: 7 * 24 * 60 * 60 * 1000,
   httpOnly: true,
   secure: false, // Apache terminates TLS; Node sees plain HTTP on port 3000
+  sameSite: 'lax', // baseline CSRF protection — cookie isn't sent on cross-site POST/DELETE
 }));
 
 // Passport 0.7+ requires these methods; cookie-session doesn't provide them
