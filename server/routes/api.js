@@ -28,17 +28,6 @@ function _rejectTooLong(res) {
 }
 
 // ── User locale helper ───────────────────────────────────────────────────────
-async function getUserLocale(userId) {
-  if (!userId) return 'en';
-  try {
-    const [rows] = await db.execute(
-      'SELECT value FROM user_settings WHERE user_id = ? AND key_name = ?',
-      [userId, 'ui_locale']
-    );
-    return (rows.length && rows[0].value) ? rows[0].value : 'en';
-  } catch { return 'en'; }
-}
-
 // ── Birth year lookup — only remaining use is the test-question age-based
 //    wording simplification opt-in; everything else about the learner now
 //    goes through services/whois.js's getWhoisBlock instead. ─────────────────
@@ -59,7 +48,7 @@ const mapCaches = {};
 
 router.get('/map', async (req, res) => {
   try {
-    const locale = await getUserLocale(req.user?.id);
+    const locale = req.user?.locale || 'en';
     if (mapCaches[locale]) return res.json(mapCaches[locale]);
 
     const translatedNodeSql = (layer) =>
@@ -128,7 +117,7 @@ router.get('/nodes/:id/overview', async (req, res) => {
     if (!rows.length) return res.status(404).json({ error: 'Node not found' });
     const node = rows[0];
 
-    const locale = await getUserLocale(req.user?.id);
+    const locale = req.user?.locale || 'en';
 
     if (node.overview && locale === 'en') return res.json({ overview: node.overview });
 
@@ -248,7 +237,7 @@ router.get('/nodes/:id/learn-progress', async (req, res) => {
       'SELECT id AS db_id FROM nodes WHERE external_id = ?', [id]
     );
     if (!nodes.length) return res.json({ done: 0, total: 0 });
-    const locale = await getUserLocale(req.user?.id);
+    const locale = req.user?.locale || 'en';
 
     const [[{ total }]] = await db.execute(
       'SELECT COUNT(*) AS total FROM knobits WHERE node_id = ? AND locale = ?',
@@ -358,7 +347,7 @@ router.post('/nodes/:id/knowledge', async (req, res) => {
 // ── Generate / return knobits for a node ─────────────────────────────────────
 router.post('/nodes/:id/learn', llmRateLimit, async (req, res) => {
   const { id }      = req.params;
-  const locale      = await getUserLocale(req.user?.id);
+  const locale      = req.user?.locale || 'en';
   const passportId  = req.user?.passport_id;
 
   try {
@@ -680,10 +669,8 @@ router.post('/learn/interact', llmRateLimit, async (req, res) => {
     const { title, nodeLabel } = rows[0];
     const uid = req.user?.id;
     const passportId = req.user?.passport_id;
-    const [locale, whoisText] = await Promise.all([
-      getUserLocale(uid),
-      getWhoisBlock(passportId),
-    ]);
+    const locale = req.user?.locale || 'en';
+    const whoisText = await getWhoisBlock(passportId);
 
     // ── Streaming branch: text-only phases ──────────────────────────────────
     if (wantStream) {
@@ -838,7 +825,7 @@ router.get('/learn/knobit/:id/download', async (req, res) => {
   if (!passportId) return res.status(400).json({ error: 'No passport' });
 
   try {
-    const locale = await getUserLocale(req.user?.id);
+    const locale = req.user?.locale || 'en';
 
     const [krows] = await db.execute(
       `SELECT k.title AS knobitTitle,
@@ -903,7 +890,7 @@ router.get('/learn/lootbox/:nodeId', llmRateLimit, async (req, res) => {
     );
     if (!nodes.length) return res.status(404).json({ error: 'Node not found' });
     const node   = nodes[0];
-    const locale = await getUserLocale(req.user?.id);
+    const locale = req.user?.locale || 'en';
 
     const [cacheRows] = await db.execute(
       'SELECT data, generated_at FROM lootbox_cache WHERE node_external_id = ? AND locale = ?',
@@ -1251,7 +1238,7 @@ router.post('/anne/message', llmRateLimit, async (req, res) => {
   if (_tooLong(message)) return _rejectTooLong(res);
 
   try {
-    const locale = await getUserLocale(uid);
+    const locale = req.user?.locale || 'en';
 
     const [historyRows] = await db.execute(
       `SELECT role, content FROM anne_messages WHERE passport_id = ? ORDER BY id DESC LIMIT 20`,
@@ -1512,7 +1499,7 @@ router.post('/profile/invite-friend', inviteRateLimit, async (req, res) => {
     const [[passportRow]] = await db.execute('SELECT display_name FROM learner_passports WHERE id = ?', [passportId]);
     const inviterName = ((passportRow && passportRow.display_name) || req.user.email.split('@')[0])
       .replace(/[\r\n]+/g, ' ').trim().slice(0, 100) || 'A Map of Knowledge user';
-    const locale = await getUserLocale(userId);
+    const locale = req.user?.locale || 'en';
 
     sendFriendInviteEmail(email, name, inviterName, req.user.email, locale)
       .catch(err => console.error('[api/profile/invite-friend] email failed:', err.message));
@@ -1688,7 +1675,7 @@ router.post('/test/question', llmRateLimit, async (req, res) => {
     const { db_id, label, level } = nodes[0];
     if (level < 4) return res.status(400).json({ error: 'Test only available for L4 and L5 nodes' });
     const breadcrumb = await getNodeBreadcrumb(db_id);
-    const locale = await getUserLocale(req.user?.id);
+    const locale = req.user?.locale || 'en';
     // Age-based wording simplification — opt-in only. Unknown age or 18+
     // leaves the prompt completely unchanged (age stays null/undefined).
     const birthYear = await _getBirthYear(req.user?.id);
@@ -1753,7 +1740,7 @@ router.post('/test/evaluate', llmRateLimit, async (req, res) => {
     if (!nodes.length) return res.status(404).json({ error: 'Node not found' });
     const { db_id, label } = nodes[0];
     const breadcrumb = await getNodeBreadcrumb(db_id);
-    const locale = await getUserLocale(req.user?.id);
+    const locale = req.user?.locale || 'en';
     const whoisText = await getWhoisBlock(passportId);
 
     if (wantStream) {
