@@ -30,6 +30,7 @@ const authRouter     = require('./routes/auth');   // also registers passport st
 const apiRouter      = require('./routes/api');
 const subsetsRouter  = require('./routes/subsets');
 const adminRouter    = require('./routes/admin');
+const webauthnRouter = require('./routes/webauthn');
 const requireAuth = require('./middleware/requireAuth');
 
 const app = express();
@@ -60,6 +61,14 @@ app.use(helmet({
   hidePoweredBy: false,
 }));
 
+// Node listens on a Unix socket (Apache proxies to it via .htaccess), so
+// req.socket.remoteAddress has no meaningful value on its own — trust the
+// single Apache hop's X-Forwarded-For (added automatically by mod_proxy_http)
+// so req.ip resolves to the real client IP. Needed for per-IP rate limiting
+// on the pre-auth routes in auth.js (login/signup have no req.user yet).
+// Ported from themapofknowledge.com's 2026-09-01 review.
+app.set('trust proxy', 1);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -86,6 +95,7 @@ app.use(passport.session());
 // ── Routes ────────────────────────────────────────────────────────────────────
 // Public auth endpoints
 app.use('/auth', authRouter);
+app.use('/auth/webauthn', webauthnRouter);
 
 // Protected API
 app.use('/api/admin', requireAuth, adminRouter);

@@ -161,6 +161,73 @@ async function run() {
       console.log('  · learner_passports.profile_bonus_awarded already exists');
     }
 
+    // users.google_linked / discord_linked — tracks which SSO providers this
+    // account has ever signed in via (Discord SSO + passkeys ported from
+    // themapofknowledge.com). Backfilled below: any existing user with no
+    // password_hash only ever could have signed up via Google (Discord/
+    // passkeys didn't exist yet), so google_linked=1 is a safe inference —
+    // needed so countAuthMethods (webauthn.js's "don't delete the last
+    // sign-in method" guard) doesn't undercount pre-existing Google users.
+    const [googleLinkedCols] = await conn.execute(
+      `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'google_linked'`
+    );
+    if (!googleLinkedCols.length) {
+      await conn.execute('ALTER TABLE users ADD COLUMN google_linked TINYINT(1) NOT NULL DEFAULT 0');
+      await conn.execute('UPDATE users SET google_linked = 1 WHERE password_hash IS NULL');
+      console.log('  + Added users.google_linked column (backfilled for existing password-less accounts)');
+    } else {
+      console.log('  · users.google_linked already exists');
+    }
+
+    const [discordLinkedCols] = await conn.execute(
+      `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'discord_linked'`
+    );
+    if (!discordLinkedCols.length) {
+      await conn.execute('ALTER TABLE users ADD COLUMN discord_linked TINYINT(1) NOT NULL DEFAULT 0');
+      console.log('  + Added users.discord_linked column');
+    } else {
+      console.log('  · users.discord_linked already exists');
+    }
+
+    // users.password_reset_token / password_reset_expires — forgot-password
+    // flow, ported from themapofknowledge.com.
+    const [resetTokenCols] = await conn.execute(
+      `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'password_reset_token'`
+    );
+    if (!resetTokenCols.length) {
+      await conn.execute('ALTER TABLE users ADD COLUMN password_reset_token VARCHAR(64) DEFAULT NULL');
+      await conn.execute('ALTER TABLE users ADD COLUMN password_reset_expires DATETIME DEFAULT NULL');
+      console.log('  + Added users.password_reset_token / password_reset_expires columns');
+    } else {
+      console.log('  · users.password_reset_token already exists');
+    }
+
+    // webauthn_credentials table — passkey sign-in, ported from
+    // themapofknowledge.com.
+    await conn.execute(`
+      CREATE TABLE IF NOT EXISTS webauthn_credentials (
+        id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        user_id       BIGINT UNSIGNED NOT NULL,
+        credential_id VARCHAR(255) NOT NULL,
+        public_key    TEXT NOT NULL,
+        counter       BIGINT UNSIGNED NOT NULL DEFAULT 0,
+        device_type   VARCHAR(32) DEFAULT NULL,
+        backed_up     TINYINT(1) NOT NULL DEFAULT 0,
+        transports    VARCHAR(255) DEFAULT NULL,
+        nickname      VARCHAR(100) DEFAULT NULL,
+        created_at    DATETIME NOT NULL DEFAULT NOW(),
+        last_used_at  DATETIME DEFAULT NULL,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_webauthn_credential_id (credential_id),
+        KEY idx_webauthn_user (user_id),
+        CONSTRAINT fk_webauthn_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+      )
+    `);
+    console.log('  · webauthn_credentials table ready');
+
     // ── 2. Check if already migrated ─────────────────────────────────────────
     const [[{ cnt }]] = await conn.execute('SELECT COUNT(*) AS cnt FROM nodes');
     if (cnt > 0) {
