@@ -1032,19 +1032,28 @@ router.post('/learn/knobit/:id/complete', async (req, res) => {
       // Awaited (unlike the achievement/streak-saver/streak calls below) so the
       // actual amount — after the learner's real momentum multiplier — can be
       // sent back and shown on the unit-complete screen's lumens stat card.
-      let lumensEarned = await game.awardLumens(passportId, userId, 10, 'knobit_complete', knobitId).catch(() => 0);
+      // lumensBreakdown keeps each component (base amount pre-multiplier) so
+      // the client can show a "10 x 1.25 = 13" style line per source, instead
+      // of just the opaque combined total.
+      const KNOBIT_BASE = 10, TOPIC_BASE = 25, BRANCH_BASE = 100;
+      const lumensBreakdown = [];
+      let lumensEarned = await game.awardLumens(passportId, userId, KNOBIT_BASE, 'knobit_complete', knobitId).catch(() => 0);
+      lumensBreakdown.push({ reason: 'knobit_complete', base: KNOBIT_BASE, amount: lumensEarned });
       if (done >= total && total > 0) {
         const [bonusAmount, branchAmount] = await Promise.all([
-          game.awardLumens(passportId, userId, 25, 'node_all_knobits', nodeExtId).catch(() => 0),
+          game.awardLumens(passportId, userId, TOPIC_BASE, 'node_all_knobits', nodeExtId).catch(() => 0),
           game.maybeAwardBranchBonus(passportId, userId, node_id).catch(() => 0),
         ]);
+        if (bonusAmount)  lumensBreakdown.push({ reason: 'node_all_knobits', base: TOPIC_BASE,  amount: bonusAmount });
+        if (branchAmount) lumensBreakdown.push({ reason: 'branch_complete',  base: BRANCH_BASE, amount: branchAmount });
         lumensEarned += (bonusAmount || 0) + (branchAmount || 0);
         game.maybeAwardStreakSaver(passportId, node_id, userId).catch(() => {});
       }
       game.checkAchievements(passportId, userId, 'knobit_complete', { totalEver }).catch(() => {});
       game.recordKnobitCompletion(passportId, localDate).catch(() => {});
 
-      return res.json({ ok: true, lumensEarned });
+      const { multiplier: momentumMultiplier } = await game.getMomentum(passportId).catch(() => ({ multiplier: 1 }));
+      return res.json({ ok: true, lumensEarned, lumensBreakdown, momentumMultiplier });
     }
 
     res.json({ ok: true });
@@ -1076,8 +1085,14 @@ router.get('/map/progress', async (req, res) => {
 // is too heavy to fetch on every map load just to check one number) ─────────
 router.get('/streak', async (req, res) => {
   const passportId = req.user?.passport_id;
-  if (!passportId) return res.json({ currentStreak: 0, longestStreak: 0, streakSavers: 0 });
-  res.json(await game.getStreak(passportId, req.query.localDate));
+  if (!passportId) {
+    return res.json({ currentStreak: 0, longestStreak: 0, streakSavers: 0, momentumMultiplier: 1, momentumKey: 'setting_out' });
+  }
+  const [streak, momentum] = await Promise.all([
+    game.getStreak(passportId, req.query.localDate),
+    game.getMomentum(passportId),
+  ]);
+  res.json({ ...streak, momentumMultiplier: momentum.multiplier, momentumKey: momentum.key });
 });
 
 // ── Leaderboard — top 5 by lumens, plus the current learner's own rank if

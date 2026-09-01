@@ -1365,6 +1365,21 @@
     el.classList.add('show');
   }
 
+  // Not shown for the final knobit in a unit — the unit-complete screen's own
+  // lumens stat card (_setLumensEarned) already covers that case.
+  function _showLumensPill(amount) {
+    if (!amount) return;
+    var el = document.getElementById('lm-lumens-pill');
+    if (!el) return;
+    var numEl   = el.querySelector('.lm-lumens-num');
+    var labelEl = el.querySelector('.lm-lumens-label');
+    if (numEl)   numEl.textContent   = '+' + amount;
+    if (labelEl) labelEl.textContent = t('label.lumens');
+    el.classList.remove('show');
+    void el.offsetWidth;
+    el.classList.add('show');
+  }
+
   function _fireConfettiBurst(item) {
     var numEl = item.querySelector('.lm-knobit-num');
     if (!numEl) return;
@@ -1391,6 +1406,7 @@
     _knobitStarted = false;
     var k = KNOBITS[CURRENT_KNOBIT_IDX];
     var completedIdx = CURRENT_KNOBIT_IDX;
+    var isLastKnobit = (CURRENT_KNOBIT_IDX + 1 >= KNOBIT_TOTAL);
     KNOBIT_DONE_COUNT++;
     apiComplete(k.id).then(function (data) {
       // Documented at the top of this file as a contract, but never actually
@@ -1401,10 +1417,14 @@
       // after every knobit, but the stat card stays hidden until then) —
       // the whole-topic bonus only gets added to lumensEarned on the last
       // knobit, when the server sees the node is actually fully done.
-      _setLumensEarned(data && data.lumensEarned);
+      _setLumensEarned(data && data.lumensEarned, data && data.lumensBreakdown, data && data.momentumMultiplier);
+      // For every other knobit, the small top-right pill is the only lumens
+      // feedback shown — the momentum multiplier is otherwise invisible day
+      // to day, so this at least surfaces that something was earned.
+      if (!isLastKnobit) _showLumensPill(data && data.lumensEarned);
     });
 
-    if (CURRENT_KNOBIT_IDX + 1 >= KNOBIT_TOTAL) {
+    if (isLastKnobit) {
       _showUnitComplete();
     } else {
       CURRENT_KNOBIT_IDX++;
@@ -1456,16 +1476,45 @@
     showLmView('lm-complete');
   }
 
+  var LUMENS_BREAKDOWN_LABELS = {
+    knobit_complete:  'quesst.breakdown_knobit',
+    node_all_knobits: 'quesst.breakdown_topic',
+    branch_complete:  'quesst.breakdown_branch',
+  };
+
   // Fills in the second stat card once the real amount is known — see the
   // comment at its call site in _completeKnobit for why this can't just be
-  // computed client-side (the momentum multiplier isn't known here).
-  function _setLumensEarned(amount) {
+  // computed client-side (the momentum multiplier isn't known here). The
+  // small breakdown underneath (source x base x multiplier = amount) makes
+  // the total legible instead of an opaque number, especially once a
+  // momentum bonus is actually in play.
+  function _setLumensEarned(amount, breakdown, multiplier) {
     var card = document.getElementById('lm-cstat-lumens');
     if (!card || !amount) return;
-    var num   = card.querySelector('.lm-cstat-num');
-    var label = card.querySelector('.lm-cstat-label');
+    var num          = card.querySelector('.lm-cstat-num');
+    var label        = card.querySelector('.lm-cstat-label');
+    var breakdownEl  = document.getElementById('lm-cstat-breakdown');
     if (num)   num.textContent   = '+' + amount;
     if (label) label.textContent = t('label.lumens');
+    if (breakdownEl) {
+      breakdownEl.innerHTML = '';
+      // Only worth showing once there's more than one source, or the
+      // multiplier is actually doing something — a single un-multiplied
+      // knobit award is already fully explained by the total above it.
+      var hasMultiplier = multiplier && multiplier !== 1;
+      if (Array.isArray(breakdown) && (breakdown.length > 1 || hasMultiplier)) {
+        breakdown.forEach(function (line) {
+          var labelKey = LUMENS_BREAKDOWN_LABELS[line.reason];
+          if (!labelKey) return;
+          var row = document.createElement('div');
+          row.className = 'lm-cstat-breakdown-line';
+          row.textContent = hasMultiplier
+            ? t(labelKey) + ': ' + line.base + ' × ' + multiplier + ' = +' + line.amount
+            : t(labelKey) + ': +' + line.amount;
+          breakdownEl.appendChild(row);
+        });
+      }
+    }
     card.style.display = '';
   }
 

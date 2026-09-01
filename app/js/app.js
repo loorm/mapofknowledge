@@ -1487,11 +1487,22 @@ function init(data, emergentData) {
   }
   function refreshStreakIcon() {
     const link = document.getElementById('topbar-streak-link');
+    const multEl = document.getElementById('topbar-streak-mult');
     if (!link) return;
     fetch('/api/streak?localDate=' + encodeURIComponent(_localDateStr()))
       .then(r => r.json())
-      .then(({ currentStreak }) => {
+      .then(({ currentStreak, momentumMultiplier }) => {
         link.classList.toggle('off', !(currentStreak > 0));
+        // Board-game-style corner tag — only shown while a bonus is actually
+        // active (×1.00 means "no multiplier in force", not worth a badge).
+        if (multEl) {
+          if (momentumMultiplier > 1) {
+            multEl.textContent = '×' + momentumMultiplier;
+            multEl.style.display = '';
+          } else {
+            multEl.style.display = 'none';
+          }
+        }
       }).catch(() => {});
   }
 

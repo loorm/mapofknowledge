@@ -47,6 +47,7 @@
       <span class="topbar-streak-spark s1"></span>
       <span class="topbar-streak-spark s2"></span>
       <span class="topbar-streak-spark s3"></span>
+      <span class="topbar-streak-mult" id="topbar-streak-mult" style="display:none"></span>
     </a>
     <div class="topbar-search-wrap">
       <svg class="search-icon" width="13" height="13" viewBox="0 0 13 13" fill="none">
@@ -452,6 +453,7 @@
       <div class="lm-complete-stat" id="lm-cstat-lumens" style="display:none">
         <div class="lm-cstat-num gold"></div>
         <div class="lm-cstat-label"></div>
+        <div class="lm-cstat-breakdown" id="lm-cstat-breakdown"></div>
       </div>
     </div>
 
@@ -491,6 +493,17 @@
       <path d="M6 10.3l2.6 2.6L14.2 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
     <span class="lm-celebrate-text"></span>
+  </div>
+
+  <!-- Per-knobit lumens reward: small amber pill, top-right, rises and drifts
+       off toward the corner as it fades — meant to read as sparks flying up
+       into the topbar's streak bonfire (the gamification shortcut), even
+       though that icon isn't literally visible here in fullscreen mode.
+       Same "not shown on the final knobit" rule as the toast above — the
+       unit-complete screen's own lumens stat card covers that case. -->
+  <div id="lm-lumens-pill" class="lm-lumens-pill" role="status" aria-live="polite">
+    <span class="lm-lumens-num"></span>
+    <span class="lm-lumens-label"></span>
   </div>
 
   <!-- Image lightbox for visuals shown in the explain-phase stream — click a
@@ -775,12 +788,12 @@
 <script src="js/tour.js"></script>
 <script src="js/knowledge-estimate.js"></script>
 <script src="js/help-hint.js"></script>
-<script src="js/learning.js?v=20"></script>
+<script src="js/learning.js?v=22"></script>
 <script src="js/testing.js?v=1"></script>
 <script src="js/layers.js?v=4"></script>
 <script src="js/filters.js?v=7"></script>
 <script src="js/anne.js"></script>
-<script src="js/app.js?v=8"></script>
+<script src="js/app.js?v=9"></script>
 <script src="js/tilt.js?v=4"></script>
 </body>
 </html>

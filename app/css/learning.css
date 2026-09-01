@@ -276,6 +276,36 @@
   animation: lmCelebrateRise 2s ease-out forwards;
 }
 
+/* Per-knobit lumens pill — smaller and off to the top-right, distinct from
+   the centered congratulatory toast above. Drifts up and slightly further
+   right as it fades, toward where the topbar's streak bonfire icon sits. */
+#lm-lumens-pill {
+  position: absolute;
+  top: 16px; right: 16px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(217,169,61,0.96);
+  color: #fff;
+  font-size: 12.5px; font-weight: 700;
+  padding: 7px 13px;
+  border-radius: 999px;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 6px 18px rgba(217,169,61,0.4);
+}
+#lm-lumens-pill .lm-lumens-label { font-weight: 600; opacity: 0.9; }
+@keyframes lmLumensRise {
+  0%   { opacity: 0; transform: translate(0, 8px) scale(0.85); }
+  15%  { opacity: 1; transform: translate(0, 0) scale(1); }
+  70%  { opacity: 1; transform: translate(10px, -30px) scale(0.95); }
+  100% { opacity: 0; transform: translate(22px, -56px) scale(0.75); }
+}
+#lm-lumens-pill.show {
+  animation: lmLumensRise 1.8s ease-out forwards;
+}
+
 /* ── start button (bottom of path view) ── */
 .lm-start-bar {
   flex-shrink: 0;
@@ -854,6 +884,16 @@
 .lm-cstat-label {
   font-size: 11px; color: var(--c7);
   margin-top: 4px; line-height: 1.3;
+}
+.lm-cstat-breakdown {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--i08);
+}
+.lm-cstat-breakdown-line {
+  font-size: 9.5px; color: var(--c7);
+  line-height: 1.5;
+  white-space: nowrap;
 }
 
 .lm-next-node {
