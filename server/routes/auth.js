@@ -348,9 +348,22 @@ router.get('/logout', (req, res, next) => {
   });
 });
 
-router.get('/me', (req, res) => {
+router.get('/me', async (req, res) => {
   if (!req.isAuthenticated()) return res.json(null);
-  const { id, email, role, passport_id, subscription_status, password_hash, email_verified } = req.user;
+  const { id, email, role, passport_id, email_verified } = req.user;
+  // password_hash/subscription_status were dropped from deserializeUser's
+  // SELECT (2026-09-01 security fix — was SELECT * on every request); this
+  // is the one route that actually needs them, so fetch fresh here instead
+  // of re-widening what's attached to req.user for every request.
+  let password_hash = null, subscription_status = null;
+  try {
+    const [[row]] = await db.execute(
+      'SELECT password_hash, subscription_status FROM users WHERE id = ?', [id]
+    );
+    if (row) ({ password_hash, subscription_status } = row);
+  } catch (err) {
+    console.error('[auth/me]', err.message);
+  }
   res.json({
     id, email, role, passport_id, subscription_status,
     hasPassword:   !!password_hash,
