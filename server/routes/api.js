@@ -2730,7 +2730,13 @@ router.post('/teacher/groups', async (req, res) => {
   const userId = req.user?.id;
   if (!userId) return res.status(401).json({ error: 'Not authenticated' });
   const label = (req.body.label || '').trim();
-  const color = (req.body.color || '#8BAD7E').trim();
+  // req.body.color is rendered client-side straight into an inline style="..."
+  // attribute string in at least one place (teacher.html's group chips) —
+  // validate the format here rather than trusting the client, since an
+  // unvalidated value stored now would be a stored-injection vector later
+  // regardless of how carefully any one render site escapes it.
+  const rawColor = (req.body.color || '').trim();
+  const color = /^#[0-9A-Fa-f]{6}$/.test(rawColor) ? rawColor : '#8BAD7E';
   if (!label) return res.status(400).json({ error: 'label required' });
   try {
     const [r] = await db.execute(

@@ -854,8 +854,13 @@ function renderDetailGroupChips(id) {
   }
   container.innerHTML = REAL_GROUPS.map(function (g) {
     var active = memberIds.indexOf(g.id) !== -1;
+    // g.color is interpolated straight into a style="..." attribute below —
+    // esc() only encodes &<>, not quotes, so it can't fully neutralize an
+    // attribute-breakout here. Validate the hex format directly instead
+    // (server also validates on write, but never trust stored data alone).
+    var safeColor = /^#[0-9A-Fa-f]{6}$/.test(g.color || '') ? g.color : '#8BAD7E';
     var style = active
-      ? 'background:' + g.color + '1a;color:' + g.color + ';border-color:' + g.color + '55'
+      ? 'background:' + safeColor + '1a;color:' + safeColor + ';border-color:' + safeColor + '55'
       : 'background:transparent;color:var(--c5);border-color:var(--i18);border-style:dashed';
     return '<button type="button" class="ta-chip ta-detail-group-chip" data-id="' + g.id + '" style="' + style + ';cursor:pointer;font-family:inherit">' + (active ? '✓ ' : '+ ') + esc(g.label) + '</button>';
   }).join('');
