@@ -114,16 +114,42 @@ app.use('/api/admin', requireAuth, adminRouter);
 app.use('/api/account', requireAuth, accountRouter);
 app.use('/api/knowledge-estimate', requireAuth, knowledgeEstimateRouter);
 
-// Protected app (the D3 knowledge map)
-app.use('/app', requireAuth, express.static(path.join(__dirname, '../app')));
-
-// Signup page (explicit route so /signup works without .html extension)
-app.get('/signup', (req, res) => res.sendFile(path.join(__dirname, '../signup.html')));
-
-// Public landing page and other static assets at root
-app.use(express.static(path.join(__dirname, '..')));
+const APP_DIR = path.join(__dirname, '../app');
+app.use('/app', express.static(APP_DIR, { dotfiles: 'deny' }));
+app.get('/', (req, res) => res.sendFile(path.join(APP_DIR, 'landing.html')));
+app.get('/index.html', (req, res) => res.redirect(301, '/')); // old bookmark → landing
+app.get(['/signup', '/signup.html'], (req, res) => res.sendFile(path.join(APP_DIR, 'signup.html')));
 
 // Health check
 app.get('/health', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
+
+// ── 404 — anything not matched above ────────────────────────────────────────
+// API/auth callers get JSON; browsers get the branded page. Replaces Express's
+// bare "Cannot GET /x" text response.
+app.use((req, res) => {
+  if (req.path.startsWith('/api/') || req.path.startsWith('/auth/') || !req.accepts('html')) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  res.status(404).sendFile(path.join(APP_DIR, '404.html'));
+});
+
+// ── Error handler — last resort for anything a route threw / next(err)'d ────
+// eslint-disable-next-line no-unused-vars  (Express needs the 4-arg signature)
+app.use((err, req, res, next) => {
+  console.error('[unhandled]', req.method, req.originalUrl, '—', err.stack || err.message);
+  if (res.headersSent) return;
+  if (req.path.startsWith('/api/') || req.path.startsWith('/auth/') || !req.accepts('html')) {
+    return res.status(500).json({ error: 'Server error' });
+  }
+  res.status(500).type('html').send(
+    '<!doctype html><meta charset="utf-8"><title>Something went wrong</title>' +
+    '<body style="min-height:100vh;margin:0;display:flex;align-items:center;justify-content:center;' +
+    'background:#080810;color:#F2EDE6;font:16px/1.6 -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;text-align:center">' +
+    '<div><p style="font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:rgba(242,237,230,.45)">500</p>' +
+    '<h1 style="margin:10px 0 12px;font-size:24px">Something went wrong</h1>' +
+    '<p style="color:rgba(242,237,230,.6)">Please try again in a moment.</p>' +
+    '<p style="margin-top:24px"><a href="/" style="color:#C4826A">Back to the home page</a></p></div></body>'
+  );
+});
 
 module.exports = app;

@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<link rel="icon" type="image/svg+xml" href="/images/logo-mark.svg">
-<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png">
+<link rel="icon" type="image/svg+xml" href="/app/images/logo-mark.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/app/images/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/app/images/favicon-16.png">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZD3FXS60X0"></script>
 <script>
@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="css/anne.css">
 <script>fetch('/api/settings').then(function(r){return r.json();}).then(function(s){var f=s.font_size;if(f==='medium')document.documentElement.classList.add('fs-medium');if(f==='large')document.documentElement.classList.add('fs-large');var p=s.palette==='midnight'?'vampire':s.palette;if(p&&p!=='sunset')document.documentElement.classList.add('palette-'+p);if(s.ui_locale&&s.ui_locale!=='en'){window._uiLocale=s.ui_locale;window.reloadStrings&&window.reloadStrings();}window._loadedSettings=s;if(window._onSettingsLoaded)window._onSettingsLoaded(s);}).catch(function(){});</script>
 <script src="js/strings.js"></script>
-<script src="/vendor/simplewebauthn-browser.min.js"></script>
+<script src="/app/vendor/simplewebauthn-browser.min.js"></script>
 </head>
 <body>
 
@@ -34,7 +34,7 @@
 
   <a class="topbar-logo" href="index.html" onclick="if(window.parent!==window&&typeof window.parent.closeOverlay==='function'){window.parent.closeOverlay();return false;}">
     <div class="topbar-logo-icon">
-      <img src="/images/logo-mark.svg" alt="" width="26" height="26">
+      <img src="/app/images/logo-mark.svg" alt="" width="26" height="26">
     </div>
     <span class="topbar-logo-text">Map of Knowledge</span>
   </a>

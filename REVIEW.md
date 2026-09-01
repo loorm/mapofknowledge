@@ -81,7 +81,22 @@ attacker will hit first, so they lead the priority list.
 Priority key: **P0** ship-blocker / active exposure · **P1** high user or security impact ·
 **P2** should fix · **P3** cleanup / defense-in-depth.
 
-### P0-1 — The entire repo is served as static files
+### P0-1 — The entire repo is served as static files  ✅ FIXED (2026-09-01)
+
+**Resolution**: `server/app.js` no longer mounts static on the repo root. `app/` is now the only
+statically-served directory (`app.use('/app', express.static(APP_DIR, { dotfiles: 'deny' }))`),
+and it's public (no `requireAuth`) — the app's HTML/CSS/JS carry no secrets and `/api/*` remains
+the real auth boundary. The public entry pages moved under `app/` (`index.html` → `app/landing.html`,
+`signup.html` → `app/signup.html`) and are served via explicit routes (`GET /`, `GET /signup`,
+`GET /signup.html`). `images/`, `vendor/`, `audio/` moved to `app/…` and all refs updated.
+Verified: `/deploy.ps1`, `/ecosystem.config.js`, `/package.json`, `/server/*`, `/server/db/*.sql`,
+`/additions_log.txt`, `/.env`, `/.git/config`, `/REVIEW.md` all return 404; the app and its assets
+still load. Follow-ups still open: the production server IP + SSH user in `deploy.ps1` were public
+for some time — treat as burned, confirm key-only SSH; move `*_log.txt` out of the repo.
+
+---
+_Original finding:_
+
 `server/app.js:124` — `app.use(express.static(path.join(__dirname, '..')))` mounts the **project
 root**. Consequences, all reachable unauthenticated:
 
@@ -226,9 +241,11 @@ Move to env vars — especially given P0-1 exposes the source publicly. Note `RO
 - **`admin.js` POST `/users`**: no transaction — a failed `users` insert leaves an orphan
   `learner_passports` row. `PATCH /users/:id` can set another account to `super_admin`; fine
   within the super-admin trust boundary but there's no audit log.
-- **No global error handler / 404 handler** in `server/app.js`, and no
-  `process.on('unhandledRejection')`. On a single-process PM2 fork, one unhandled rejection in a
-  non-`await`-guarded path takes the whole site down until `autorestart`.
+- **Error/404 handling** — _partly addressed 2026-09-01:_ `server/app.js` now has a 404 handler
+  (branded `app/404.html` for browsers, JSON for API/auth callers) and a catch-all error handler
+  (logs the stack, returns a generic 500). Still open: `process.on('unhandledRejection')` — on a
+  single-process PM2 fork, one unhandled rejection in a non-`await`-guarded path still takes the
+  site down until `autorestart`.
 - **`express.json()`** has no explicit size limit (defaults to 100 KB). Set it small
   (`{ limit: '32kb' }`) except where you genuinely need more.
 - **`deserializeUser` returns `false` for a deleted user** → `req.user` is `undefined`, and
@@ -279,18 +296,16 @@ Move to env vars — especially given P0-1 exposes the source publicly. Note `RO
   accidental `==`. Add ESLint (with `eslint-plugin-promise` and `eslint-plugin-security`) + a
   `lint` npm script, run it in CI / a pre-commit hook, and add Prettier so formatting stops
   being a review concern.
-- **Repo hygiene**: `additions_log.txt`, `collisions_log.txt` don't belong in the web root, and
-  `server/db/*.sql` is still inside the statically-served tree (see P0-1) — none of it should be
-  reachable over HTTP. `deploy.ps1` should reference the server by a config value, not a
-  committed IP. No CI pipeline at all — no automated check runs between `git push` and the
-  `pm2 reload` on the server.
+- **Repo hygiene**: `additions_log.txt` / `collisions_log.txt` are no longer web-reachable (P0-1
+  fixed) but still sit in the repo root — move them into a gitignored `docs/` or `data/` dir.
+  `deploy.ps1` should reference the server by a config value, not a committed IP. No CI pipeline
+  at all — no automated check runs between `git push` and the `pm2 reload` on the server.
 
 ---
 
 ## 5. Suggested order of work
 
-1. **P0-1** — restrict static serving to a `public/` dir + `dotfiles: 'deny'`. (~1 hr, removes
-   the biggest exposure.)
+1. ~~**P0-1** — restrict static serving~~ ✅ done 2026-09-01 (see above).
 2. **P0-2** — configure Turnstile and fail closed.
 3. **P1-1 / P1-2** — guard lumen awards to first-completion; add `llmRateLimit` + input caps to
    subset import. (Stops currency farming and runaway API cost.)
