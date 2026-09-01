@@ -1,4 +1,5 @@
 node_modules/
+.idea/
 *.pub
 *.pub.pub
 .env
