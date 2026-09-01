@@ -1248,7 +1248,7 @@
     if (momentum.multiplier > 1) {
       momentumBadge = `
       <div class="qst-momentum-badge">
-        <span class="qst-momentum-icon">⛵</span>
+        <span class="qst-momentum-icon">🚀</span>
         <span class="qst-momentum-mult">×${momentum.multiplier}</span>
         <span class="qst-momentum-tier">${esc(t('quesst.momentum_' + momentum.key))}</span>
       </div>`;
