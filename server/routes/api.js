@@ -7,7 +7,6 @@ const { notify, getUserLocale } = require('../services/notifications');
 const { buildKnobitDocx } = require('../services/knobitDocx');
 const { renderPassportText } = require('../services/passportText');
 const { redeemLinkCode, sendChildInvite, acceptChildInvite, generateCode } = require('../services/links');
-const testlog = require('../testlog'); // TESTLOG
 
 // ── User profile helper ──────────────────────────────────────────────────────
 async function getUserProfile(userId) {
@@ -2003,18 +2002,11 @@ router.post('/test/question', async (req, res) => {
       const edited = await llm.editTranslatedText(editFields, locale, req.user?.id);
       result = { ...result, ...edited };
     }
-    testlog('route_question_generated', { userId: req.user?.id, nodeId, nodeLabel: label, questionNum, history, result }); // TESTLOG
     res.json(result);
   } catch (err) {
     console.error('[api/test/question]', err.message);
     res.status(500).json({ error: 'Failed to generate question' });
   }
-});
-
-// TESTLOG — client-side event logger (Q1-Q3 MCQ local evaluation). Remove with other TESTLOG markers.
-router.post('/test/log', (req, res) => {
-  testlog('client_mcq_local', { userId: req.user?.id, ...req.body });
-  res.json({ ok: true });
 });
 
 // ── 4-tier diagnostic: evaluate answer ───────────────────────────────────────
@@ -2033,8 +2025,6 @@ router.post('/test/evaluate', async (req, res) => {
     if (!nodes.length) return res.status(404).json({ error: 'Node not found' });
     const { db_id, label, display_label } = nodes[0];
     const breadcrumb = await getNodeBreadcrumb(db_id);
-
-    testlog('route_evaluate_input', { userId: req.user?.id, nodeId, nodeLabel: label, questionNum, question, options, correctIndex, userAnswer, history }); // TESTLOG
 
     if (wantStream) {
       let streamFn;
@@ -2056,7 +2046,6 @@ router.post('/test/evaluate', async (req, res) => {
         );
       }
       const onDone = async (fullText) => {
-        testlog('route_evaluate_stream_response', { userId: req.user?.id, questionNum, raw: fullText }); // TESTLOG
         if (questionNum !== 4 || !passportId) return;
         try {
           const cleaned = fullText.trim()
