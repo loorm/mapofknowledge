@@ -7,16 +7,54 @@
 
 require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
 
-const path = require('path');
-const fs   = require('fs');
-const db   = require('./index');
+const path  = require('path');
+const fs    = require('fs');
+const mysql = require('mysql2/promise');
+const db    = require('./index');
 
 const BASE_JSON     = path.join(__dirname, '../../app/knowledge_map.json');
 const EMERGENT_JSON = path.join(__dirname, '../../app/knowledge_map_emergent.json');
+const SCHEMA_SQL    = path.join(__dirname, 'schema.sql');
 
 const BATCH = 500;
 
+// Bootstraps a completely empty database from schema.sql — the ONLY thing
+// this touches is a database with no `users` table at all, i.e. genuinely
+// fresh. Everything else in this script is additive (ALTER/CREATE IF NOT
+// EXISTS) against tables assumed to already exist, which was previously
+// true only because the original schema-creation step lived nowhere in
+// this repo — a fresh clone had no way to bootstrap a database at all.
+// Ported from themapofknowledge.com's 2026-09-01 review, verified there
+// directly against its own production DB (detection query correctly
+// no-ops when tables exist; the mysql2 multipleStatements execution
+// mechanism proven against disposable throwaway tables) before porting.
+async function bootstrapSchemaIfNeeded() {
+  const [tables] = await db.query("SHOW TABLES LIKE 'users'");
+  if (tables.length) {
+    console.log('Base schema already present — skipping bootstrap from schema.sql.');
+    return;
+  }
+  console.log('No base schema detected (no `users` table) — bootstrapping from server/db/schema.sql...');
+  const conn = await mysql.createConnection({
+    host:     process.env.DB_HOST,
+    port:     parseInt(process.env.DB_PORT || '3306'),
+    user:     process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    multipleStatements: true, // only ever used for this one-shot file, never the shared app pool
+  });
+  try {
+    const schemaSql = fs.readFileSync(SCHEMA_SQL, 'utf8');
+    await conn.query(schemaSql);
+    console.log('  + Base schema created from schema.sql.');
+  } finally {
+    await conn.end();
+  }
+}
+
 async function run() {
+  await bootstrapSchemaIfNeeded();
+
   const conn = await db.getConnection();
   try {
     console.log('=== KnoBitz — DB Migration ===\n');

@@ -208,6 +208,9 @@ router.get('/map', async (req, res) => {
 
 // Bust cache when migration reruns or translations are updated
 router.post('/map/bust-cache', (req, res) => {
+  if (!['admin', 'super_admin'].includes(req.user?.role)) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
   Object.keys(mapCaches).forEach(k => delete mapCaches[k]);
   res.json({ ok: true });
 });
