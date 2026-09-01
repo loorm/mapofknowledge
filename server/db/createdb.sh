@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+#
+# Creates the local `mapofknowledge` database + app user (empty — no tables).
+#
+# This does NOT create the schema. After running this, build the tables and
+# load the curriculum data with:
+#
+#     npm run migrate          # (= node server/db/migrate.js)
+#
 set -euo pipefail
 
 if [ "$(id -u)" -ne 0 ]; then
@@ -45,6 +53,9 @@ echo "✓ Database '${DB_NAME}' and user '${DB_USER}' are ready."
 if "$CLIENT" --host="$DB_HOST" --port="$DB_PORT" --user="$DB_USER" --password="$DB_PASS" \
      --execute="USE \`${DB_NAME}\`; SELECT 1;" >/dev/null 2>&1; then
   echo "✓ Verified: app user can connect to '${DB_NAME}'."
+  echo
+  echo "Next: create the tables and load the curriculum data with:"
+  echo "  npm run migrate"
 else
   echo "! Warning: could not connect as '${DB_USER}' — check the password you entered." >&2
 fi
