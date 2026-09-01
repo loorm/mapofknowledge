@@ -14,17 +14,12 @@
    toggled on by default, running counter) -> commit -> done. Nothing is
    written to user_node_knowledge until the user confirms the review step.
 
-   ROLE GATE (temporary — remove to enable for everyone):
-   Visible only to admin/super_admin while this feature is being reviewed.
-   To enable for all users once reviewed, delete the two lines marked below.
+   Rolled out to all user tiers 2026-09-01 (was admin/super_admin-only
+   during review).
    ══════════════════════════════════════════════════════════════════════════ */
 (function () {
-  // TEMPORARY ROLE GATE — delete this line and the `if` line inside
-  // _roleAllowed() below to enable this feature for every user tier.
-  var ROLE_GATE_ENABLED = true;
-  function _roleAllowed(role) {
-    if (!ROLE_GATE_ENABLED) return true;
-    return role === 'admin' || role === 'super_admin';
+  function _roleAllowed() {
+    return true;
   }
 
   var MAX_TEXT_CHARS = 4000; // matches server/routes/api.js's MAX_FREE_TEXT_CHARS
