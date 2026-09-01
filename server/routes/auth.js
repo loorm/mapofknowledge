@@ -229,7 +229,14 @@ passport.serializeUser((user, done) => done(null, user.id));
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const [rows] = await db.execute('SELECT * FROM users WHERE id = ?', [id]);
+    // Only the columns actually read from req.user anywhere in the app —
+    // was SELECT * before, which attached password_hash, email_verify_token,
+    // link_code, etc. to req.user on every request. Ported from
+    // themapofknowledge.com's 2026-09-01 security review.
+    const [rows] = await db.execute(
+      'SELECT id, email, passport_id, role, email_verified FROM users WHERE id = ?',
+      [id]
+    );
     done(null, rows[0] || false);
   } catch (err) {
     done(err);
