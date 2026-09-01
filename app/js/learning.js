@@ -1365,6 +1365,21 @@
     el.classList.add('show');
   }
 
+  // Not shown for the final knobit in a unit — the unit-complete screen's own
+  // lumens stat card (_setLumensEarned) already covers that case.
+  function _showLumensPill(amount) {
+    if (!amount) return;
+    var el = document.getElementById('lm-lumens-pill');
+    if (!el) return;
+    var numEl   = el.querySelector('.lm-lumens-num');
+    var labelEl = el.querySelector('.lm-lumens-label');
+    if (numEl)   numEl.textContent   = '+' + amount;
+    if (labelEl) labelEl.textContent = t('label.lumens');
+    el.classList.remove('show');
+    void el.offsetWidth;
+    el.classList.add('show');
+  }
+
   function _fireConfettiBurst(item) {
     var numEl = item.querySelector('.lm-knobit-num');
     if (!numEl) return;
@@ -1391,6 +1406,7 @@
     _knobitStarted = false;
     var k = KNOBITS[CURRENT_KNOBIT_IDX];
     var completedIdx = CURRENT_KNOBIT_IDX;
+    var isLastKnobit = (CURRENT_KNOBIT_IDX + 1 >= KNOBIT_TOTAL);
     KNOBIT_DONE_COUNT++;
     apiComplete(k.id).then(function (data) {
       // Documented at the top of this file as a contract, but never actually
@@ -1402,9 +1418,13 @@
       // the whole-topic bonus only gets added to lumensEarned on the last
       // knobit, when the server sees the node is actually fully done.
       _setLumensEarned(data && data.lumensEarned);
+      // For every other knobit, the small top-right pill is the only lumens
+      // feedback shown — the momentum multiplier is otherwise invisible day
+      // to day, so this at least surfaces that something was earned.
+      if (!isLastKnobit) _showLumensPill(data && data.lumensEarned);
     });
 
-    if (CURRENT_KNOBIT_IDX + 1 >= KNOBIT_TOTAL) {
+    if (isLastKnobit) {
       _showUnitComplete();
     } else {
       CURRENT_KNOBIT_IDX++;
