@@ -244,12 +244,23 @@ function momentumLabel(multiplier) {
   return 'Setting out';
 }
 
+// Machine key for the client to resolve via t('quesst.momentum_<key>') —
+// momentumLabel above is unlocalized English and was never actually
+// rendered anywhere until the multiplier UI was added; this is what that
+// UI (Lumens & Rank card, topbar bonfire badge) reads instead.
+function _momentumKey(multiplier) {
+  if (multiplier >= 2.0)  return 'full_sail';
+  if (multiplier >= 1.5)  return 'steady_expedition';
+  if (multiplier >= 1.25) return 'building_pace';
+  return 'setting_out';
+}
+
 async function getMomentum(passportId) {
   const [rows] = await db.execute(
     'SELECT last_activity_at, streak_days, multiplier FROM user_momentum WHERE passport_id = ?',
     [passportId]
   );
-  if (!rows.length) return { multiplier: 1.0, streakDays: 0, label: 'Setting out' };
+  if (!rows.length) return { multiplier: 1.0, streakDays: 0, label: 'Setting out', key: 'setting_out' };
 
   const m = rows[0];
   const hoursSince = (Date.now() - new Date(m.last_activity_at).getTime()) / 3600000;
@@ -258,10 +269,10 @@ async function getMomentum(passportId) {
       'UPDATE user_momentum SET streak_days=0, multiplier=1.00, updated_at=NOW() WHERE passport_id=?',
       [passportId]
     );
-    return { multiplier: 1.0, streakDays: 0, label: 'Setting out' };
+    return { multiplier: 1.0, streakDays: 0, label: 'Setting out', key: 'setting_out' };
   }
   const mult = parseFloat(m.multiplier);
-  return { multiplier: mult, streakDays: m.streak_days, label: momentumLabel(mult) };
+  return { multiplier: mult, streakDays: m.streak_days, label: momentumLabel(mult), key: _momentumKey(mult) };
 }
 
 async function _updateMomentum(passportId) {

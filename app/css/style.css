@@ -107,6 +107,22 @@ body { background: var(--map-bg); font-family: system-ui, -apple-system, sans-se
   100% { opacity: 0; transform: translate(var(--drift, 4px), -15px) scale(0.3); }
 }
 
+/* Momentum multiplier badge — small corner tag on the bonfire icon, like a
+   board-game card's multiplier corner. Only shown while a bonus is active
+   (×1.25 and up); see refreshStreakIcon in app.js. */
+.topbar-streak-mult {
+  position: absolute;
+  bottom: -3px; right: -4px;
+  font-size: 9px; font-weight: 800; line-height: 1;
+  color: #fff;
+  background: #D9A93D;
+  border: 1.5px solid var(--bg, #fff);
+  border-radius: 6px;
+  padding: 2px 3px;
+  pointer-events: none;
+  letter-spacing: -0.2px;
+}
+
 .topbar-search-wrap { position: relative; }
 .topbar-search-wrap .search-icon {
   position: absolute; left: 9px; top: 50%; transform: translateY(-50%);

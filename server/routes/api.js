@@ -1076,8 +1076,14 @@ router.get('/map/progress', async (req, res) => {
 // is too heavy to fetch on every map load just to check one number) ─────────
 router.get('/streak', async (req, res) => {
   const passportId = req.user?.passport_id;
-  if (!passportId) return res.json({ currentStreak: 0, longestStreak: 0, streakSavers: 0 });
-  res.json(await game.getStreak(passportId, req.query.localDate));
+  if (!passportId) {
+    return res.json({ currentStreak: 0, longestStreak: 0, streakSavers: 0, momentumMultiplier: 1, momentumKey: 'setting_out' });
+  }
+  const [streak, momentum] = await Promise.all([
+    game.getStreak(passportId, req.query.localDate),
+    game.getMomentum(passportId),
+  ]);
+  res.json({ ...streak, momentumMultiplier: momentum.multiplier, momentumKey: momentum.key });
 });
 
 // ── Leaderboard — top 5 by lumens, plus the current learner's own rank if

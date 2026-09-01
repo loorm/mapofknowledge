@@ -1239,6 +1239,21 @@
     }
     var nextLabel = next ? esc(t('quesst.rank_' + next.key)) : esc(t('quesst.max_rank_label'));
 
+    // Momentum multiplier badge — only shown while a bonus is actually in
+    // force (×1.00/"setting_out" means no bonus, not worth a badge). The
+    // multiplier itself was already live server-side for a while before
+    // this was ever surfaced anywhere in the UI.
+    var momentum = g.momentum || {};
+    var momentumBadge = '';
+    if (momentum.multiplier > 1) {
+      momentumBadge = `
+      <div class="qst-momentum-badge">
+        <span class="qst-momentum-icon">🔥</span>
+        <span class="qst-momentum-mult">×${momentum.multiplier}</span>
+        <span class="qst-momentum-tier">${esc(t('quesst.momentum_' + momentum.key))}</span>
+      </div>`;
+    }
+
     card.innerHTML = `
       <div class="p-card-title-row">
         <div class="p-card-title">${esc(t('quesst.lumens_title'))}</div>
@@ -1250,7 +1265,7 @@
           <span class="qst-lumens-count">${lumens.toLocaleString()}</span>
         </div>
         <div class="qst-lumens-label">${esc(t('quesst.lumens_label'))}</div>
-      </div>
+      </div>${momentumBadge}
       <div class="qst-rank-row">
         <span class="qst-rank-badge">${esc(rank)}</span>
         <div class="qst-rank-bar"><div class="qst-rank-fill" style="width:${pct}%"></div></div>
