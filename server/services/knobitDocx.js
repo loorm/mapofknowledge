@@ -1,7 +1,7 @@
 const { Document, Packer, Paragraph, TextRun, HeadingLevel, ExternalHyperlink } = require('docx');
 
 // Mirrors the client's phase.step_N + phase.* i18n pairs (app/js/learning.js /
-// i18n_seed.sql) so the downloaded document uses the same wording the learner saw.
+// server/db/i18n_seed.sql) so the downloaded document uses the same wording the learner saw.
 const PHASE_HEADINGS = {
   explain:     { en: 'Step 1 — Explain',      et: '1. samm — Selgitus' },
   demonstrate: { en: 'Step 2 — Demonstrate',  et: '2. samm — Näide' },
