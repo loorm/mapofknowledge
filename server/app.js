@@ -141,15 +141,7 @@ app.use((err, req, res, next) => {
   if (req.path.startsWith('/api/') || req.path.startsWith('/auth/') || !req.accepts('html')) {
     return res.status(500).json({ error: 'Server error' });
   }
-  res.status(500).type('html').send(
-    '<!doctype html><meta charset="utf-8"><title>Something went wrong</title>' +
-    '<body style="min-height:100vh;margin:0;display:flex;align-items:center;justify-content:center;' +
-    'background:#080810;color:#F2EDE6;font:16px/1.6 -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;text-align:center">' +
-    '<div><p style="font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:rgba(242,237,230,.45)">500</p>' +
-    '<h1 style="margin:10px 0 12px;font-size:24px">Something went wrong</h1>' +
-    '<p style="color:rgba(242,237,230,.6)">Please try again in a moment.</p>' +
-    '<p style="margin-top:24px"><a href="/" style="color:#C4826A">Back to the home page</a></p></div></body>'
-  );
+  res.status(500).sendFile(path.join(APP_DIR, '500.html'));
 });
 
 module.exports = app;
