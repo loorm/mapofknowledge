@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="/app/images/logo-mark.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/app/images/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/app/images/favicon-16.png">
+<title>Page not found — Map of Knowledge</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100%; padding: 24px;
+    background: #080810;
+    color: #F2EDE6;
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    text-align: center;
+  }
+  .box { max-width: 420px; }
+  .mark { width: 44px; height: 44px; margin: 0 auto 28px; display: block; opacity: .9; }
+  .code { font-size: 13px; letter-spacing: .18em; text-transform: uppercase; color: rgba(242,237,230,.45); }
+  h1 { margin: 10px 0 12px; font-size: 24px; font-weight: 650; letter-spacing: -.01em; }
+  p { color: rgba(242,237,230,.6); font-size: 15px; }
+  .actions { margin-top: 28px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  a.btn {
+    display: inline-block; padding: 11px 22px; border-radius: 10px;
+    font-size: 14px; font-weight: 600; text-decoration: none;
+    transition: background .15s, border-color .15s;
+  }
+  a.primary { background: #C4826A; color: #fff; }
+  a.primary:hover { background: #b3735c; }
+  a.ghost { border: 1px solid rgba(255,255,255,.14); color: #F2EDE6; }
+  a.ghost:hover { border-color: rgba(255,255,255,.3); }
+</style>
+</head>
+<body>
+  <div class="box">
+    <img class="mark" src="/app/images/logo-mark.svg" alt="">
+    <div class="code">404</div>
+    <h1>This page isn’t on the map</h1>
+    <p>The page you’re looking for doesn’t exist, or has moved.</p>
+    <div class="actions">
+      <a class="btn primary" href="/">Go to the home page</a>
+      <a class="btn ghost" href="/app/">Open the map</a>
+    </div>
+  </div>
+</body>
+</html>
