@@ -1,6 +1,7 @@
 /**
  * One-time migration: JSON files → MariaDB
- * Also adds missing columns/tables if they don't exist yet.
+ * Also adds missing columns/tables if they don't exist yet, and (re)seeds the
+ * UI strings from i18n_seed.sql on every run.
  *
  * Run: node server/db/migrate.js
  */
@@ -15,6 +16,7 @@ const db    = require('./index');
 const BASE_JSON     = path.join(__dirname, '../../app/knowledge_map.json');
 const EMERGENT_JSON = path.join(__dirname, '../../app/knowledge_map_emergent.json');
 const SCHEMA_SQL    = path.join(__dirname, 'schema.sql');
+const I18N_SEED_SQL = path.join(__dirname, 'i18n_seed.sql');
 
 const BATCH = 500;
 
@@ -50,6 +52,12 @@ async function bootstrapSchemaIfNeeded() {
   } finally {
     await conn.end();
   }
+}
+
+async function seedI18nStrings(conn) {
+  const sql = fs.readFileSync(I18N_SEED_SQL, 'utf8');
+  await conn.query(sql); // single statement — no multipleStatements needed
+  console.log('  · ui_strings seeded from i18n_seed.sql');
 }
 
 async function run() {
@@ -303,6 +311,10 @@ async function run() {
       )
     `);
     console.log('  · learner_whois table ready');
+
+    // ── UI strings (i18n) — always, before the early-return below ────────────
+    console.log('Seeding UI strings...');
+    await seedI18nStrings(conn);
 
     // ── 2. Check if already migrated ─────────────────────────────────────────
     const [[{ cnt }]] = await conn.execute('SELECT COUNT(*) AS cnt FROM nodes');
