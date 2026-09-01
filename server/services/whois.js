@@ -91,7 +91,7 @@ async function getWhoisBlock(passportId) {
     if (!row) return '';
     const parts = [row.core_text, row.narrative_text].filter(Boolean);
     if (!parts.length) return '';
-    return `\n\nLEARNER CONTEXT (single source of truth on this learner — supersedes any other partial info you may have):\n${parts.join('\n\n')}`;
+    return `\n\nLEARNER CONTEXT — describes the person you are currently teaching or talking with. They are your reader/conversation partner, not a third party: address them directly as "you", never by name or in the third person, even though this context is written about them descriptively. Single source of truth on them, supersedes any other partial info you may have:\n${parts.join('\n\n')}`;
   } catch (err) {
     console.error('[whois/getWhoisBlock]', err.message);
     return '';
