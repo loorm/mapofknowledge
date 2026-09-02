@@ -10,3 +10,4 @@ docs/
 design/
 mapofknowledge_deploy
 mapofknowledge_deploy.pub
+llm_debug_log.jsonl

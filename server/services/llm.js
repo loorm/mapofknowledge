@@ -1,5 +1,8 @@
 const Anthropic = require('@anthropic-ai/sdk');
 const https     = require('https');
+const fs        = require('fs');
+const path      = require('path');
+const { AsyncLocalStorage } = require('async_hooks');
 const db        = require('../db');
 
 // maxRetries: the SDK's built-in retry (network errors, 408/409/429/5xx) covers
@@ -17,6 +20,87 @@ const client = new Anthropic({
   maxRetries: 3,
   httpAgent: new https.Agent({ keepAlive: false }),
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TEMPORARY FULL-EXCHANGE DEBUG LOG — 2026-09-02, requested by Margo to see
+// exactly what's sent to/from the LLM across one whole knobit. Scoped to her
+// user id only; a no-op for everyone else. REMOVE this whole block (and the
+// matching middleware hook in server/app.js) once she's done with it — it is
+// not meant to be permanent, for the same reason the old testlog.js was
+// removed from KnobitMap (full prompts/answers to a plaintext file is a
+// privacy/security smell as a permanent fixture, fine as a one-off).
+//
+// Implementation: wraps client.messages.create so EVERY call anywhere in
+// this file — explain/demonstrate/practice/grade/meaning/ask-bar/Anne
+// (including her tool-use loop), streaming or not — is captured with zero
+// changes to any of the ~20 individual generate*/stream* functions.
+// AsyncLocalStorage carries "is this her request" through the async chain
+// from the middleware that sets it, so nested/awaited calls are covered
+// automatically. Output is a local JSONL file, gitignored, outside every
+// web-served directory (server/app.js only serves /app, /images, /vendor,
+// /audio — this lives at the project root).
+const DEBUG_LOG_USER_ID = '1'; // margo.loor@gmail.com — verified via `SELECT id FROM users`
+const DEBUG_LOG_PATH = path.join(__dirname, '../../llm_debug_log.jsonl');
+const _debugLogStore = new AsyncLocalStorage();
+
+function runWithLlmDebugLog(userId, fn) {
+  if (String(userId) !== DEBUG_LOG_USER_ID) return fn();
+  return _debugLogStore.run({ seq: 0 }, fn);
+}
+
+function _appendDebugLog(entry) {
+  try {
+    fs.appendFileSync(DEBUG_LOG_PATH, JSON.stringify(entry) + '\n');
+  } catch (err) {
+    console.error('[llm/debugLog]', err.message);
+  }
+}
+
+(function _installDebugLogHook() {
+  const rawCreate = client.messages.create.bind(client.messages);
+  client.messages.create = function (args) {
+    const store = _debugLogStore.getStore();
+    if (!store) return rawCreate(args);
+
+    const seq = ++store.seq;
+    const base = {
+      ts: new Date().toISOString(),
+      seq,
+      model: args.model,
+      system: args.system,
+      messages: args.messages,
+      tools: args.tools ? args.tools.map(t => t.name) : undefined,
+    };
+
+    if (args.stream) {
+      return rawCreate(args).then((stream) => (async function* () {
+        const blocks = [];
+        let stopReason = null;
+        for await (const event of stream) {
+          if (event.type === 'content_block_start') {
+            blocks[event.index] = event.content_block.type === 'tool_use'
+              ? { type: 'tool_use', name: event.content_block.name, inputJson: '' }
+              : { type: 'text', text: '' };
+          } else if (event.type === 'content_block_delta') {
+            const b = blocks[event.index];
+            if (b && event.delta.type === 'text_delta') b.text += event.delta.text;
+            else if (b && event.delta.type === 'input_json_delta') b.inputJson += event.delta.partial_json;
+          } else if (event.type === 'message_delta' && event.delta?.stop_reason) {
+            stopReason = event.delta.stop_reason;
+          }
+          yield event;
+        }
+        _appendDebugLog({ ...base, streamed: true, stopReason, response: blocks });
+      })());
+    }
+
+    return rawCreate(args).then((resp) => {
+      _appendDebugLog({ ...base, streamed: false, stopReason: resp.stop_reason, response: resp.content });
+      return resp;
+    });
+  };
+}());
+// ═══════════════════════════════════════════════════════════════════════════
 
 function _logUsage(userId, callType, usage, model) {
   if (!userId || !usage) return;
@@ -1404,6 +1488,7 @@ function knowledgeEstimatePercentage(awardedYear, retentionTier) {
 }
 
 module.exports = {
+  runWithLlmDebugLog, // TEMPORARY — see the debug-log block near the top of this file
   generateOverview,
   generateKnobits,
   moderateTags,

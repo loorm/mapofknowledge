@@ -102,6 +102,15 @@ app.use((req, res, next) => {
 app.use(passport.initialize());
 app.use(passport.session());
 
+// TEMPORARY — full LLM exchange debug log, Margo's account only. See the
+// matching block in server/services/llm.js for what this captures and why;
+// remove both together once she's done with it.
+const { runWithLlmDebugLog } = require('./services/llm');
+app.use((req, res, next) => {
+  if (req.user) return runWithLlmDebugLog(req.user.id, next);
+  next();
+});
+
 // ── Routes ────────────────────────────────────────────────────────────────────
 // Public auth endpoints
 app.use('/auth', authRouter);
