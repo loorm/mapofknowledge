@@ -246,17 +246,7 @@
     // several ways of leaving learning mode the learner actually uses —
     // previously only the "Back to the map" button on lm-complete saved
     // it, so e.g. leaving via the top-bar logo silently discarded it.
-    var reflInp = document.getElementById('lm-reflection-input');
-    var reflText = reflInp ? reflInp.value.trim() : '';
-    if (reflText) {
-      fetch('/api/profile/reflections', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ text: reflText }),
-      }).catch(function () {});
-      reflInp.value = '';
-      _resetCharCounter('lm-reflection-counter');
-    }
+    _saveUnitCompleteReflection();
 
     _knobitStarted = false;
     if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
@@ -1518,8 +1508,29 @@
     card.style.display = '';
   }
 
+  // Shared by every way of leaving the unit-complete screen with an unsent
+  // reflection still in the textarea. closeLearningMode() already called
+  // this inline; _startRecommendedNode() jumping straight into the next
+  // node bypassed closeLearningMode() entirely (never tore down the old
+  // overlay, just rebuilt it for the new node), so a reflection typed then
+  // "Start learning"-ed away was silently discarded — never reached the
+  // server at all, not even a failed request.
+  function _saveUnitCompleteReflection() {
+    var reflInp = document.getElementById('lm-reflection-input');
+    var reflText = reflInp ? reflInp.value.trim() : '';
+    if (!reflText) return;
+    fetch('/api/profile/reflections', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ text: reflText }),
+    }).catch(function () {});
+    reflInp.value = '';
+    _resetCharCounter('lm-reflection-counter');
+  }
+
   window._startRecommendedNode = function () {
     if (!_recommendedNodeId || !window.MapView || !window.MapView.startLearningNode) return;
+    _saveUnitCompleteReflection();
     window.MapView.startLearningNode(_recommendedNodeId, { autoStart: true }).catch(function () {});
   };
 
