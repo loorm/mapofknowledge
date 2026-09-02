@@ -47,17 +47,12 @@ body { background: var(--map-bg); font-family: system-ui, -apple-system, sans-se
   display: flex; align-items: center; gap: 9px;
   text-decoration: none; flex-shrink: 0;
 }
-.topbar-logo-icon {
-  width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.topbar-logo-icon img { width: 100%; height: 100%; }
-.topbar-logo-text {
-  font-size: 14px; font-weight: 650;
-  color: var(--c2); letter-spacing: -0.3px;
-  white-space: nowrap;
-}
+/* Full lockup (mark + wordmark) on the actual web app; the mark-only icon
+   is what the logo system's own README scopes for small/app-icon contexts
+   — used here as the compact fallback once the topbar gets too narrow for
+   the full lockup to read well. */
+.topbar-logo-full { display: block; height: 28px; width: auto; flex-shrink: 0; }
+.topbar-logo-mark { display: none; width: 32px; height: 32px; flex-shrink: 0; }
 
 .topbar-right {
   display: flex; align-items: center; gap: 6px; flex-shrink: 0;
@@ -738,7 +733,8 @@ body { background: var(--map-bg); font-family: system-ui, -apple-system, sans-se
 .connector-line { animation: connector-pulse 3.5s ease-in-out infinite; }
 
 @media (max-width: 520px) {
-  .topbar-logo-text { display: none; }
+  .topbar-logo-full { display: none; }
+  .topbar-logo-mark { display: block; }
 }
 
 /* ── Notification unread indicators ─────────── */
