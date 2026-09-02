@@ -231,6 +231,44 @@ Node app over http. HSTS covers repeat visits, not the first.
 Move to env vars — especially given P0-1 exposes the source publicly. Note `ROLE_MAP` grants
 `super_admin` to an email on first login; anyone who can register that address gets the role.
 
+### P2-7 — Error handling: crash / hang gaps and an inconsistent contract
+
+**What's already solid**: the main learn/stream flow (`app/js/learning.js`) is careful —
+`_httpError` / `_onApiError` helpers, `429` detection, silent stream-retry before any output is
+emitted, real user-facing "connection error" strings. Every `api.js` request handler has a
+`try/catch` that logs with a `[route]` tag and returns JSON. `_runStream` (`api.js:505`) clears
+its keepalive interval and closes the SSE stream on error. The Anthropic SDK's built-in retry
+(408/409/429/5xx) is understood and deliberately relied on (`llm.js:8`), with extra hand-rolled
+retry for mid-stream drops (`llm.js:305`, `:990`).
+
+**The gaps**:
+
+1. **Async work runs outside `try`.** `subsets.js:168` and `:215` `await db.execute(...)`
+   ownership checks *before* the `try` block; the same shape appears in other routes where a
+   validation query runs pre-`try`. In Express 4 an async handler that rejects is **not** routed
+   to the error middleware — the request hangs until the proxy times out and the rejection is
+   unhandled.
+2. **No `process.on('unhandledRejection')` / `process.on('uncaughtException')`.** Combined with
+   #1 and the scattered fire-and-forget promises (§4 async bullet), one rejection can take the
+   single PM2 fork down until `autorestart`.
+3. **The global error handler (`app.js:147`) is nearly unreachable.** Express 4 doesn't forward
+   async route rejections to it, and routes catch locally and `res.json` themselves — so it only
+   ever fires for a sync throw in middleware. Adopt `express-async-errors` (monkey-patches the
+   router to forward async rejections) or a `wrap(fn)` helper, then routes can `throw` and the
+   response is centralized.
+4. **Inconsistent error contract.** Responses are variously `{ error: 'message' }`,
+   `{ error: true }` (`_runStream`), `{}` with no log (`api.js:1079`), and `200 { recommendation:
+   null }` / `200 { top: [] }` on failure (`next-recommendation`, `leaderboard`). The frontend
+   can't reliably tell "empty" from "broken".
+5. **Internal detail leaked to the client.** `api.js:798` returns
+   `{ error: 'LLM interaction failed: ' + err.message }`. Return a generic string; keep
+   `err.message` in the log only.
+
+**Fix**: add the two `process.on` handlers (log + graceful exit, let PM2 restart); move pre-`try`
+`await`s inside the block, or adopt `express-async-errors` + one error handler; settle on a
+single error-response shape (`{ error: string }` + the right HTTP status) and apply it; stop
+concatenating `err.message` into responses; log the silent `catch` at `api.js:1079`.
+
 ### P3 — Defense-in-depth / cleanup
 - **SSRF surface**: `_checkUrlAlive` (`api.js:873`) and the lootbox URL checks do server-side
   `fetch()` on URLs that originate from LLM output. Only `.ok` is returned to the client (no
@@ -241,11 +279,10 @@ Move to env vars — especially given P0-1 exposes the source publicly. Note `RO
 - **`admin.js` POST `/users`**: no transaction — a failed `users` insert leaves an orphan
   `learner_passports` row. `PATCH /users/:id` can set another account to `super_admin`; fine
   within the super-admin trust boundary but there's no audit log.
-- **Error/404 handling** — _partly addressed 2026-09-01:_ `server/app.js` now has a 404 handler
-  (branded `app/404.html` for browsers, JSON for API/auth callers) and a catch-all error handler
-  (logs the stack, returns a generic 500). Still open: `process.on('unhandledRejection')` — on a
-  single-process PM2 fork, one unhandled rejection in a non-`await`-guarded path still takes the
-  site down until `autorestart`.
+- **404 handling** — _addressed 2026-09-01:_ `server/app.js` now has a 404 handler (branded
+  `app/404.html` for browsers, JSON for API/auth callers) and a catch-all error handler. The
+  remaining error-handling work (unhandled-rejection guards, pre-`try` async, dead global handler,
+  inconsistent contract) is now its own finding — see **P2-7**.
 - **`express.json()`** has no explicit size limit (defaults to 100 KB). Set it small
   (`{ limit: '32kb' }`) except where you genuinely need more.
 - **`deserializeUser` returns `false` for a deleted user** → `req.user` is `undefined`, and
@@ -278,6 +315,35 @@ Move to env vars — especially given P0-1 exposes the source publicly. Note `RO
   review. A tiny tagged-template helper that escapes interpolations by default would neutralize
   most of P2-3's residual risk. The 46 KB `index.html` and large inline `<script>` blocks also
   block a clean CSP.
+- **Async style is inconsistent across the whole JS codebase — standardize on `async`/`await`.**
+  - *Frontend:* every `app/*.html` and `app/js/*.js` file does `fetch(url).then(function (r) {
+    return r.json(); }).then(function (data) { … }).catch(function () {})` with `function`
+    expressions rather than arrow functions. Nested `.then(function () { return r.json().then(
+    function (d) { … }) })` to get status + body together (`account.html:314`, `:432`, `:497`) is
+    exactly the pyramid `await` removes; there is no `await Promise.all` anywhere, so independent
+    `fetch`es that could run in parallel are chained sequentially; the settings-bootstrap inline
+    scripts end in a bare `.catch(function () {})` that swallows failures silently.
+  - *Backend:* the request/response path is `async`/`await`, but every best-effort side effect —
+    ~40 call sites — is a detached `.then()` / `.catch(() => {})` chain: `_logUsage` in
+    `services/llm.js:105`, `updateAncestorKnowledge(...).catch(() => {})`, `refreshWhoisIfDue(
+    ...).catch(() => {})`, and the whole cluster of `game.awardLumens / checkAchievements /
+    recordKnobitCompletion(...).catch(() => {})` calls in `routes/api.js` (lines 323, 333, 392,
+    626–646, 948, 995–1055, 1268–1332, 1365–1426, 1544–1586, 1727–1743), plus
+    `checkFriendJoinBonus(...).catch(() => {})` in `routes/auth.js` and the `.then()` chains in
+    `services/llm.js:76` / `:97`. These are deliberately fire-and-forget so a failed lumen award
+    can't fail the user's request — but `.catch(() => {})` also means a broken gamification query,
+    a wedged WHOIS refresh, or a failed `token_usage` insert (billing data) produces **no log
+    line anywhere**. Ties into P1-1 (farmable currency — you can't see the awards misbehaving)
+    and the logging bullet above.
+  - *Fix:* one shared `fireAndForget(promise, context)` helper that awaits, catches, and logs via
+    the structured logger (§4 logging bullet) with the call context — replace every
+    `.catch(() => {})` with it. Convert frontend chains to `async`/`await` + arrow functions
+    file-by-file as each screen is touched. The genuine callback APIs that stay: Passport's
+    `req.login()` / `req.logout()` and the `req.session.regenerate/save` shims in `app.js` (no
+    promise API — wrap with `util.promisify` if you want them uniform too).
+  - This is maintainability, not user-impact or security on its own, but the silent-swallow half
+    is a real observability hole. An ESLint rule (`promise/no-floating-promises`,
+    `promise/catch-or-return`) would stop new instances landing — see the linting bullet.
 - **Logging is ad hoc.** Every module logs via bare `console.log` / `console.error` with a
   hand-typed `[module/route]` prefix, straight to PM2's stdout/stderr files. No log levels
   (can't dial verbosity up for a bug or down for noise), no structure (can't grep/query by
@@ -312,9 +378,10 @@ Move to env vars — especially given P0-1 exposes the source publicly. Note `RO
 4. **P1-3** — subset IDOR gate. (One-line-per-route change.)
 5. **P1-4 / P1-5** — verified-email check on OAuth match; `session_epoch` for revocation.
 6. **P2** batch — settings allowlist, knowledge-value validation, CSP, CSRF headers, cookie
-   `secure`, de-hardcode emails.
-7. **P3 + architecture** — error handlers, `api.js` split, first tests, move logs/SQL out of web
-   root.
+   `secure`, de-hardcode emails, **P2-7** error handling (`process.on` guards + pre-`try` async
+   are quick; the `express-async-errors` switch and contract cleanup are larger).
+7. **P3 + architecture** — `api.js` split, first tests, move logs/SQL out of web root,
+   standardize async style (§4).
 
 ---
 
