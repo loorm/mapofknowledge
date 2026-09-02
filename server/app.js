@@ -126,7 +126,13 @@ app.use('/api/knowledge-estimate', requireAuth, knowledgeEstimateRouter);
 const APP_DIR = path.join(__dirname, '../app');
 app.use('/app', express.static(APP_DIR, { dotfiles: 'deny' }));
 app.get('/', (req, res) => res.sendFile(path.join(APP_DIR, 'landing.html')));
-app.get('/index.html', (req, res) => res.redirect(301, '/')); // old bookmark → landing
+// Serves the same file rather than redirecting to '/' — Apache resolves a
+// bare '/' request to '/index.html' before proxying here (some DirectoryIndex-
+// equivalent behavior upstream), so a redirect-to-'/' here created an
+// infinite loop: '/' -> (Apache maps to) /index.html -> redirect to '/' ->
+// (Apache maps to) /index.html -> ... Took the live site down for every
+// visitor hitting the bare domain (ERR_TOO_MANY_REDIRECTS) until this fix.
+app.get('/index.html', (req, res) => res.sendFile(path.join(APP_DIR, 'landing.html')));
 app.get(['/signup', '/signup.html'], (req, res) => res.sendFile(path.join(APP_DIR, 'signup.html')));
 
 // Health check
