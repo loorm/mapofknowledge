@@ -845,6 +845,51 @@
     _reflShowing += 5; _renderReflectionsWithState();
   };
 
+  var _allNotes    = [];
+  var _notesShowing = 5;
+
+  function _renderNotesWithState() {
+    const card = document.getElementById('notes-card');
+    if (!card) return;
+    const showing   = _allNotes.slice(0, _notesShowing);
+    const remaining = Math.max(0, _allNotes.length - _notesShowing);
+
+    const rowsHtml = !showing.length
+      ? empty(t('msg.no_notes'))
+      : showing.map(function(n) {
+          var topic = [n.node_label, n.knobit_title].filter(Boolean).join(' — ');
+          return `<div class="p-note">
+            <div class="p-note-date">${fmtDate(n.created_at)}</div>
+            ${esc(n.text)}
+            ${topic ? `<div class="p-note-topic">${esc(topic)}</div>` : ''}
+          </div>`;
+        }).join('');
+
+    const moreBtn = remaining > 0
+      ? `<button class="p-edit-btn p-edit-btn-load-more" onclick="window.loadMoreNotes()">
+           ${t('btn.load_more')} (${remaining} ${t('label.remaining')})
+         </button>`
+      : '';
+
+    const downloadBtn = _allNotes.length
+      ? `<a class="p-edit-btn p-edit-btn-nowrap" href="/api/profile/notes/download">${t('btn.download_notes')}</a>`
+      : '';
+
+    card.innerHTML = `<div class="p-card-title">${t('section.notes')}<button type="button" class="hh-btn" aria-label="${esc(t('hh.more_info'))}">?</button><span class="hh-content" hidden>${t('hh.notes_text')}</span></div>
+      <div class="p-scroll-sm">${rowsHtml}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">${moreBtn}${downloadBtn}</div>`;
+  }
+
+  function renderNotes(notes) {
+    _allNotes     = notes || [];
+    _notesShowing = 5;
+    _renderNotesWithState();
+  }
+
+  window.loadMoreNotes = function() {
+    _notesShowing += 5; _renderNotesWithState();
+  };
+
   function renderGoals(goals) {
     // Hide legacy cards
     ['objectives-card','plans-card'].forEach(function(id) {
@@ -1185,6 +1230,7 @@
         renderCredentials(d.credentials, d.mapKnowledge);
         renderCompetence(d.competence, d.mapKnowledge);
         renderReflections(d.reflections);
+        renderNotes(d.notes);
         renderGoals(d.goals);
         renderSuggestions(d.suggestions);
         renderStreak(d.streak);

@@ -295,6 +295,20 @@
 }
 .p-quote:last-child { margin-bottom: 0; }
 
+/* Personal notes — same yellow/pushpin identity as the in-thread note blocks
+   (learning.css .block-personal_note), just a compact list treatment here. */
+.p-note {
+  padding: 9px 13px;
+  border-left: 3px solid #E8D690;
+  background: #FFF6D8;
+  border-radius: 0 9px 9px 0;
+  margin-bottom: 8px;
+  font-size: 12.5px; color: #4A3C10; line-height: 1.65;
+}
+.p-note:last-child { margin-bottom: 0; }
+.p-note-date  { font-size: 10px; color: #8A7530; margin-bottom: 4px; }
+.p-note-topic { font-size: 10.5px; color: #8A7530; margin-top: 5px; font-style: italic; }
+
 /* ── Timeline / plans ────────────────────── */
 .p-plan {
   display: flex; align-items: flex-start; gap: 16px;
@@ -530,6 +544,7 @@ select.p-edit-input { cursor: pointer; }
 /* Scrollable list containers */
 .p-scroll-sm  { max-height: 300px; overflow-y: auto; }
 .p-scroll-md  { max-height: 340px; overflow-y: auto; }
+.p-scroll-sm  { max-height: 190px; overflow-y: auto; }
 .p-scroll-lg  { max-height: 380px; overflow-y: auto; }
 .p-scroll-xl  { max-height: 480px; overflow-y: auto; }
 

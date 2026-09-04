@@ -77,6 +77,17 @@ async function fetchFullPassport(passportId) {
     [passportId]
   );
 
+  const [notes] = await db.execute(
+    `SELECT pn.id, pn.text, pn.phase, pn.created_at,
+            k.title AS knobit_title, n.label AS node_label
+     FROM passport_notes pn
+     JOIN knobits k ON pn.knobit_id = k.id
+     JOIN nodes n ON k.node_id = n.id
+     WHERE pn.passport_id = ?
+     ORDER BY pn.created_at DESC`,
+    [passportId]
+  );
+
   const [learningStyle] = await db.execute(
     'SELECT * FROM passport_learning_style WHERE passport_id = ?',
     [passportId]
@@ -112,6 +123,7 @@ async function fetchFullPassport(passportId) {
     tags,
     relationships,
     reflections,
+    notes,
     learningStyle: learningStyle[0] || null,
     goals,
     aspirations,
