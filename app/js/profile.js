@@ -875,7 +875,7 @@
       ? `<a class="p-edit-btn p-edit-btn-nowrap" href="/api/profile/notes/download">${t('btn.download_notes')}</a>`
       : '';
 
-    card.innerHTML = `<div class="p-card-title">${t('section.notes')}<button type="button" class="hh-btn" aria-label="${esc(t('hh.more_info'))}">?</button><span class="hh-content" hidden>${t('hh.notes_text')}</span></div>
+    card.innerHTML = `<div class="p-card-title">${t('section.notes')}</div>
       <div class="p-scroll-sm">${rowsHtml}</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">${moreBtn}${downloadBtn}</div>`;
   }
