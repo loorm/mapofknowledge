@@ -175,9 +175,69 @@ async function _fetchFullPassport(passportId, locale) {
 // ── In-memory map cache per locale (10k+ nodes — cache after first DB load) ───
 const mapCaches = {};
 
+// ── TEMPORARY per-user test-map override ─────────────────────────────────────
+// One user (id 36, mtamjarv@gmail.com) sees a small alternate IGCSE map instead
+// of the normal one, for a live test — see docs/test_igcse_user36_2026-09-09.md
+// for the full change record and rollback SQL. To revert: delete this block,
+// its call site below, and run that doc's rollback SQL.
+const TEST_MAP_OVERRIDE_USER_ID = 36;
+const TEST_MAP_OVERRIDE_SUBSET_NAME = 'Cambridge IGCSE Mathematics 0580 — Core (2025–27)';
+
+async function _buildOverrideMap(locale) {
+  // Every node the filter anchors, plus every ancestor up to L1 (recursive
+  // walk up parent_id — MariaDB 11.4 on this host supports WITH RECURSIVE).
+  const [closure] = await db.execute(
+    `WITH RECURSIVE anc AS (
+       SELECT n.id, n.parent_id
+       FROM knowledge_subset_nodes ksn
+       JOIN knowledge_subsets s ON s.id = ksn.subset_id AND s.name = ?
+       JOIN nodes n ON n.id = ksn.node_id
+       UNION
+       SELECT p.id, p.parent_id
+       FROM anc a
+       JOIN nodes p ON p.id = a.parent_id
+     )
+     SELECT DISTINCT id FROM anc`,
+    [TEST_MAP_OVERRIDE_SUBSET_NAME]
+  );
+  const ids = closure.map(r => r.id);
+  if (!ids.length) return { nodes: [], edges: [] };
+  const placeholders = ids.map(() => '?').join(',');
+
+  const [nodes] = locale === 'en'
+    ? await db.execute(
+        `SELECT external_id AS id, label, level FROM nodes WHERE id IN (${placeholders})`, ids)
+    : await db.execute(
+        `SELECT n.external_id AS id, COALESCE(tr.label, n.label) AS label, n.level
+         FROM nodes n
+         LEFT JOIN node_translations tr
+           ON tr.node_external_id = n.external_id AND tr.locale = ?
+         WHERE n.id IN (${placeholders})`, [locale, ...ids]);
+
+  const [edges] = await db.execute(
+    `SELECT s.external_id AS source, t.external_id AS target
+     FROM edges e
+     JOIN nodes s ON e.source_node_id = s.id
+     JOIN nodes t ON e.target_node_id = t.id
+     WHERE e.edge_type = 'hierarchy'
+       AND e.source_node_id IN (${placeholders}) AND e.target_node_id IN (${placeholders})`,
+    [...ids, ...ids]
+  );
+
+  return { nodes, edges };
+}
+
 router.get('/map', async (req, res) => {
   try {
     const locale = await getUserLocale(req.user?.id);
+
+    // TEMPORARY — see comment on TEST_MAP_OVERRIDE_USER_ID above. Bypasses
+    // mapCaches entirely (never reads or writes it), so this can't leak into
+    // or be overwritten by the shared per-locale cache.
+    if (req.user?.id === TEST_MAP_OVERRIDE_USER_ID) {
+      return res.json(await _buildOverrideMap(locale));
+    }
+
     if (mapCaches[locale]) return res.json(mapCaches[locale]);
 
     const [nodes] = locale === 'en'
