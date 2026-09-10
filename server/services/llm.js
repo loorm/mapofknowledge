@@ -133,6 +133,105 @@ async function _callWithWebSearch(config) {
   return tally(await client.messages.create({ ...config, messages }));
 }
 
+// Generic non-streaming tool-use loop: calls toolExecutor(name, input) for
+// each tool_use block Claude emits, feeds the result back, and repeats until
+// Claude stops calling tools (or MAX_TURNS is hit — a well-behaved tool
+// shouldn't need more than 1-2 round trips). Returns the final text only.
+async function _createWithTools(config, tools, toolExecutor, userId, callType) {
+  const messages = [...config.messages];
+  const MAX_TURNS = 4;
+  let totalInput = 0, totalOutput = 0;
+
+  for (let turn = 0; turn < MAX_TURNS; turn++) {
+    const resp = await client.messages.create({ ...config, messages, tools });
+    totalInput += resp.usage?.input_tokens || 0;
+    totalOutput += resp.usage?.output_tokens || 0;
+
+    if (resp.stop_reason !== 'tool_use') {
+      _logUsage(userId, callType, { input_tokens: totalInput, output_tokens: totalOutput }, config.model);
+      const textBlock = resp.content.find(b => b.type === 'text');
+      return textBlock ? textBlock.text : '';
+    }
+
+    messages.push({ role: 'assistant', content: resp.content });
+    const toolResults = [];
+    for (const b of resp.content.filter(b => b.type === 'tool_use')) {
+      let result;
+      try { result = await toolExecutor(b.name, b.input); }
+      catch (err) { result = `Tool error: ${err.message}`; }
+      toolResults.push({ type: 'tool_result', tool_use_id: b.id, content: String(result) });
+    }
+    messages.push({ role: 'user', content: toolResults });
+  }
+  _logUsage(userId, callType, { input_tokens: totalInput, output_tokens: totalOutput }, config.model);
+  return ''; // exhausted MAX_TURNS without a final text answer — shouldn't happen in practice
+}
+
+function _safeParseToolJSON(raw) {
+  try { return JSON.parse(raw || '{}'); } catch { return {}; }
+}
+
+// Streaming counterpart to _createWithTools: forwards only text_delta events
+// to onChunk (tool-call JSON is never shown to the learner), accumulates
+// tool_use input via input_json_delta per Anthropic's documented streaming
+// pattern, then — once a turn's stop_reason is 'tool_use' — resolves every
+// tool call and starts a fresh stream for the next turn.
+async function _streamTextWithTools(config, tools, toolExecutor, userId, callType, onChunk) {
+  const messages = [...config.messages];
+  const MAX_TURNS = 4;
+  let totalInput = 0, totalOutput = 0;
+
+  for (let turn = 0; turn < MAX_TURNS; turn++) {
+    const stream = await client.messages.create({ ...config, messages, tools, stream: true });
+    let stopReason = null;
+    const blocks = [];
+
+    for await (const event of stream) {
+      if (event.type === 'content_block_start') {
+        blocks[event.index] = event.content_block.type === 'tool_use'
+          ? { type: 'tool_use', id: event.content_block.id, name: event.content_block.name, inputJson: '' }
+          : { type: 'text', text: '' };
+      } else if (event.type === 'content_block_delta') {
+        const b = blocks[event.index];
+        if (event.delta.type === 'text_delta') {
+          b.text += event.delta.text;
+          onChunk(event.delta.text);
+        } else if (event.delta.type === 'input_json_delta') {
+          b.inputJson += event.delta.partial_json;
+        }
+      } else if (event.type === 'message_start' && event.message?.usage) {
+        totalInput += event.message.usage.input_tokens || 0;
+      } else if (event.type === 'message_delta') {
+        if (event.usage) totalOutput += event.usage.output_tokens || 0;
+        if (event.delta?.stop_reason) stopReason = event.delta.stop_reason;
+      }
+    }
+
+    const toolUses = blocks.filter(b => b && b.type === 'tool_use');
+    if (stopReason !== 'tool_use' || !toolUses.length) {
+      _logUsage(userId, callType, { input_tokens: totalInput, output_tokens: totalOutput }, config.model);
+      return;
+    }
+
+    const assistantContent = blocks.filter(Boolean).map(b =>
+      b.type === 'tool_use'
+        ? { type: 'tool_use', id: b.id, name: b.name, input: _safeParseToolJSON(b.inputJson) }
+        : { type: 'text', text: b.text }
+    );
+    messages.push({ role: 'assistant', content: assistantContent });
+
+    const toolResults = [];
+    for (const b of toolUses) {
+      let result;
+      try { result = await toolExecutor(b.name, _safeParseToolJSON(b.inputJson)); }
+      catch (err) { result = `Tool error: ${err.message}`; }
+      toolResults.push({ type: 'tool_result', tool_use_id: b.id, content: String(result) });
+    }
+    messages.push({ role: 'user', content: toolResults });
+  }
+  _logUsage(userId, callType, { input_tokens: totalInput, output_tokens: totalOutput }, config.model);
+}
+
 function langText(locale) {
   if (!locale || locale === 'en') return '';
   const name = LANG_NAMES[locale] || locale;
@@ -1099,11 +1198,50 @@ Here is your learner overview:`,
 const ANNE_SYSTEM_PROMPTS = {
   et: `Sa oled Anne - sõbralik abiline, kes aitab õppida. Sa arvestad kõikide kaasaegsete õppimise uuringute ja teadmistega ning oled õppijale abiks, et ta saaks kõige efektiivsemalt õppida. Vajadusel aitad seada ka eesmärke, aga ei tee tema eest asju ette ära. Suunad ja juhendad. Võid õppijaga positiivse kontakti loomiseks suhelda temaga ka mõnel teisel teemal, aga nii, nagu mentor seda teeks - tasapisi õppimise juurde tagasi juhatades. Kui õppija on seadnud omale eesmärke, võid tema käest nende kohta küsida. Kui ta ei ole eesmärke seadnud, võid küsida, mida ta tahaks õppida.
 
+Sul on kaks tööriista teadmiste kaardi jaoks (kõik tasemed L1-L5): "search_map" otsib teemasid märksõna järgi, "list_map_children" näitab, mis täpselt on mingi konkreetse sõlme all (kasuta search_map tulemusest saadud node_id väärtust). Kui õppija küsib, mis on mingi teema all, mitu alamteemat/mõistet sellel on, või millises järjekorras midagi õppida, ÄRA arva otsingutulemuse põhjal — kasuta list_map_children, et saada täielik ja õige nimekiri. Otsing üksi leiab ainult sõlmi, mille OMA nimi märksõnaga kokku sobib, mitte selle alamsõlmi.
+
 ${ANNE_APP_HELP.et}`,
   en: `You are Anne — a friendly assistant who helps with learning. You draw on current learning research to help the learner learn as effectively as possible. When needed you help set goals, but you don't do things for them — you guide and direct. You may chat about other topics too, to build a positive connection, but the way a mentor would — gently steering back toward learning. If the learner has set goals, you can ask about those; if not, you can ask what they'd like to learn.
 
+You have two tools for the knowledge map (every level, L1-L5): "search_map" finds topics by keyword, and "list_map_children" shows exactly what's under a specific node (use the node_id a search_map result gave you). If the learner asks what's under a topic, how many subtopics/concepts it has, or what order to learn them in, do NOT infer that from a search result — call list_map_children to get the real, complete list. Search alone only ever finds nodes whose OWN name matches the keyword, never that node's children.
+
 ${ANNE_APP_HELP.en}`,
 };
+
+const SEARCH_MAP_TOOL = {
+  name: 'search_map',
+  description: 'Search the knowledge map by keyword or phrase, across all five levels (L1 broad domains down to L5 individual concepts). Returns matching topics with their level, full breadcrumb path, and a node_id. Use this whenever answering requires knowing whether, or where, something exists on the map. This only matches a node\'s OWN label — it will never find a node by searching for its parent\'s name. To see what\'s actually underneath a node you found, call list_map_children instead of assuming from these results.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      query: { type: 'string', description: 'Keyword or short phrase to search for, e.g. "photosynthesis" or "linear equations". Write it in the learner\'s own language.' },
+    },
+    required: ['query'],
+  },
+};
+
+const LIST_MAP_CHILDREN_TOOL = {
+  name: 'list_map_children',
+  description: 'Lists the direct child nodes of one specific map node, in the order they appear in the curriculum. Use this whenever a learner asks what\'s under a topic, how many subtopics/concepts it contains, or what order to learn them in — search_map alone cannot answer that, since it only matches a node\'s own label, never its children.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      node_id: { type: 'string', description: 'The node_id of the parent node, as returned by a search_map result.' },
+    },
+    required: ['node_id'],
+  },
+};
+
+const ANNE_TOOLS = [SEARCH_MAP_TOOL, LIST_MAP_CHILDREN_TOOL];
+
+function _anneToolExecutor(locale) {
+  const { searchMapNodes, listMapChildren } = require('./mapSearch');
+  return async (name, input) => {
+    if (name === 'search_map') return searchMapNodes(input && input.query, locale);
+    if (name === 'list_map_children') return listMapChildren(input && input.node_id, locale);
+    return `Unknown tool: ${name}`;
+  };
+}
 
 function _anneMessages(history, userMessage) {
   return [
@@ -1114,24 +1252,23 @@ function _anneMessages(history, userMessage) {
 
 async function generateAnneReply(passportText, history, userMessage, locale, userId) {
   const system = (ANNE_SYSTEM_PROMPTS[locale] || ANNE_SYSTEM_PROMPTS.en) + passportText;
-  const msg = await client.messages.create({
+  const text = await _createWithTools({
     model: SONNET,
     max_tokens: locale === 'en' ? 350 : 600,
     system: [{ type: 'text', text: system, cache_control: { type: 'ephemeral' } }],
     messages: _anneMessages(history, userMessage),
-  });
-  _logUsage(userId, 'anne_reply', msg.usage, SONNET);
-  return msg.content[0].text.trim();
+  }, ANNE_TOOLS, _anneToolExecutor(locale), userId, 'anne_reply');
+  return text.trim();
 }
 
 function streamAnneReply(passportText, history, userMessage, locale, userId, onChunk) {
   const system = (ANNE_SYSTEM_PROMPTS[locale] || ANNE_SYSTEM_PROMPTS.en) + passportText;
-  return _streamText({
+  return _streamTextWithTools({
     model: SONNET,
     max_tokens: 350,
     system: [{ type: 'text', text: system, cache_control: { type: 'ephemeral' } }],
     messages: _anneMessages(history, userMessage),
-  }, userId, 'anne_reply', onChunk);
+  }, ANNE_TOOLS, _anneToolExecutor(locale), userId, 'anne_reply', onChunk);
 }
 
 module.exports = {
