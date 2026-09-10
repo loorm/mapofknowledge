@@ -210,8 +210,9 @@
 
     var overlay = document.getElementById('learning-mode');
     if (overlay) overlay.classList.add('active');
-    // Anne stays visible in learning mode (her own z-index already sits
-    // above #learning-mode) — only the product tour hides her now.
+    // Anne's actual show/hide for learning mode is handled per-view in
+    // showLmView (hidden only while lm-knobit — the lesson bytes — is
+    // active); she starts here in whatever state the previous view left her.
 
     // Show one-time fullscreen tip
     if (!localStorage.getItem(window.lsKey('lm_fs_tip_shown'))) {
@@ -711,6 +712,11 @@
       var el = document.getElementById(v);
       if (el) el.classList.toggle('active', v === id);
     });
+
+    // Anne hovers over the lesson content itself while bytes are on screen —
+    // hide her there, but keep her around in the path view (between knobits)
+    // and on the unit-complete screen.
+    if (window.Anne) window.Anne.setVisible(id !== 'lm-knobit');
 
     // Calls attention to the back button once on entering the path view,
     // then every 30s for as long as it stays active.
