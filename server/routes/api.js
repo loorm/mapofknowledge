@@ -4,7 +4,7 @@ const db      = require('../db');
 const llm     = require('../services/llm');
 const game    = require('../services/game');
 const { notify, getUserLocale } = require('../services/notifications');
-const { buildKnobitDocx } = require('../services/knobitDocx');
+const { buildKnobitDocx, buildNotesDocx } = require('../services/knobitDocx');
 const { renderPassportText } = require('../services/passportText');
 const { redeemLinkCode, sendChildInvite, acceptChildInvite, generateCode } = require('../services/links');
 const llmRateLimit = require('../middleware/llmRateLimit');
@@ -107,6 +107,17 @@ async function _fetchFullPassport(passportId, locale) {
     [passportId]
   );
 
+  const [notes] = await db.execute(
+    `SELECT pn.id, pn.text, pn.phase, pn.created_at,
+            k.title AS knobit_title, n.label AS node_label
+     FROM passport_notes pn
+     JOIN knobits k ON pn.knobit_id = k.id
+     JOIN nodes n ON k.node_id = n.id
+     WHERE pn.passport_id = ?
+     ORDER BY pn.created_at DESC`,
+    [passportId]
+  );
+
   const [learningStyle] = await db.execute(
     'SELECT * FROM passport_learning_style WHERE passport_id = ?',
     [passportId]
@@ -164,6 +175,7 @@ async function _fetchFullPassport(passportId, locale) {
     tags,
     relationships,
     reflections,
+    notes,
     learningStyle: learningStyle[0] || null,
     goals,
     aspirations,
@@ -1123,7 +1135,38 @@ router.post('/learn/knobit/:id/note', async (req, res) => {
   if (!text) return res.status(400).json({ error: 'text required' });
 
   await _saveInteraction(passportId, knobitId, phase, 'personal_note', 0, null, null, text);
+  // Permanent copy — knobit_interactions above is scratch state for resume
+  // and gets wiped wholesale by /complete; this is the one that survives.
+  await db.execute(
+    'INSERT INTO passport_notes (passport_id, knobit_id, phase, text) VALUES (?, ?, ?, ?)',
+    [passportId, knobitId, phase, text]
+  ).catch((err) => console.error('[passport_notes]', err.message));
   res.json({ ok: true });
+});
+
+// ── Download every saved note as one .docx ───────────────────────────────────
+router.get('/profile/notes/download', async (req, res) => {
+  const passportId = req.user?.passport_id;
+  if (!passportId) return res.status(400).json({ error: 'No passport' });
+  try {
+    const locale = await getUserLocale(req.user?.id);
+    const [notes] = await db.execute(
+      `SELECT pn.text, pn.created_at, k.title AS knobit_title, n.label AS node_label
+       FROM passport_notes pn
+       JOIN knobits k ON pn.knobit_id = k.id
+       JOIN nodes n ON k.node_id = n.id
+       WHERE pn.passport_id = ?
+       ORDER BY pn.created_at DESC`,
+      [passportId]
+    );
+    const buffer = await buildNotesDocx(notes, locale);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    res.setHeader('Content-Disposition', 'attachment; filename="notes.docx"');
+    res.send(buffer);
+  } catch (err) {
+    console.error('[api/profile/notes/download]', err.message);
+    res.status(500).json({ error: 'Failed to build download' });
+  }
 });
 
 // ── Download the in-progress knobit as a .docx (must be called before /complete,

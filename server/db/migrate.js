@@ -228,6 +228,36 @@ async function run() {
     `);
     console.log('  · webauthn_credentials table ready');
 
+    // passport_notes — permanent home for personal notes taken mid-knobit
+    // (the pin-icon toggle on the ask-bar). Previously these only lived in
+    // knobit_interactions, which POST /learn/knobit/:id/complete deletes
+    // wholesale on completion (it's scratch state for resume, not permanent
+    // storage) — so every note was silently wiped the moment its knobit was
+    // finished. This table is written alongside that ephemeral copy (never
+    // deleted) so notes survive knobit completion; shown in Learner Passport
+    // Section 2, under Reflections. See server/routes/api.js's
+    // POST /learn/knobit/:id/note and GET /profile/notes/download. Ported
+    // from themapofknowledge.com.
+    await conn.execute(`
+      CREATE TABLE IF NOT EXISTS passport_notes (
+        id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        passport_id BIGINT UNSIGNED NOT NULL,
+        knobit_id   BIGINT UNSIGNED NOT NULL,
+        phase       ENUM('explain','demonstrate','practice','meaning') NOT NULL,
+        text        TEXT NOT NULL,
+        created_at  DATETIME NOT NULL DEFAULT NOW(),
+        PRIMARY KEY (id),
+        KEY idx_passport_notes_passport (passport_id, created_at),
+        CONSTRAINT fk_passport_notes_passport
+          FOREIGN KEY (passport_id) REFERENCES learner_passports (id)
+          ON DELETE CASCADE,
+        CONSTRAINT fk_passport_notes_knobit
+          FOREIGN KEY (knobit_id) REFERENCES knobits (id)
+          ON DELETE CASCADE
+      )
+    `);
+    console.log('  · passport_notes table ready');
+
     // ── 2. Check if already migrated ─────────────────────────────────────────
     const [[{ cnt }]] = await conn.execute('SELECT COUNT(*) AS cnt FROM nodes');
     if (cnt > 0) {

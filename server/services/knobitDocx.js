@@ -151,4 +151,31 @@ async function buildKnobitDocx(rows, nodeLabel, knobitTitle, locale) {
   return Packer.toBuffer(doc);
 }
 
-module.exports = { buildKnobitDocx };
+const NOTES_TITLE = { en: 'My Notes', et: 'Minu märkused' };
+
+// notes: passport_notes rows (joined with knobit/node label), ordered newest
+// first — same order as the Passport's own Notes card. One entry per note,
+// dated and tagged with which topic it was taken during.
+async function buildNotesDocx(notes, locale) {
+  var children = [
+    new Paragraph({ text: _tr(NOTES_TITLE, locale), heading: HeadingLevel.TITLE }),
+  ];
+
+  notes.forEach(function (n) {
+    var dateStr = new Date(n.created_at).toISOString().slice(0, 10);
+    var topic = [n.node_label, n.knobit_title].filter(Boolean).join(' — ');
+    children.push(new Paragraph({
+      children: [
+        new TextRun({ text: dateStr, bold: true }),
+        new TextRun({ text: topic ? '   ·   ' + topic : '', italics: true }),
+      ],
+    }));
+    children = children.concat(_textToParagraphs(n.text));
+    children.push(new Paragraph({ text: '' }));
+  });
+
+  var doc = new Document({ sections: [{ children: children }] });
+  return Packer.toBuffer(doc);
+}
+
+module.exports = { buildKnobitDocx, buildNotesDocx };
