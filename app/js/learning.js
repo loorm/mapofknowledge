@@ -1542,7 +1542,7 @@
       // Only meaningful (and only rendered) on the last knobit of a unit —
       // the whole-topic bonus only gets added to lumensEarned once the
       // server sees the node is actually fully done.
-      _setLumensEarned(data && data.lumensEarned);
+      _setLumensEarned(data && data.lumensEarned, data && data.lumensBreakdown, data && data.momentumMultiplier);
     });
 
     if (_treeMode) {
@@ -1604,16 +1604,45 @@
     showLmView('lm-complete');
   }
 
+  var LUMENS_BREAKDOWN_LABELS = {
+    knobit_complete:  'quesst.breakdown_knobit',
+    node_all_knobits: 'quesst.breakdown_topic',
+    branch_complete:  'quesst.breakdown_branch',
+  };
+
   // Fills in the second stat card once the real amount is known — see the
   // comment at its call site in _completeKnobit for why this can't just be
-  // computed client-side (the momentum multiplier isn't known here).
-  function _setLumensEarned(amount) {
+  // computed client-side (the momentum multiplier isn't known here). The
+  // small breakdown underneath (source x base x multiplier = amount) makes
+  // the total legible instead of an opaque number, especially once a
+  // momentum bonus is actually in play.
+  function _setLumensEarned(amount, breakdown, multiplier) {
     var card = document.getElementById('lm-cstat-lumens');
     if (!card || !amount) return;
-    var num   = card.querySelector('.lm-cstat-num');
-    var label = card.querySelector('.lm-cstat-label');
+    var num          = card.querySelector('.lm-cstat-num');
+    var label        = card.querySelector('.lm-cstat-label');
+    var breakdownEl  = document.getElementById('lm-cstat-breakdown');
     if (num)   num.textContent   = '+' + amount;
     if (label) label.textContent = t('label.lumens');
+    if (breakdownEl) {
+      breakdownEl.innerHTML = '';
+      // Only worth showing once there's more than one source, or the
+      // multiplier is actually doing something — a single un-multiplied
+      // knobit award is already fully explained by the total above it.
+      var hasMultiplier = multiplier && multiplier !== 1;
+      if (Array.isArray(breakdown) && (breakdown.length > 1 || hasMultiplier)) {
+        breakdown.forEach(function (line) {
+          var labelKey = LUMENS_BREAKDOWN_LABELS[line.reason];
+          if (!labelKey) return;
+          var row = document.createElement('div');
+          row.className = 'lm-cstat-breakdown-line';
+          row.textContent = hasMultiplier
+            ? t(labelKey) + ': ' + line.base + ' × ' + multiplier + ' = +' + line.amount
+            : t(labelKey) + ': +' + line.amount;
+          breakdownEl.appendChild(row);
+        });
+      }
+    }
     card.style.display = '';
   }
 
